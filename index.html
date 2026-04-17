@@ -530,7 +530,6 @@ textarea{resize:none;min-height:80px;}
 <nav>
   <button class="active" onclick="showTab('dashboard')"><span class="nav-icon">🌌</span>Galáxia</button>
   <button onclick="showTab('mamadas')"><span class="nav-icon">🍼</span>Nutrição</button>
-  <button onclick="showTab('duvidas')"><span class="nav-icon">📜</span>Missivas</button>
   <button onclick="showTab('agenda')"><span class="nav-icon">🗺️</span>Missões</button>
   <button onclick="showTab('mesversario')"><span class="nav-icon">🌙</span>Órbitas</button>
   <button onclick="showTab('vacinas')"><span class="nav-icon">🛡️</span>Escudos</button>
@@ -623,45 +622,12 @@ textarea{resize:none;min-height:80px;}
   <div id="lista-mamadas"></div>
 </div>
 
-<!-- MISSIVAS -->
-<div id="tab-duvidas" class="tab-panel">
-  <div class="sub-tabs">
-    <button class="sub-tab active" id="stab-perguntas" onclick="showSubTab('perguntas')">📜 Missivas</button>
-    <button class="sub-tab" id="stab-repositorio" onclick="showSubTab('repositorio')">📚 Holocron</button>
-  </div>
-  <div id="subpanel-perguntas" class="subpanel active">
-    <div class="card">
-      <div class="section-title">📜 Nova Missiva ao Curandeiro</div>
-      <div class="form-group"><label>Questão</label><textarea id="d-texto" placeholder="Ex: A dose diária está adequada?"></textarea></div>
-      <div class="form-group">
-        <label>Categoria</label>
-        <select id="d-cat">
-          <option value="alimentacao">🍼 Nutrição</option><option value="sono">😴 Sono</option>
-          <option value="desenvolvimento">📈 Crescimento</option><option value="saude">🏥 Saúde</option>
-          <option value="vacinas">💉 Vacinas</option><option value="comportamento">🧠 Comportamento</option>
-          <option value="outro">💬 Outros</option>
-        </select>
-      </div>
-      <button class="btn btn-gold btn-full" onclick="salvarDuvida()">💫 Enviar Missiva</button>
-    </div>
-    <div class="filter-bar">
-      <button class="filter-btn active" id="fd-pendentes" onclick="filtrarDuvidas('pendentes',this)">⏳ Pendentes</button>
-      <button class="filter-btn" id="fd-respondidas" onclick="filtrarDuvidas('respondidas',this)">✅ Respondidas</button>
-      <button class="filter-btn" id="fd-todas" onclick="filtrarDuvidas('todas',this)">📋 Todas</button>
-    </div>
-    <div id="lista-duvidas"></div>
-  </div>
-  <div id="subpanel-repositorio" class="subpanel">
-    <div style="margin-bottom:14px"><input type="text" id="repo-busca" placeholder="🔍  Buscar no Holocron..." oninput="renderRepositorio()"></div>
-    <div id="lista-repositorio"></div>
-  </div>
-</div>
-
 <!-- MISSÕES -->
 <div id="tab-agenda" class="tab-panel">
   <div class="sub-tabs">
     <button class="sub-tab active" id="stab-missoes" onclick="showSubTabMissoes('missoes')">🗺️ Missões</button>
     <button class="sub-tab" id="stab-medicacao" onclick="showSubTabMissoes('medicacao')">⚗️ Elixires</button>
+    <button class="sub-tab" id="stab-missivas" onclick="showSubTabMissoes('missivas')">📜 Missivas</button>
   </div>
   <div id="subpanel-missoes" class="subpanel active">
     <div class="card">
@@ -738,6 +704,44 @@ textarea{resize:none;min-height:80px;}
     <div class="section-title" style="margin-top:4px">⚗️ Elixires Ativos</div>
     <div id="lista-medicacao"></div>
   </div>
+
+  <!-- PAINEL MISSIVAS -->
+  <div id="subpanel-missivas" class="subpanel">
+    <div class="sub-tabs" style="margin-bottom:14px">
+      <button class="sub-tab active" id="stab-perguntas" onclick="showSubTab('perguntas')">📜 Missivas ao Mestre</button>
+      <button class="sub-tab" id="stab-repositorio" onclick="showSubTab('repositorio')">📚 Holocron do Saber</button>
+    </div>
+    <div id="subpanel-perguntas" class="subpanel active">
+      <div class="card">
+        <div class="section-title">📜 Nova Missiva ao Curandeiro</div>
+        <div class="form-group"><label>Questão</label><textarea id="d-texto" placeholder="Ex: A dose diária está adequada para o peso?"></textarea></div>
+        <div class="form-group">
+          <label>Categoria</label>
+          <select id="d-cat">
+            <option value="alimentacao">🍼 Nutrição e Energia</option>
+            <option value="sono">😴 Ciclos de Repouso</option>
+            <option value="desenvolvimento">📈 Crescimento</option>
+            <option value="saude">🏥 Saúde e Cura</option>
+            <option value="vacinas">💉 Escudos de Proteção</option>
+            <option value="comportamento">🧠 Comportamento</option>
+            <option value="outro">💬 Outros</option>
+          </select>
+        </div>
+        <button class="btn btn-gold btn-full" onclick="salvarDuvida()">💫 Enviar Missiva</button>
+      </div>
+      <div class="filter-bar">
+        <button class="filter-btn active" id="fd-pendentes" onclick="filtrarDuvidas('pendentes', this)">⏳ Pendentes</button>
+        <button class="filter-btn" id="fd-respondidas" onclick="filtrarDuvidas('respondidas', this)">✅ Respondidas</button>
+        <button class="filter-btn" id="fd-todas" onclick="filtrarDuvidas('todas', this)">📋 Todas</button>
+      </div>
+      <div id="lista-duvidas"></div>
+    </div>
+    <div id="subpanel-repositorio" class="subpanel">
+      <div class="repo-search-bar"><input type="text" id="repo-busca" placeholder="🔍  Buscar no Holocron do Saber..." oninput="renderRepositorio()"></div>
+      <div id="lista-repositorio"></div>
+    </div>
+  </div>
+
 </div>
 
 <!-- ÓRBITAS -->
@@ -1528,10 +1532,11 @@ exibirQuote(quoteAleatoria());
 
 let activeFilter={mamadas:'todos',duvidas:'pendentes',agenda:'proximos'};
 function showTab(id){
+  if(id==='duvidas'){showTab('agenda');setTimeout(()=>showSubTabMissoes('missivas'),50);return;}
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
   document.getElementById('tab-'+id).classList.add('active');
-  const tabs=['dashboard','mamadas','duvidas','agenda','mesversario','vacinas','fraldas','sono'];
+  const tabs=['dashboard','mamadas','agenda','mesversario','vacinas','fraldas','sono'];
   const idx=tabs.indexOf(id);if(idx>=0)document.querySelectorAll('nav button')[idx].classList.add('active');
   if(id==='fraldas'){initFraldaForm();renderFraldas();renderFraldaStats();}
   if(id==='sono'){initSonoForm();renderSono();renderSonoStats();}
@@ -1673,7 +1678,7 @@ function renderMesversario(){
   el.innerHTML=Object.keys(grupos).sort((a,b)=>a-b).map(mes=>`<div class="mv-mes-grupo"><div class="mv-mes-header">${nomeMes(parseInt(mes))}</div><div class="mv-mes-items">${grupos[mes].map(x=>`<div class="mv-item"><div class="mv-item-body"><div class="mv-item-titulo">${x.titulo}</div>${x.obs?`<div class="mv-item-obs">${x.obs}</div>`:''}</div><span class="mv-cat-badge">${MV_CATS[x.cat]||x.cat}</span><button class="btn btn-danger btn-sm" onclick="deleteMesversario(${x.id})">🗑</button></div>`).join('')}</div></div>`).join('');
 }
 function setMvFiltro(val,btn){mvFiltroMes=val;renderMesversario();}
-function showSubTabMissoes(id){document.querySelectorAll('#tab-agenda .subpanel').forEach(p=>p.classList.remove('active'));document.querySelectorAll('#tab-agenda .sub-tab').forEach(b=>b.classList.remove('active'));document.getElementById('subpanel-'+id).classList.add('active');document.getElementById('stab-'+id).classList.add('active');if(id==='medicacao')renderMedicacao();}
+function showSubTabMissoes(id){document.querySelectorAll('#tab-agenda .subpanel').forEach(p=>p.classList.remove('active'));document.querySelectorAll('#tab-agenda .sub-tab').forEach(b=>b.classList.remove('active'));document.getElementById('subpanel-'+id).classList.add('active');document.getElementById('stab-'+id).classList.add('active');if(id==='medicacao')renderMedicacao();if(id==='missivas'){renderDuvidas();renderDashboard();}}
 function showOrbitasTab(tab,btn){document.querySelectorAll('.orbitas-stab').forEach(b=>b.classList.remove('active'));document.querySelectorAll('.orbitas-panel').forEach(p=>p.style.display='none');if(btn)btn.classList.add('active');else document.getElementById('ostab-'+tab)?.classList.add('active');document.getElementById('orbitas-panel-'+tab).style.display='block';if(tab==='crescimento'){initCrescForm();renderCrescimento();setTimeout(renderGraficoCrescimento,50);}}
 
 // ── CRESCIMENTO ──
@@ -2100,5 +2105,144 @@ function renderGlossario(){
   @media(max-width:480px){.gi{grid-template-columns:1fr;gap:4px;}.gi-seta{display:none;}.gi-comum::before{content:'↳ ';color:#7ab3d4;}}
 </style>
 
+
+<script>
+// ── ONBOARDING WIZARD — patch ──
+let _obCurrentStep=0,_obPin1='',_obPin2='',_obFotoPendente=null,_obEmojiGuardiao='🧑';
+
+function obRenderEmojiGrid(){
+  const grid=document.getElementById('ob-emoji-grid');
+  if(!grid)return;
+  grid.innerHTML=EMOJIS_DISPONIVEIS.map(e=>`<button class="emoji-btn ${e===_obEmojiGuardiao?'sel':''}" onclick="obSelecionarEmoji('${e}',this)">${e}</button>`).join('');
+}
+function obSelecionarEmoji(emoji,btn){
+  _obEmojiGuardiao=emoji;
+  document.querySelectorAll('#ob-emoji-grid .emoji-btn').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');
+}
+function obAtualizarDots(step){
+  for(let i=0;i<4;i++){const d=document.getElementById('ob-dot-'+i);if(!d)continue;d.className=i<step?'ob-dot done':i===step?'ob-dot active':'ob-dot';}
+}
+function obProximo(fromStep,skip){
+  if(fromStep===0){
+    _obCurrentStep=1;
+    document.getElementById('ob-step-0').classList.remove('active');
+    document.getElementById('ob-step-1').classList.add('active');
+    obAtualizarDots(1);
+    const inp=document.getElementById('ob-nasc-bebe');
+    if(!inp.value)inp.value=todayISO();
+    return;
+  }
+  if(fromStep===1){
+    const nome=document.getElementById('ob-nome-bebe').value.trim();
+    const nasc=document.getElementById('ob-nasc-bebe').value;
+    if(!nome){alert('⚠️ Informe o nome do bebê!');return;}
+    if(!nasc){alert('⚠️ Informe a data de nascimento!');return;}
+    saveBabyConfig({name:nome,birthDate:nasc,photo:_obFotoPendente});
+    _obCurrentStep=2;
+    document.getElementById('ob-step-1').classList.remove('active');
+    document.getElementById('ob-step-2').classList.add('active');
+    obAtualizarDots(2);
+    setTimeout(()=>document.getElementById('ob-pin1-oculto').focus(),200);
+    return;
+  }
+  if(fromStep===3&&skip){obFinalizarSemGuardiao();return;}
+}
+function obPin1Input(input){
+  const val=input.value.replace(/\D/g,'').slice(0,6);input.value=val;_obPin1=val;
+  for(let i=0;i<6;i++){const d=document.getElementById('op1-'+i);if(d)d.className='pin-dot'+(i<val.length?' filled':'');}
+  if(val.length===6)setTimeout(()=>document.getElementById('ob-pin2-oculto').focus(),100);
+  obValidarPins();
+}
+function focarObPin1(){const el=document.getElementById('ob-pin1-oculto');if(el){el.value=_obPin1;el.focus();}}
+function focarObPin2(){const el=document.getElementById('ob-pin2-oculto');if(el){el.value=_obPin2;el.focus();}}
+function obPin2Input(input){
+  const val=input.value.replace(/\D/g,'').slice(0,6);input.value=val;_obPin2=val;
+  for(let i=0;i<6;i++){const d=document.getElementById('op2-'+i);if(d)d.className='pin-dot'+(i<val.length?' filled':'');}
+  obValidarPins();
+}
+function obValidarPins(){
+  const statusEl=document.getElementById('ob-pin-status');
+  const btn=document.getElementById('ob-btn-confirmar-pin');
+  if(_obPin1.length<6||_obPin2.length<6){statusEl.textContent='';statusEl.className='ob-pin-status';btn.disabled=true;btn.style.opacity='0.4';return;}
+  if(_obPin1===_obPin2){statusEl.textContent='✅ PINs coincidem';statusEl.className='ob-pin-status ok';btn.disabled=false;btn.style.opacity='1';}
+  else{statusEl.textContent='❌ PINs não coincidem';statusEl.className='ob-pin-status erro';btn.disabled=true;btn.style.opacity='0.4';}
+}
+function obConfirmarPin(){
+  if(_obPin1!==_obPin2||_obPin1.length!==6)return;
+  saveAppConfig({pin:_obPin1,setupDone:false});
+  _obCurrentStep=3;
+  document.getElementById('ob-step-2').classList.remove('active');
+  document.getElementById('ob-step-3').classList.add('active');
+  obAtualizarDots(3);
+  obRenderEmojiGrid();
+}
+function obFinalizar(){
+  const nome=document.getElementById('ob-guardiao-nome').value.trim();
+  if(!nome){alert('⚠️ Informe o nome do guardião!');return;}
+  const id='g_'+Date.now();
+  GUARDIOES[id]={nome,emoji:_obEmojiGuardiao,papel:'Guardião da Força'};
+  saveGuardioes(GUARDIOES);
+  obConcluir();
+}
+function obFinalizarSemGuardiao(){obConcluir();}
+function obConcluir(){
+  const appCfg=getAppConfig();saveAppConfig({...appCfg,setupDone:true});
+  const babyCfg=getBabyConfig();
+  if(_obFotoPendente){saveBabyConfig({...babyCfg,photo:_obFotoPendente});}
+  initFirebaseRefs();
+  document.getElementById('tela-onboarding').style.display='none';
+  atualizarHeaderBebe();atualizarFotoArthurHeader();
+  renderListaGuardioes();
+  document.getElementById('tela-login').style.display='flex';
+  showToast('🛸 Bem-vindo(a) ao BabyForce, '+getBabyName()+'!');
+}
+function obPreviewFoto(input){
+  if(!input.files[0])return;
+  redimensionarImagem(input.files[0],400,b64=>{
+    _obFotoPendente=b64;
+    const prev=document.getElementById('ob-photo-preview'),emoji=document.getElementById('ob-photo-emoji');
+    prev.src=b64;prev.style.display='block';emoji.style.display='none';
+  });
+}
+let cfgFotoPendente=null;
+function abrirConfiguracaoBebe(){
+  fecharMenuGuardiao();
+  const baby=getBabyConfig();
+  document.getElementById('cfg-nome-bebe').value=baby.name||'';
+  document.getElementById('cfg-nasc-bebe').value=baby.birthDate||'';
+  document.getElementById('cfg-novo-pin').value='';
+  document.getElementById('cfg-confirmar-pin').value='';
+  const prev=document.getElementById('cfg-photo-preview'),emoji=document.getElementById('cfg-photo-emoji');
+  if(baby.photo){prev.src=baby.photo;prev.style.display='block';emoji.style.display='none';}
+  else{prev.style.display='none';emoji.style.display='block';}
+  document.getElementById('modal-config-bebe').style.display='flex';
+}
+function fecharConfiguracaoBebe(){document.getElementById('modal-config-bebe').style.display='none';}
+function cfgPreviewFoto(input){
+  if(!input.files[0])return;
+  redimensionarImagem(input.files[0],400,b64=>{
+    cfgFotoPendente=b64;
+    const prev=document.getElementById('cfg-photo-preview'),emoji=document.getElementById('cfg-photo-emoji');
+    prev.src=b64;prev.style.display='block';emoji.style.display='none';
+  });
+}
+function salvarConfiguracaoBebe(){
+  const nome=document.getElementById('cfg-nome-bebe').value.trim();
+  const nasc=document.getElementById('cfg-nasc-bebe').value;
+  const newPin=document.getElementById('cfg-novo-pin').value;
+  const confirmPin=document.getElementById('cfg-confirmar-pin').value;
+  if(!nome){alert('⚠️ Informe o nome!');return;}
+  if(!nasc){alert('⚠️ Informe a data!');return;}
+  if(newPin&&newPin.length===6){
+    if(newPin!==confirmPin){alert('⚠️ PINs não coincidem!');return;}
+    const appCfg=getAppConfig();saveAppConfig({...appCfg,pin:newPin});showToast('🔐 PIN alterado!');
+  }
+  const babyCfg=getBabyConfig();
+  saveBabyConfig({...babyCfg,name:nome,birthDate:nasc,photo:cfgFotoPendente||babyCfg.photo});
+  cfgFotoPendente=null;initFirebaseRefs();atualizarHeaderBebe();
+  fecharConfiguracaoBebe();showToast('✅ Configurações salvas!');
+}
+</script>
 </body>
 </html>
