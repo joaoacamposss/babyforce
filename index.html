@@ -321,6 +321,67 @@ textarea{resize:none;min-height:80px;}
 .ob-pin-status.ok{color:#39ff14;}
 .ob-pin-status.erro{color:var(--red-saber);}
 </style>
+
+<style>
+/* ── GOOGLE PLACES AUTOCOMPLETE ── */
+.pac-container {
+  background: linear-gradient(135deg, rgba(5,25,55,0.98), rgba(3,15,35,0.99));
+  border: 1px solid rgba(0,180,255,0.3);
+  border-top: none;
+  border-radius: 0 0 12px 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+  font-family: 'Exo 2', sans-serif;
+  z-index: 99999;
+  margin-top: -2px;
+}
+.pac-item {
+  padding: 10px 14px;
+  border-top: 1px solid rgba(0,180,255,0.08);
+  color: var(--white);
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: background 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.pac-item:first-child { border-top: none; }
+.pac-item:hover, .pac-item-selected {
+  background: rgba(0,80,180,0.35) !important;
+}
+.pac-item-query {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--white);
+  padding-right: 4px;
+}
+.pac-matched { color: var(--blue-neon); font-weight: 700; }
+.pac-secondary-text { color: var(--text-dim); font-size: 0.72rem; }
+.pac-icon {
+  filter: invert(0.6) sepia(1) hue-rotate(180deg) saturate(2);
+  width: 14px;
+  height: 14px;
+}
+.pac-logo::after { display: none; } /* Remove "powered by Google" se desejar */
+
+/* Campo local com ícone de pin */
+.local-input-wrap {
+  position: relative;
+}
+.local-input-wrap::before {
+  content: '📍';
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1rem;
+  pointer-events: none;
+  z-index: 1;
+}
+.local-input-wrap input {
+  padding-left: 38px !important;
+}
+</style>
 </head>
 <body>
 
@@ -654,7 +715,12 @@ textarea{resize:none;min-height:80px;}
         <input type="text" id="a-profissional-outro" placeholder="Nome do profissional" style="display:none;margin-top:6px">
         <div id="prof-card" style="display:none;margin-top:8px;background:rgba(0,50,120,0.3);border:1px solid rgba(0,180,255,0.2);border-radius:8px;padding:10px 12px;font-size:0.75rem;color:var(--text-dim);line-height:1.6"></div>
       </div>
-      <div class="form-group"><label>Local</label><input type="text" id="a-local" placeholder="ex: Clínica Pediátrica Central"></div>
+      <div class="form-group">
+          <label>Local / Endereço</label>
+          <div class="local-input-wrap">
+            <input type="text" id="a-local" placeholder="Buscar local no Google Maps..." autocomplete="off">
+          </div>
+        </div>
       <button class="btn btn-primary btn-full" onclick="salvarEvento()">🚀 Registrar Missão</button>
     </div>
     <div class="filter-bar">
@@ -1789,19 +1855,294 @@ function renderVacinas(){
 
 // ── MEDICAÇÃO ──
 const MEDICAMENTOS_DB=[
-  {nome:'Dipirona Sódica (Novalgina)',generico:'Dipirona Sódica',cat:'🌡️ Antitérmico'},{nome:'Paracetamol (Tylenol Bebê)',generico:'Paracetamol',cat:'🌡️ Antitérmico'},
-  {nome:'Ibuprofeno (Alivium)',generico:'Ibuprofeno',cat:'🌡️ Anti-inflamatório'},{nome:'Amoxicilina (Amoxil)',generico:'Amoxicilina',cat:'💊 Antibiótico'},
-  {nome:'Amoxicilina + Clavulanato (Clavulin)',generico:'Amoxicilina + Clavulanato',cat:'💊 Antibiótico'},{nome:'Azitromicina (Zitromax)',generico:'Azitromicina',cat:'💊 Antibiótico'},
-  {nome:'Cefalexina (Keflex)',generico:'Cefalexina',cat:'💊 Antibiótico'},{nome:'Vitamina D3 (Addera D3)',generico:'Colecalciferol',cat:'🌟 Vitamina'},
-  {nome:'Vitamina D (D-Tabs)',generico:'Colecalciferol',cat:'🌟 Vitamina'},{nome:'Ferro (Noripurum)',generico:'Ferro (Hidróxido Polimaltosado)',cat:'🌟 Suplemento'},
-  {nome:'Simeticona (Luftal Bebê)',generico:'Simeticona',cat:'🍼 Gastro'},{nome:'Omeprazol (Losec)',generico:'Omeprazol',cat:'🍼 Gastro'},
-  {nome:'Domperidona (Motilium)',generico:'Domperidona',cat:'🍼 Gastro'},{nome:'Ondansetrona (Vonau)',generico:'Ondansetrona',cat:'🍼 Gastro'},
-  {nome:'Loratadina (Loratamed)',generico:'Loratadina',cat:'🌸 Antialérgico'},{nome:'Cetirizina (Zyrtec)',generico:'Cetirizina',cat:'🌸 Antialérgico'},
-  {nome:'Salbutamol (Aerolin)',generico:'Salbutamol',cat:'🫁 Respiratório'},{nome:'Budesonida (Pulmicort)',generico:'Budesonida',cat:'🫁 Respiratório'},
-  {nome:'Prednisolona (Predsim)',generico:'Prednisolona',cat:'🫁 Respiratório'},{nome:'Nistatina (Micostatin)',generico:'Nistatina',cat:'🧴 Dermatológico'},
-  {nome:'Floratil (probiótico)',generico:'Saccharomyces boulardii',cat:'🦠 Probiótico'},{nome:'Soro Fisiológico Nasal',generico:'Cloreto de Sódio 0,9%',cat:'👃 ORL'},
+  // ══════════════════════════════════════════════════
+  // 🌡️ ANTITÉRMICOS E ANALGÉSICOS — ANVISA/OMS
+  // ══════════════════════════════════════════════════
+  {nome:'Dipirona Sódica (Novalgina Gotas)',generico:'Dipirona Sódica',cat:'🌡️ Antitérmico/Analgésico',ref:'ANVISA'},
+  {nome:'Dipirona Sódica (Anador Bebê)',generico:'Dipirona Sódica',cat:'🌡️ Antitérmico/Analgésico',ref:'ANVISA'},
+  {nome:'Dipirona Sódica (Magnopyrol)',generico:'Dipirona Sódica',cat:'🌡️ Antitérmico/Analgésico',ref:'ANVISA'},
+  {nome:'Paracetamol (Tylenol Bebê Gotas)',generico:'Paracetamol',cat:'🌡️ Antitérmico/Analgésico',ref:'ANVISA/OMS'},
+  {nome:'Paracetamol (Tempra Gotas)',generico:'Paracetamol',cat:'🌡️ Antitérmico/Analgésico',ref:'ANVISA'},
+  {nome:'Paracetamol (Dôrflex Infantil)',generico:'Paracetamol',cat:'🌡️ Antitérmico/Analgésico',ref:'ANVISA'},
+  {nome:'Paracetamol (Panadol Baby)',generico:'Paracetamol',cat:'🌡️ Antitérmico/Analgésico',ref:'ANVISA'},
+  {nome:'Ibuprofeno (Alivium Bebê Gotas)',generico:'Ibuprofeno',cat:'🌡️ Anti-inflamatório/Antitérmico',ref:'ANVISA/OMS'},
+  {nome:'Ibuprofeno (Advil Bebê)',generico:'Ibuprofeno',cat:'🌡️ Anti-inflamatório/Antitérmico',ref:'ANVISA'},
+  {nome:'Ibuprofeno (Motrin Infantil)',generico:'Ibuprofeno',cat:'🌡️ Anti-inflamatório/Antitérmico',ref:'ANVISA'},
+  {nome:'Ibuprofeno (Ibupirac)',generico:'Ibuprofeno',cat:'🌡️ Anti-inflamatório/Antitérmico',ref:'ANVISA'},
+  {nome:'Ibuprofeno (Nurofen Infantil)',generico:'Ibuprofeno',cat:'🌡️ Anti-inflamatório/Antitérmico',ref:'ANVISA'},
+  // ══════════════════════════════════════════════════
+  // 💊 ANTIBIÓTICOS — ANVISA/OMS
+  // ══════════════════════════════════════════════════
+  {nome:'Amoxicilina (Amoxil Suspensão)',generico:'Amoxicilina',cat:'💊 Antibiótico',ref:'ANVISA/OMS'},
+  {nome:'Amoxicilina (Clavulin BD Suspensão)',generico:'Amoxicilina + Clavulanato',cat:'💊 Antibiótico',ref:'ANVISA/OMS'},
+  {nome:'Amoxicilina (Flemoxin)',generico:'Amoxicilina',cat:'💊 Antibiótico',ref:'ANVISA'},
+  {nome:'Amoxicilina + Clavulanato (Augmentin)',generico:'Amoxicilina + Clavulanato',cat:'💊 Antibiótico',ref:'ANVISA'},
+  {nome:'Amoxicilina + Clavulanato (Clavulin ES)',generico:'Amoxicilina + Clavulanato',cat:'💊 Antibiótico',ref:'ANVISA'},
+  {nome:'Azitromicina (Zitromax Suspensão)',generico:'Azitromicina',cat:'💊 Antibiótico',ref:'ANVISA/OMS'},
+  {nome:'Azitromicina (Azitromin)',generico:'Azitromicina',cat:'💊 Antibiótico',ref:'ANVISA'},
+  {nome:'Azitromicina (Astro)',generico:'Azitromicina',cat:'💊 Antibiótico',ref:'ANVISA'},
+  {nome:'Cefalexina (Keflex Suspensão)',generico:'Cefalexina',cat:'💊 Antibiótico',ref:'ANVISA'},
+  {nome:'Cefalexina (Cefadroxil Suspensão)',generico:'Cefalexina',cat:'💊 Antibiótico',ref:'ANVISA'},
+  {nome:'Cefadroxila (Cefamox Suspensão)',generico:'Cefadroxila',cat:'💊 Antibiótico',ref:'ANVISA'},
+  {nome:'Cefprozila (Cefzil Suspensão)',generico:'Cefprozila',cat:'💊 Antibiótico',ref:'ANVISA'},
+  {nome:'Cefuroxima (Zinnat Suspensão)',generico:'Cefuroxima axetil',cat:'💊 Antibiótico',ref:'ANVISA'},
+  {nome:'Sulfametoxazol + Trimetoprim (Bactrim Suspensão)',generico:'Sulfametoxazol + Trimetoprim',cat:'💊 Antibiótico',ref:'ANVISA/OMS'},
+  {nome:'Sulfametoxazol + Trimetoprim (Infectrin)',generico:'Sulfametoxazol + Trimetoprim',cat:'💊 Antibiótico',ref:'ANVISA'},
+  {nome:'Claritromicina (Klaricid Suspensão)',generico:'Claritromicina',cat:'💊 Antibiótico',ref:'ANVISA'},
+  {nome:'Eritromicina (Pantomicina Suspensão)',generico:'Eritromicina',cat:'💊 Antibiótico',ref:'ANVISA/OMS'},
+  {nome:'Nitrofurantoína (Macrobid)',generico:'Nitrofurantoína',cat:'💊 Antibiótico',ref:'ANVISA'},
+  {nome:'Metronidazol (Flagyl Suspensão)',generico:'Metronidazol',cat:'💊 Antibiótico/Antiparasitário',ref:'ANVISA/OMS'},
+  {nome:'Metronidazol (Flagyl)',generico:'Metronidazol',cat:'💊 Antibiótico/Antiparasitário',ref:'ANVISA/OMS'},
+  {nome:'Ampicilina + Sulbactam',generico:'Ampicilina + Sulbactam',cat:'💊 Antibiótico',ref:'ANVISA'},
+  {nome:'Linezolida (Zyvox Suspensão)',generico:'Linezolida',cat:'💊 Antibiótico',ref:'ANVISA'},
+  {nome:'Vancomicina',generico:'Vancomicina',cat:'💊 Antibiótico',ref:'ANVISA/OMS'},
+  {nome:'Clindamicina (Dalacin Pediátrico)',generico:'Clindamicina',cat:'💊 Antibiótico',ref:'ANVISA'},
+  {nome:'Tobramicina (Tobrex)',generico:'Tobramicina',cat:'💊 Antibiótico ocular',ref:'ANVISA'},
+  // ══════════════════════════════════════════════════
+  // 🌟 VITAMINAS E SUPLEMENTOS — ANVISA/OMS/SBP
+  // ══════════════════════════════════════════════════
+  {nome:'Vitamina D3 (D-Tabs Gotas)',generico:'Colecalciferol',cat:'🌟 Vitamina',ref:'ANVISA/OMS/SBP'},
+  {nome:'Vitamina D3 (Addera D3 Gotas)',generico:'Colecalciferol',cat:'🌟 Vitamina',ref:'ANVISA/OMS'},
+  {nome:'Vitamina D3 (Supra D3)',generico:'Colecalciferol',cat:'🌟 Vitamina',ref:'ANVISA'},
+  {nome:'Vitamina D3 (Baby D-Vi-Sol)',generico:'Colecalciferol',cat:'🌟 Vitamina',ref:'ANVISA'},
+  {nome:'Vitamina D3 (Depura D)',generico:'Colecalciferol',cat:'🌟 Vitamina',ref:'ANVISA'},
+  {nome:'Vitamina A (Arovit Gotas)',generico:'Retinol (Vitamina A)',cat:'🌟 Vitamina',ref:'ANVISA/OMS'},
+  {nome:'Vitamina A + D (Advilax)',generico:'Vitamina A + D',cat:'🌟 Vitamina',ref:'ANVISA'},
+  {nome:'Vitamina C (Cebion Gotas)',generico:'Ácido Ascórbico',cat:'🌟 Vitamina',ref:'ANVISA'},
+  {nome:'Vitamina C (Cewin Gotas)',generico:'Ácido Ascórbico',cat:'🌟 Vitamina',ref:'ANVISA'},
+  {nome:'Vitamina K (Kanakion Neonatal)',generico:'Fitomenadiona (Vitamina K1)',cat:'🌟 Vitamina',ref:'ANVISA/OMS'},
+  {nome:'Complexo B (Benerva)',generico:'Complexo B',cat:'🌟 Vitamina',ref:'ANVISA'},
+  {nome:'Complexo B (Neurobion)',generico:'Complexo B',cat:'🌟 Vitamina',ref:'ANVISA'},
+  {nome:'Vitamina E (Ephynal)',generico:'Tocoferol (Vitamina E)',cat:'🌟 Vitamina',ref:'ANVISA'},
+  {nome:'Ferro (Noripurum Gotas)',generico:'Ferro Hidróxido Polimaltosado',cat:'🌟 Suplemento Mineral',ref:'ANVISA/OMS/SBP'},
+  {nome:'Ferro (Fer-In-Sol Gotas)',generico:'Sulfato Ferroso',cat:'🌟 Suplemento Mineral',ref:'ANVISA/OMS'},
+  {nome:'Ferro (Ibfer)',generico:'Ferro Quelato',cat:'🌟 Suplemento Mineral',ref:'ANVISA'},
+  {nome:'Ferro + Ácido Fólico (Neutrofer)',generico:'Ferro + Ácido Fólico',cat:'🌟 Suplemento Mineral',ref:'ANVISA'},
+  {nome:'Ácido Fólico (Neofolin)',generico:'Ácido Fólico',cat:'🌟 Vitamina',ref:'ANVISA/OMS'},
+  {nome:'Zinco (Zincovit)',generico:'Zinco',cat:'🌟 Suplemento Mineral',ref:'ANVISA/OMS'},
+  {nome:'Zinco (Sultrine)',generico:'Sulfato de Zinco',cat:'🌟 Suplemento Mineral',ref:'ANVISA/OMS'},
+  {nome:'Cálcio (Calcium 500)',generico:'Carbonato de Cálcio',cat:'🌟 Suplemento Mineral',ref:'ANVISA'},
+  {nome:'Cálcio + Vitamina D (Calcimax)',generico:'Cálcio + Vitamina D',cat:'🌟 Suplemento Mineral',ref:'ANVISA'},
+  {nome:'Polivitamínico (Apetil Gotas)',generico:'Polivitamínico',cat:'🌟 Vitamina',ref:'ANVISA'},
+  {nome:'Polivitamínico (Poli-Vi-Sol)',generico:'Polivitamínico',cat:'🌟 Vitamina',ref:'ANVISA'},
+  {nome:'Polivitamínico (Multivitamínico Pediátrico)',generico:'Polivitamínico',cat:'🌟 Vitamina',ref:'ANVISA'},
+  {nome:'Ômega 3 (Baby Fish Oil)',generico:'DHA + EPA (Ômega 3)',cat:'🌟 Suplemento',ref:'ANVISA/OMS'},
+  {nome:'Ômega 3 (Biomega Kids)',generico:'DHA + EPA',cat:'🌟 Suplemento',ref:'ANVISA'},
+  {nome:'Flúor (Flugel Gotas)',generico:'Fluoreto de Sódio',cat:'🌟 Suplemento Mineral',ref:'ANVISA/OMS'},
+  // ══════════════════════════════════════════════════
+  // 🍼 GASTROINTESTINAL — ANVISA/OMS
+  // ══════════════════════════════════════════════════
+  {nome:'Simeticona (Luftal Bebê Gotas)',generico:'Simeticona',cat:'🍼 Gastrointestinal',ref:'ANVISA'},
+  {nome:'Simeticona (Dimecon Gotas)',generico:'Simeticona',cat:'🍼 Gastrointestinal',ref:'ANVISA'},
+  {nome:'Simeticona (Bebê Gessy)',generico:'Simeticona',cat:'🍼 Gastrointestinal',ref:'ANVISA'},
+  {nome:'Simeticona (Mylanta Gas Bebê)',generico:'Simeticona',cat:'🍼 Gastrointestinal',ref:'ANVISA'},
+  {nome:'Omeprazol (Losec Suspensão)',generico:'Omeprazol',cat:'🍼 Gastrointestinal',ref:'ANVISA'},
+  {nome:'Omeprazol (Peprazol)',generico:'Omeprazol',cat:'🍼 Gastrointestinal',ref:'ANVISA'},
+  {nome:'Lansoprazol (Prevacid)',generico:'Lansoprazol',cat:'🍼 Gastrointestinal',ref:'ANVISA'},
+  {nome:'Ranitidina (Antak Xarope)',generico:'Ranitidina',cat:'🍼 Gastrointestinal',ref:'ANVISA'},
+  {nome:'Domperidona (Motilium Suspensão)',generico:'Domperidona',cat:'🍼 Gastrointestinal',ref:'ANVISA'},
+  {nome:'Domperidona (Peridon)',generico:'Domperidona',cat:'🍼 Gastrointestinal',ref:'ANVISA'},
+  {nome:'Ondansetrona (Vonau Flash)',generico:'Ondansetrona',cat:'🍼 Gastrointestinal',ref:'ANVISA'},
+  {nome:'Ondansetrona (Zofran)',generico:'Ondansetrona',cat:'🍼 Gastrointestinal',ref:'ANVISA'},
+  {nome:'Bromoprida (Plamet Gotas)',generico:'Bromoprida',cat:'🍼 Gastrointestinal',ref:'ANVISA'},
+  {nome:'Soro Reidratação Oral (Pedialyte)',generico:'Soro de Reidratação Oral',cat:'🍼 Gastrointestinal',ref:'ANVISA/OMS'},
+  {nome:'Soro Reidratação Oral (Hidrafix)',generico:'Soro de Reidratação Oral',cat:'🍼 Gastrointestinal',ref:'ANVISA/OMS'},
+  {nome:'Soro Reidratação Oral (Enfalyte)',generico:'Soro de Reidratação Oral',cat:'🍼 Gastrointestinal',ref:'ANVISA/OMS'},
+  {nome:'Lactulose (Lactulona Xarope)',generico:'Lactulose',cat:'🍼 Gastrointestinal',ref:'ANVISA'},
+  {nome:'Polietilenoglicol (Muvinlax)',generico:'Macrogol 4000',cat:'🍼 Gastrointestinal',ref:'ANVISA'},
+  {nome:'Polietilenoglicol (Movicol Pediátrico)',generico:'Macrogol 3350',cat:'🍼 Gastrointestinal',ref:'ANVISA'},
+  {nome:'Bismuto (Bismol Suspensão)',generico:'Subsalicilato de Bismuto',cat:'🍼 Gastrointestinal',ref:'ANVISA'},
+  {nome:'Racecadotrila (Hidrasec Sachê)',generico:'Racecadotrila',cat:'🍼 Gastrointestinal',ref:'ANVISA'},
+  {nome:'Fenazopiridina + Butilbrometo',generico:'Hioscina + Dipirona',cat:'🍼 Gastrointestinal',ref:'ANVISA'},
+  {nome:'Butilbrometo (Buscopan Gotas)',generico:'Butilbrometo de Escopolamina',cat:'🍼 Gastrointestinal',ref:'ANVISA'},
+  {nome:'Alumínio + Magnésio (Maalox Suspensão)',generico:'Hidróxido de Alumínio + Magnésio',cat:'🍼 Gastrointestinal',ref:'ANVISA'},
+  // ══════════════════════════════════════════════════
+  // 🦠 PROBIÓTICOS — ANVISA/OMS/ANS
+  // ══════════════════════════════════════════════════
+  {nome:'Probiótico (Floratil Sachê)',generico:'Saccharomyces boulardii',cat:'🦠 Probiótico',ref:'ANVISA'},
+  {nome:'Probiótico (Floratil Cápsulas)',generico:'Saccharomyces boulardii',cat:'🦠 Probiótico',ref:'ANVISA'},
+  {nome:'Probiótico (Lacteol Fort)',generico:'Lactobacillus acidophilus',cat:'🦠 Probiótico',ref:'ANVISA'},
+  {nome:'Probiótico (Lactipan)',generico:'Lactobacillus rhamnosus GG',cat:'🦠 Probiótico',ref:'ANVISA/OMS'},
+  {nome:'Probiótico (Bio Gaia Gotas)',generico:'Lactobacillus reuteri',cat:'🦠 Probiótico',ref:'ANVISA/SBP'},
+  {nome:'Probiótico (Reuterina Gotas)',generico:'Lactobacillus reuteri DSM 17938',cat:'🦠 Probiótico',ref:'ANVISA'},
+  {nome:'Probiótico (Simfort)',generico:'Lactobacillus + Bifidobacterium',cat:'🦠 Probiótico',ref:'ANVISA'},
+  {nome:'Probiótico (Infloran)',generico:'Bifidobacterium bifidum + Lactobacillus',cat:'🦠 Probiótico',ref:'ANVISA'},
+  // ══════════════════════════════════════════════════
+  // 🌸 ANTIALÉRGICOS/ANTI-HISTAMÍNICOS — ANVISA/OMS
+  // ══════════════════════════════════════════════════
+  {nome:'Loratadina (Loratamed Xarope)',generico:'Loratadina',cat:'🌸 Antialérgico',ref:'ANVISA/OMS'},
+  {nome:'Loratadina (Claritin Pediátrico)',generico:'Loratadina',cat:'🌸 Antialérgico',ref:'ANVISA'},
+  {nome:'Loratadina (Histadin)',generico:'Loratadina',cat:'🌸 Antialérgico',ref:'ANVISA'},
+  {nome:'Cetirizina (Zyrtec Gotas)',generico:'Cetirizina',cat:'🌸 Antialérgico',ref:'ANVISA'},
+  {nome:'Cetirizina (Cetiristad)',generico:'Cetirizina',cat:'🌸 Antialérgico',ref:'ANVISA'},
+  {nome:'Cetirizina (Reactine)',generico:'Cetirizina',cat:'🌸 Antialérgico',ref:'ANVISA'},
+  {nome:'Levocetirizina (Zix)',generico:'Levocetirizina',cat:'🌸 Antialérgico',ref:'ANVISA'},
+  {nome:'Levocetirizina (Alenia)',generico:'Levocetirizina',cat:'🌸 Antialérgico',ref:'ANVISA'},
+  {nome:'Deslanoratadina (Desalex Xarope)',generico:'Desloratadina',cat:'🌸 Antialérgico',ref:'ANVISA'},
+  {nome:'Fexofenadina (Allegra Kids)',generico:'Fexofenadina',cat:'🌸 Antialérgico',ref:'ANVISA'},
+  {nome:'Hidroxizina (Hixizine Xarope)',generico:'Hidroxizina',cat:'🌸 Antialérgico',ref:'ANVISA'},
+  {nome:'Dexclorfeniramina (Polaramine Xarope)',generico:'Dexclorfeniramina',cat:'🌸 Antialérgico',ref:'ANVISA'},
+  {nome:'Prometazina (Fenergan Xarope)',generico:'Prometazina',cat:'🌸 Antialérgico',ref:'ANVISA'},
+  {nome:'Ketotifeno (Zaditen Xarope)',generico:'Cetotifeno',cat:'🌸 Antialérgico',ref:'ANVISA'},
+  {nome:'Cromoglicato (Opticrom Colírio)',generico:'Cromoglicato de Sódio',cat:'🌸 Antialérgico ocular',ref:'ANVISA'},
+  // ══════════════════════════════════════════════════
+  // 🫁 RESPIRATÓRIO/BRONCODILATADOR — ANVISA/OMS/ANS
+  // ══════════════════════════════════════════════════
+  {nome:'Salbutamol (Aerolin Spray)',generico:'Salbutamol',cat:'🫁 Broncodilatador',ref:'ANVISA/OMS'},
+  {nome:'Salbutamol (Ventolin)',generico:'Salbutamol',cat:'🫁 Broncodilatador',ref:'ANVISA/OMS'},
+  {nome:'Salbutamol (Aerolin Nebulização)',generico:'Salbutamol',cat:'🫁 Broncodilatador',ref:'ANVISA'},
+  {nome:'Fenoterol (Berotec Nebulização)',generico:'Fenoterol',cat:'🫁 Broncodilatador',ref:'ANVISA'},
+  {nome:'Formoterol (Foradil)',generico:'Formoterol',cat:'🫁 Broncodilatador',ref:'ANVISA'},
+  {nome:'Brometo de Ipratrópio (Atrovent Nebulização)',generico:'Brometo de Ipratrópio',cat:'🫁 Broncodilatador',ref:'ANVISA'},
+  {nome:'Budesonida (Pulmicort Nebulização)',generico:'Budesonida',cat:'🫁 Corticoide inalatório',ref:'ANVISA/OMS'},
+  {nome:'Budesonida + Formoterol (Symbicort)',generico:'Budesonida + Formoterol',cat:'🫁 Corticoide inalatório',ref:'ANVISA'},
+  {nome:'Fluticasona (Flixotide Spray)',generico:'Propionato de Fluticasona',cat:'🫁 Corticoide inalatório',ref:'ANVISA'},
+  {nome:'Beclometasona (Clenil)',generico:'Dipropionato de Beclometasona',cat:'🫁 Corticoide inalatório',ref:'ANVISA'},
+  {nome:'Montelucaste (Singulair Baby)',generico:'Montelucaste',cat:'🫁 Antileucotrienico',ref:'ANVISA'},
+  {nome:'Montelucaste (Singular)',generico:'Montelucaste',cat:'🫁 Antileucotrienico',ref:'ANVISA'},
+  {nome:'Prednisolona (Predsim Xarope)',generico:'Prednisolona',cat:'🫁 Corticoide oral',ref:'ANVISA'},
+  {nome:'Prednisolona (Prelone)',generico:'Prednisolona',cat:'🫁 Corticoide oral',ref:'ANVISA'},
+  {nome:'Dexametasona (Decadron Xarope)',generico:'Dexametasona',cat:'🫁 Corticoide oral',ref:'ANVISA'},
+  {nome:'Prednisona (Meticorten)',generico:'Prednisona',cat:'🫁 Corticoide oral',ref:'ANVISA'},
+  {nome:'Ambroxol (Mucosolvan Xarope)',generico:'Ambroxol',cat:'🫁 Mucolítico',ref:'ANVISA'},
+  {nome:'Carbocisteína (Fluidin Xarope)',generico:'Carbocisteína',cat:'🫁 Mucolítico',ref:'ANVISA'},
+  {nome:'N-Acetilcisteína (Fluimucil Xarope)',generico:'N-Acetilcisteína',cat:'🫁 Mucolítico',ref:'ANVISA'},
+  {nome:'Guaifenesina (Vick 44E)',generico:'Guaifenesina',cat:'🫁 Expectorante',ref:'ANVISA'},
+  // ══════════════════════════════════════════════════
+  // 👃 OTORRINOLARINGOLÓGICO — ANVISA
+  // ══════════════════════════════════════════════════
+  {nome:'Soro Fisiológico Nasal (Salsep)',generico:'Cloreto de Sódio 0,9%',cat:'👃 ORL',ref:'ANVISA'},
+  {nome:'Soro Fisiológico (Sorine)',generico:'Cloreto de Sódio 0,9%',cat:'👃 ORL',ref:'ANVISA'},
+  {nome:'Solução Hipertônica Nasal (Rinosoro)',generico:'Cloreto de Sódio 3%',cat:'👃 ORL',ref:'ANVISA'},
+  {nome:'Solução Nasal (Nasosal Baby)',generico:'Solução Salina Isotônica',cat:'👃 ORL',ref:'ANVISA'},
+  {nome:'Oximetazolina (Nariciv Baby)',generico:'Oximetazolina',cat:'👃 ORL',ref:'ANVISA'},
+  {nome:'Mometasona (Nasonex Spray Nasal)',generico:'Furoato de Mometasona',cat:'👃 ORL',ref:'ANVISA'},
+  {nome:'Budesonida nasal (Rhinocort)',generico:'Budesonida nasal',cat:'👃 ORL',ref:'ANVISA'},
+  {nome:'Fluticasona nasal (Flonase)',generico:'Propionato de Fluticasona nasal',cat:'👃 ORL',ref:'ANVISA'},
+  {nome:'Gotas auriculares (Otosporin)',generico:'Polimixina B + Neomicina + Hidrocortisona',cat:'👃 ORL',ref:'ANVISA'},
+  {nome:'Analgésico auricular (Otalgine)',generico:'Fenazona + Benzocaína',cat:'👃 ORL',ref:'ANVISA'},
+  // ══════════════════════════════════════════════════
+  // 🧴 DERMATOLÓGICO — ANVISA
+  // ══════════════════════════════════════════════════
+  {nome:'Nistatina (Micostatin Creme)',generico:'Nistatina',cat:'🧴 Dermatológico/Antifúngico',ref:'ANVISA'},
+  {nome:'Nistatina (Micostatin Suspensão oral)',generico:'Nistatina',cat:'🧴 Dermatológico/Antifúngico',ref:'ANVISA'},
+  {nome:'Cetoconazol (Nizoral Creme)',generico:'Cetoconazol',cat:'🧴 Dermatológico/Antifúngico',ref:'ANVISA'},
+  {nome:'Miconazol (Daktarin Gel Oral)',generico:'Miconazol',cat:'🧴 Dermatológico/Antifúngico',ref:'ANVISA'},
+  {nome:'Clotrimazol (Clotrimazol Creme)',generico:'Clotrimazol',cat:'🧴 Dermatológico/Antifúngico',ref:'ANVISA'},
+  {nome:'Fluconazol (Zoltec Suspensão)',generico:'Fluconazol',cat:'🧴 Antifúngico oral',ref:'ANVISA'},
+  {nome:'Hidrocortisona 1% (Cortaid Creme)',generico:'Hidrocortisona',cat:'🧴 Dermatológico/Corticoide',ref:'ANVISA'},
+  {nome:'Betametasona (Diprosone Creme)',generico:'Dipropionato de Betametasona',cat:'🧴 Dermatológico/Corticoide',ref:'ANVISA'},
+  {nome:'Dexametasona Creme (Decadron Creme)',generico:'Dexametasona',cat:'🧴 Dermatológico/Corticoide',ref:'ANVISA'},
+  {nome:'Óxido de Zinco (Creme Anti-Assadura)',generico:'Óxido de Zinco',cat:'🧴 Dermatológico',ref:'ANVISA'},
+  {nome:'Óxido de Zinco (Hipoglós)',generico:'Óxido de Zinco + Óleo de Fígado',cat:'🧴 Dermatológico',ref:'ANVISA'},
+  {nome:'Dexpantenol (Bepantol Bebê)',generico:'Dexpantenol',cat:'🧴 Dermatológico',ref:'ANVISA'},
+  {nome:'Bacitracina + Neomicina (Nebacetin Pomada)',generico:'Bacitracina + Neomicina',cat:'🧴 Dermatológico/Antibiótico',ref:'ANVISA'},
+  {nome:'Mupirocina (Bactroban Pomada)',generico:'Mupirocina',cat:'🧴 Dermatológico/Antibiótico',ref:'ANVISA'},
+  {nome:'Ácido Fusídico (Fucidine Creme)',generico:'Ácido Fusídico',cat:'🧴 Dermatológico/Antibiótico',ref:'ANVISA'},
+  {nome:'Permetrina (Kwell Loção)',generico:'Permetrina',cat:'🧴 Dermatológico/Antiparasitário',ref:'ANVISA'},
+  // ══════════════════════════════════════════════════
+  // 👁️ OFTALMOLÓGICO — ANVISA
+  // ══════════════════════════════════════════════════
+  {nome:'Tobramicina (Tobrex Colírio)',generico:'Tobramicina',cat:'👁️ Oftalmológico',ref:'ANVISA'},
+  {nome:'Tobramicina + Dexametasona (Tobradex)',generico:'Tobramicina + Dexametasona',cat:'👁️ Oftalmológico',ref:'ANVISA'},
+  {nome:'Cloranfenicol (Clorofenicol Colírio)',generico:'Cloranfenicol',cat:'👁️ Oftalmológico',ref:'ANVISA'},
+  {nome:'Neomicina + Polimixina (Neosporin Oftálmico)',generico:'Neomicina + Polimixina B',cat:'👁️ Oftalmológico',ref:'ANVISA'},
+  {nome:'Lágrima Artificial (Liposic)',generico:'Carbômero',cat:'👁️ Oftalmológico',ref:'ANVISA'},
+  {nome:'Lágrima Artificial (Refresh)',generico:'Carboximetilcelulose',cat:'👁️ Oftalmológico',ref:'ANVISA'},
+  // ══════════════════════════════════════════════════
+  // 🧠 NEUROLÓGICO/ANTICONVULSIVANTE — ANVISA/OMS
+  // ══════════════════════════════════════════════════
+  {nome:'Fenobarbital (Gardenal Xarope)',generico:'Fenobarbital',cat:'🧠 Anticonvulsivante',ref:'ANVISA/OMS'},
+  {nome:'Ácido Valproico (Depakene Xarope)',generico:'Ácido Valproico',cat:'🧠 Anticonvulsivante',ref:'ANVISA/OMS'},
+  {nome:'Carbamazepina (Tegretol Xarope)',generico:'Carbamazepina',cat:'🧠 Anticonvulsivante',ref:'ANVISA/OMS'},
+  {nome:'Diazepam (Diempax Solução retal)',generico:'Diazepam',cat:'🧠 Anticonvulsivante/Emergência',ref:'ANVISA/OMS'},
+  {nome:'Midazolam Intranasal',generico:'Midazolam',cat:'🧠 Anticonvulsivante/Emergência',ref:'ANVISA/OMS'},
+  {nome:'Levetiracetam (Keppra Solução)',generico:'Levetiracetam',cat:'🧠 Anticonvulsivante',ref:'ANVISA'},
+  {nome:'Topiramato (Topamax Sprinkle)',generico:'Topiramato',cat:'🧠 Anticonvulsivante',ref:'ANVISA'},
+  {nome:'Metilfenidato (Ritalina Infantil)',generico:'Metilfenidato',cat:'🧠 Psicoestimulante',ref:'ANVISA'},
+  {nome:'Risperidona (Risperdal Solução)',generico:'Risperidona',cat:'🧠 Antipsicótico',ref:'ANVISA'},
+  // ══════════════════════════════════════════════════
+  // 🦷 ODONTOLÓGICO — ANVISA
+  // ══════════════════════════════════════════════════
+  {nome:'Gel para Gengivas (Baby Oral B)',generico:'Lidocaína + Camilica',cat:'🦷 Odontológico',ref:'ANVISA'},
+  {nome:'Benzocaína Gel (Orravan)',generico:'Benzocaína',cat:'🦷 Odontológico',ref:'ANVISA'},
+  {nome:'Sialor (Dimetilaminoetanol)',generico:'Sal sódico da carboximetilcelulose',cat:'🦷 Odontológico',ref:'ANVISA'},
+  // ══════════════════════════════════════════════════
+  // 🦟 ANTIPARASITÁRIOS — ANVISA/OMS
+  // ══════════════════════════════════════════════════
+  {nome:'Albendazol (Zentel Suspensão)',generico:'Albendazol',cat:'🦟 Antiparasitário',ref:'ANVISA/OMS'},
+  {nome:'Mebendazol (Pantelmin Suspensão)',generico:'Mebendazol',cat:'🦟 Antiparasitário',ref:'ANVISA/OMS'},
+  {nome:'Metronidazol (Flagyl Suspensão)',generico:'Metronidazol',cat:'🦟 Antiparasitário',ref:'ANVISA/OMS'},
+  {nome:'Secnidazol (Secnidal Suspensão)',generico:'Secnidazol',cat:'🦟 Antiparasitário',ref:'ANVISA'},
+  {nome:'Tinidazol (Amebin)',generico:'Tinidazol',cat:'🦟 Antiparasitário',ref:'ANVISA'},
+  {nome:'Ivermectina (Stromectol)',generico:'Ivermectina',cat:'🦟 Antiparasitário',ref:'ANVISA'},
+  {nome:'Nitazoxanida (Annita Suspensão)',generico:'Nitazoxanida',cat:'🦟 Antiparasitário',ref:'ANVISA'},
+  {nome:'Praziquantel (Biltricida)',generico:'Praziquantel',cat:'🦟 Antiparasitário',ref:'ANVISA/OMS'},
+  {nome:'Pirimetamina (Daraprim)',generico:'Pirimetamina',cat:'🦟 Antiparasitário',ref:'ANVISA/OMS'},
+  // ══════════════════════════════════════════════════
+  // 🩺 ENDÓCRINO/METABÓLICO — ANVISA/OMS
+  // ══════════════════════════════════════════════════
+  {nome:'Levotiroxina (Puran T4)',generico:'Levotiroxina Sódica',cat:'🩺 Hormônio Tireoidiano',ref:'ANVISA/OMS'},
+  {nome:'Levotiroxina (Euthyrox)',generico:'Levotiroxina Sódica',cat:'🩺 Hormônio Tireoidiano',ref:'ANVISA'},
+  {nome:'Insulina NPH (Novolin N)',generico:'Insulina NPH',cat:'🩺 Antidiabético',ref:'ANVISA/OMS'},
+  {nome:'Insulina Regular (Novolin R)',generico:'Insulina Regular',cat:'🩺 Antidiabético',ref:'ANVISA/OMS'},
+  {nome:'Glicose Oral (Glutose)',generico:'Glicose',cat:'🩺 Metabólico',ref:'ANVISA'},
+  // ══════════════════════════════════════════════════
+  // 💉 USO HOSPITALAR / EMERGÊNCIA — ANVISA/OMS
+  // ══════════════════════════════════════════════════
+  {nome:'Adrenalina (Epinefrina Injetável)',generico:'Adrenalina/Epinefrina',cat:'💉 Emergência',ref:'ANVISA/OMS'},
+  {nome:'Adrenalina Autoinjetável (EpiPen Jr)',generico:'Epinefrina',cat:'💉 Emergência anafilaxia',ref:'ANVISA/ANS'},
+  {nome:'Dipirona Injetável',generico:'Dipirona Sódica',cat:'💉 Analgésico/Antitérmico',ref:'ANVISA'},
+  {nome:'Hidrocortisona Injetável (Solu-Cortef)',generico:'Succinato Sódico de Hidrocortisona',cat:'💉 Corticoide IV',ref:'ANVISA/OMS'},
+  {nome:'Dexametasona Injetável',generico:'Dexametasona',cat:'💉 Corticoide IV',ref:'ANVISA/OMS'},
+  {nome:'Amoxicilina Injetável',generico:'Amoxicilina',cat:'💉 Antibiótico IV',ref:'ANVISA'},
+  {nome:'Ceftriaxona (Rocefin Injetável)',generico:'Ceftriaxona',cat:'💉 Antibiótico IV',ref:'ANVISA/OMS'},
+  {nome:'Ampicilina Injetável',generico:'Ampicilina',cat:'💉 Antibiótico IV',ref:'ANVISA/OMS'},
+  {nome:'Gentamicina Injetável',generico:'Gentamicina',cat:'💉 Antibiótico IV',ref:'ANVISA/OMS'},
+  {nome:'Ondansetrona Injetável (Zofran IV)',generico:'Ondansetrona',cat:'💉 Antieméticos IV',ref:'ANVISA'},
+  {nome:'Glicose 10% IV (Soro Glicosado)',generico:'Glicose',cat:'💉 Fluido IV',ref:'ANVISA/OMS'},
+  {nome:'Solução Fisiológica 0,9% IV',generico:'Cloreto de Sódio 0,9%',cat:'💉 Fluido IV',ref:'ANVISA/OMS'},
+  {nome:'Ringer Lactato IV',generico:'Solução de Ringer Lactato',cat:'💉 Fluido IV',ref:'ANVISA/OMS'},
+  // ══════════════════════════════════════════════════
+  // 🫀 CARDIOVASCULAR — ANVISA/OMS
+  // ══════════════════════════════════════════════════
+  {nome:'Propranolol (Inderal Xarope)',generico:'Propranolol',cat:'🫀 Cardiovascular',ref:'ANVISA'},
+  {nome:'Atenolol (Tenormin)',generico:'Atenolol',cat:'🫀 Cardiovascular',ref:'ANVISA'},
+  {nome:'Captopril (Capoten Comprimido)',generico:'Captopril',cat:'🫀 Anti-hipertensivo',ref:'ANVISA'},
+  {nome:'Enalapril (Renitec)',generico:'Enalapril',cat:'🫀 Anti-hipertensivo',ref:'ANVISA'},
+  {nome:'Furosemida (Lasix)',generico:'Furosemida',cat:'🫀 Diurético',ref:'ANVISA/OMS'},
+  {nome:'Espironolactona (Aldactone)',generico:'Espironolactona',cat:'🫀 Diurético',ref:'ANVISA'},
+  {nome:'Digoxina (Lanicor Elixir)',generico:'Digoxina',cat:'🫀 Cardiotônico',ref:'ANVISA/OMS'},
+  {nome:'Amiodarona (Ancoron)',generico:'Amiodarona',cat:'🫀 Antiarrítmico',ref:'ANVISA'},
+  // ══════════════════════════════════════════════════
+  // 🩸 HEMATOLÓGICO — ANVISA/OMS
+  // ══════════════════════════════════════════════════
+  {nome:'Ácido Fólico (Neofolin 5mg)',generico:'Ácido Fólico',cat:'🩸 Hematológico',ref:'ANVISA/OMS'},
+  {nome:'Hidroxiureia (Hydrea)',generico:'Hidroxiureia',cat:'🩸 Hematológico',ref:'ANVISA/OMS'},
+  {nome:'Deferiprona (Ferriprox)',generico:'Deferiprona',cat:'🩸 Quelante de ferro',ref:'ANVISA/ANS'},
+  {nome:'Deferoxamina (Desferal)',generico:'Deferoxamina',cat:'🩸 Quelante de ferro',ref:'ANVISA/OMS'},
+  {nome:'Vitamina K1 (Konakion)',generico:'Fitomenadiona',cat:'🩸 Hemostático',ref:'ANVISA/OMS'},
+  {nome:'Ácido Tranexâmico (Transamin)',generico:'Ácido Tranexâmico',cat:'🩸 Hemostático',ref:'ANVISA'},
+  // ══════════════════════════════════════════════════
+  // 🧪 OUTROS / ESPECÍFICOS — ANVISA/OMS/ANS
+  // ══════════════════════════════════════════════════
+  {nome:'Cafeína (Cafenol Neonatal)',generico:'Citrato de Cafeína',cat:'🧪 Neonatal',ref:'ANVISA/OMS'},
+  {nome:'Surfactante Pulmonar (Survanta)',generico:'Beractant',cat:'🧪 Neonatal',ref:'ANVISA/OMS'},
+  {nome:'Surfactante (Curosurf)',generico:'Poractant alfa',cat:'🧪 Neonatal',ref:'ANVISA/OMS'},
+  {nome:'Sildenafil (Viagra)',generico:'Sildenafil',cat:'🧪 Hipertensão pulmonar',ref:'ANVISA/OMS'},
+  {nome:'Bosentana (Tracleer)',generico:'Bosentana',cat:'🧪 Hipertensão pulmonar',ref:'ANVISA/ANS'},
+  {nome:'Ivacaftor (Kalydeco)',generico:'Ivacaftor',cat:'🧪 Fibrose Cística',ref:'ANVISA/ANS'},
+  {nome:'Lumacaftor + Ivacaftor (Orkambi)',generico:'Lumacaftor + Ivacaftor',cat:'🧪 Fibrose Cística',ref:'ANVISA/ANS'},
+  {nome:'Ibuprofen IV (Pedea)',generico:'Ibuprofeno IV',cat:'🧪 Neonatal (PCA)',ref:'ANVISA'},
+  {nome:'Indometacina IV',generico:'Indometacina',cat:'🧪 Neonatal (PCA)',ref:'ANVISA/OMS'},
+  {nome:'Alfacalcidol (One Alpha)',generico:'Alfacalcidol',cat:'🧪 Metabólico',ref:'ANVISA'},
+  {nome:'Carnitina (Carnitene Solução)',generico:'Levocarnitina',cat:'🧪 Metabólico',ref:'ANVISA/OMS'},
+  {nome:'Biotina (Biotina 5mg)',generico:'Biotina (Vitamina H)',cat:'🧪 Metabólico',ref:'ANVISA'},
+  {nome:'Aciclovir (Zovirax Suspensão)',generico:'Aciclovir',cat:'🧪 Antiviral',ref:'ANVISA/OMS'},
+  {nome:'Oseltamivir (Tamiflu Suspensão)',generico:'Oseltamivir',cat:'🧪 Antiviral',ref:'ANVISA/OMS'},
+  {nome:'Ganciclovir (Cymevene)',generico:'Ganciclovir',cat:'🧪 Antiviral',ref:'ANVISA/OMS'},
 ];
-function buscarMedicamento(termo){const sug=document.getElementById('med-sugestoes');if(!termo||termo.length<2){sug.style.display='none';return;}const t=termo.toLowerCase();const resultados=MEDICAMENTOS_DB.filter(m=>m.nome.toLowerCase().includes(t)||m.generico.toLowerCase().includes(t)).slice(0,8);if(!resultados.length){sug.style.display='none';return;}sug.style.display='block';sug.innerHTML=resultados.map(m=>`<div onclick="selecionarMedicamento('${m.nome.replace(/'/g,"\\'")}','${m.generico.replace(/'/g,"\\'")}','${m.cat}')" style="padding:10px 14px;cursor:pointer;border-bottom:1px solid rgba(0,180,255,0.1);transition:background 0.15s" onmousedown="this.style.background='rgba(0,80,160,0.3)'" ontouchstart="this.style.background='rgba(0,80,160,0.3)'" onmouseup="this.style.background=''" ontouchend="this.style.background=''"><div style="font-size:0.85rem;color:var(--white);font-weight:700">${m.nome}</div><div style="font-size:0.68rem;color:var(--text-dim)">${m.cat} · ${m.generico}</div></div>`).join('');}
+function buscarMedicamento(termo){const sug=document.getElementById('med-sugestoes');if(!termo||termo.length<2){sug.style.display='none';return;}const t=termo.toLowerCase();const resultados=MEDICAMENTOS_DB.filter(m=>m.nome.toLowerCase().includes(t)||m.generico.toLowerCase().includes(t)||(m.cat&&m.cat.toLowerCase().includes(t))).slice(0,10);if(!resultados.length){sug.style.display='none';return;}sug.style.display='block';sug.innerHTML=resultados.map(m=>`<div onclick="selecionarMedicamento('${m.nome.replace(/'/g,"\\'")}','${m.generico.replace(/'/g,"\\'")}','${m.cat}')" style="padding:10px 14px;cursor:pointer;border-bottom:1px solid rgba(0,180,255,0.1);transition:background 0.15s" onmousedown="this.style.background='rgba(0,80,160,0.3)'" ontouchstart="this.style.background='rgba(0,80,160,0.3)'" onmouseup="this.style.background=''" ontouchend="this.style.background=''"><div style="font-size:0.85rem;color:var(--white);font-weight:700">${m.nome}</div><div style="font-size:0.68rem;color:var(--text-dim)">${m.cat} · ${m.generico}</div></div>`).join('');}
 function selecionarMedicamento(nome,generico){document.getElementById('med-nome').value=nome;document.getElementById('med-generico').value=generico;document.getElementById('med-sugestoes').style.display='none';}
 document.addEventListener('click',e=>{if(!e.target.closest('#med-nome')&&!e.target.closest('#med-sugestoes')){const s=document.getElementById('med-sugestoes');if(s)s.style.display='none';}});
 let medicacoes=[];
@@ -2243,6 +2584,135 @@ function salvarConfiguracaoBebe(){
   cfgFotoPendente=null;initFirebaseRefs();atualizarHeaderBebe();
   fecharConfiguracaoBebe();showToast('✅ Configurações salvas!');
 }
+</script>
+
+<script>
+// ════════════════════════════════════════════════════════
+// GOOGLE PLACES AUTOCOMPLETE
+// ════════════════════════════════════════════════════════
+
+// ⚠️  Configure sua chave de API do Google Maps aqui:
+// 1. Acesse: https://console.cloud.google.com/
+// 2. Crie um projeto → Ative "Maps JavaScript API" e "Places API"
+// 3. Gere uma chave de API e cole abaixo
+const GOOGLE_MAPS_API_KEY = 'AIzaSyBR1wBBHsBngYYivWo8nzsSViL6Sjuakis';
+
+let _placesAutocomplete = null;
+let _googleMapsLoaded = false;
+
+// Carrega a API do Google Maps dinamicamente
+function carregarGoogleMaps() {
+  if (_googleMapsLoaded || GOOGLE_MAPS_API_KEY === 'SUA_CHAVE_AQUI') {
+    if (GOOGLE_MAPS_API_KEY === 'SUA_CHAVE_AQUI') {
+      console.warn('BabyForce: Configure GOOGLE_MAPS_API_KEY para ativar o autocomplete de local.');
+      ativarAutocompleteFallback();
+    }
+    return;
+  }
+  if (typeof google !== 'undefined' && google.maps) {
+    _googleMapsLoaded = true;
+    iniciarPlacesAutocomplete();
+    return;
+  }
+  const script = document.createElement('script');
+  script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&libraries=places&language=pt-BR&region=BR&callback=_onGoogleMapsReady`;
+  script.async = true;
+  script.defer = true;
+  script.onerror = () => {
+    console.warn('BabyForce: Falha ao carregar Google Maps API. Verifique a chave de API.');
+    ativarAutocompleteFallback();
+  };
+  document.head.appendChild(script);
+}
+
+// Callback chamado quando o Google Maps API carregou
+window._onGoogleMapsReady = function() {
+  _googleMapsLoaded = true;
+  iniciarPlacesAutocomplete();
+};
+
+// Inicializa o Places Autocomplete no campo a-local
+function iniciarPlacesAutocomplete() {
+  const input = document.getElementById('a-local');
+  if (!input || !window.google?.maps?.places) return;
+
+  _placesAutocomplete = new google.maps.places.Autocomplete(input, {
+    types: ['establishment', 'geocode'],
+    componentRestrictions: { country: 'br' },
+    fields: ['name', 'formatted_address', 'geometry', 'place_id', 'types'],
+  });
+
+  // Bias para localização do usuário se disponível
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(pos => {
+      const circle = new google.maps.Circle({
+        center: { lat: pos.coords.latitude, lng: pos.coords.longitude },
+        radius: 50000, // 50km de raio
+      });
+      _placesAutocomplete.setBounds(circle.getBounds());
+    }, () => {});
+  }
+
+  // Quando um lugar for selecionado
+  _placesAutocomplete.addListener('place_changed', () => {
+    const place = _placesAutocomplete.getPlace();
+    if (!place.name && !place.formatted_address) return;
+
+    // Montar string de local elegante
+    let localStr = '';
+    if (place.name && place.formatted_address) {
+      // Evitar duplicação se o nome já está no endereço
+      const addr = place.formatted_address;
+      localStr = place.name === addr ? addr : `${place.name} — ${addr}`;
+    } else {
+      localStr = place.name || place.formatted_address || '';
+    }
+
+    input.value = localStr;
+    // Disparar evento para garantir que o valor seja capturado
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+  });
+
+  // Prevenir submit do form ao pressionar Enter na sugestão
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && document.querySelector('.pac-container .pac-item-selected')) {
+      e.preventDefault();
+    }
+  });
+
+  console.log('BabyForce: Google Places Autocomplete ativado ✅');
+}
+
+// Fallback: autocomplete básico sem Google (lista de clínicas genéricas)
+function ativarAutocompleteFallback() {
+  const input = document.getElementById('a-local');
+  if (!input) return;
+  // Apenas placeholder informativo
+  input.placeholder = 'Digite o endereço ou local da consulta';
+}
+
+// Inicializa o Places quando a tab de Agenda for aberta
+// Sobrescreve showTab para inicializar na primeira vez que abrir Missões
+const _origShowTab = window.showTab;
+window.showTab = function(id) {
+  _origShowTab && _origShowTab(id);
+  if (id === 'agenda' && !_googleMapsLoaded) {
+    setTimeout(carregarGoogleMaps, 200);
+  }
+};
+
+// Também inicializa no DOMContentLoaded caso já esteja na aba agenda
+document.addEventListener('DOMContentLoaded', () => {
+  // Observar quando o input a-local aparecer no DOM (tab pode estar oculta)
+  const observer = new MutationObserver(() => {
+    const input = document.getElementById('a-local');
+    if (input && _googleMapsLoaded && !_placesAutocomplete) {
+      iniciarPlacesAutocomplete();
+      observer.disconnect();
+    }
+  });
+  observer.observe(document.body, { childList: true, subtree: true });
+});
 </script>
 </body>
 </html>
