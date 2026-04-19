@@ -4047,7 +4047,17 @@ window._confirmarConvite = async function() {
   const convites = _getConvitesPendentes();
   const jaTemConvite = Object.values(convites).find(c => c.email === email && c.status === 'pendente');
   if (jaTemConvite) {
-    if (!confirm(`Já existe um convite pendente para ${email}.\n\nDeseja reenviar o convite? (o anterior será substituído)`)) {
+    const reenviar = await (typeof BFModal !== 'undefined'
+      ? BFModal.confirm({
+          title: 'Convite já enviado',
+          icon: '📨',
+          variant: 'info',
+          message: `Já existe um convite pendente para ${email}.\n\nDeseja reenviar? O convite anterior será substituído por um novo.`,
+          okLabel: 'Reenviar',
+          cancelLabel: 'Cancelar',
+        })
+      : Promise.resolve(confirm(`Já existe um convite pendente para ${email}. Reenviar?`)));
+    if (!reenviar) {
       if (errEl) errEl.textContent = '';
       return;
     }
@@ -4088,12 +4098,20 @@ window._confirmarConvite = async function() {
   _saveConvitesPendentes(convites);
 
   // Envia magic link via Firebase
-  let envioOk = false, mensagemErro = '';
+  let envioOk = false, mensagemErro = '', codigoErro = '';
   try {
     if (typeof firebase === 'undefined' || !firebase.auth) {
-      throw new Error('Firebase não disponível (modo offline)');
+      const err = new Error('Firebase não disponível (modo offline)');
+      err.code = 'bf/firebase-unavailable';
+      throw err;
     }
     if (typeof initFirebaseRefs === 'function') initFirebaseRefs();
+    // Verifica conectividade antes
+    if (navigator.onLine === false) {
+      const err = new Error('Sem conexão com a internet');
+      err.code = 'bf/offline';
+      throw err;
+    }
     const actionCodeSettings = {
       url: window.location.origin + window.location.pathname + '?acceptInvite=' + encodeURIComponent(token),
       handleCodeInApp: true,
@@ -4104,8 +4122,9 @@ window._confirmarConvite = async function() {
     if (typeof BFAudit !== 'undefined') BFAudit.log('convite_enviado', { token: token.substring(0, 6), email: email.substring(0, 3) + '***', comoAdmin });
   } catch (e) {
     mensagemErro = e.message || 'erro ao enviar';
+    codigoErro = e.code || '';
     console.warn('[convite] envio falhou:', e);
-    if (typeof BFAudit !== 'undefined') BFAudit.log('convite_envio_falha', { erro: e.code || 'unknown' });
+    if (typeof BFAudit !== 'undefined') BFAudit.log('convite_envio_falha', { erro: codigoErro || 'unknown' });
   }
 
   // Reabilita botão
@@ -4116,45 +4135,149 @@ window._confirmarConvite = async function() {
     document.getElementById('modal-convidar-guardiao').remove();
     _renderizarListaGuardioesAdmin();
     if (typeof showToast === 'function') showToast(`📨 Convite enviado para ${email}`);
-    // Mostrar aviso detalhado
-    alert(
-      `✓ Convite enviado!\n\n` +
-      `📧 E-mail: ${email}\n` +
-      `👤 Nome: ${nome}\n` +
-      `📆 Válido por ${CONVITE_VALIDADE_DIAS} dias\n\n` +
-      `${nome} receberá um e-mail com um link.\n` +
-      `Ao clicar no link, poderá criar uma senha e entrar no app.\n\n` +
-      `Você pode acompanhar o status em "Convites pendentes" no painel de administração.`
-    );
+    // Mostrar aviso detalhado via BFModal
+    await (typeof BFModal !== 'undefined'
+      ? BFModal.alert({
+          title: 'Convite enviado',
+          icon: '✓',
+          variant: 'success',
+          message: `📧 E-mail: ${email}\n👤 Nome: ${nome}\n📆 Válido por ${CONVITE_VALIDADE_DIAS} dias\n\n${nome} receberá um e-mail com um link de convite.\n\nAo clicar no link, poderá criar uma senha e entrar no app.\n\nVocê pode acompanhar o status em "Convites pendentes" no painel de administração.`,
+        })
+      : Promise.resolve(alert(`Convite enviado para ${email}`)));
   } else {
-    // Falha — mantém convite salvo (admin pode copiar link manualmente) mas avisa
-    if (errEl) errEl.textContent = '⚠ ' + mensagemErro;
-    // Oferece link manual para copiar
+    // Diagnóstico traduzido para o usuário
+    const diagnostico = _traduzirErroConvite(codigoErro, mensagemErro);
+
+    // Sem mostrar o erro técnico "cru" no modal; mostra UI amigável
+    if (errEl) errEl.textContent = '⚠ ' + diagnostico.resumo;
+
+    // Oferece link manual via BFModal
     const linkManual = window.location.origin + window.location.pathname + '?acceptInvite=' + encodeURIComponent(token);
-    setTimeout(() => {
-      const copiar = confirm(
-        `Não foi possível enviar o e-mail automaticamente.\n\n` +
-        `Motivo: ${mensagemErro}\n\n` +
-        `Deseja copiar o link do convite manualmente?\n` +
-        `Você pode enviar para ${email} por WhatsApp, SMS ou outro meio.\n\n` +
-        `OK = copiar link\nCancelar = descartar convite`
-      );
+    setTimeout(async () => {
+      const copiar = await (typeof BFModal !== 'undefined'
+        ? BFModal.confirm({
+            title: 'Não foi possível enviar o e-mail',
+            icon: diagnostico.icon,
+            variant: diagnostico.variant,
+            message: `${diagnostico.explicacao}\n\n💡 Alternativa: copie o link do convite e envie manualmente por WhatsApp, SMS ou outro meio.\n\nDestinatário: ${email}`,
+            okLabel: '📋 Copiar link do convite',
+            cancelLabel: 'Descartar convite',
+          })
+        : Promise.resolve(confirm('Copiar link manual?')));
+
       if (copiar) {
         try {
-          navigator.clipboard.writeText(linkManual);
-          alert('✓ Link copiado!\n\nLink:\n' + linkManual + '\n\nEnvie este link para ' + email);
-        } catch {
-          prompt('Copie o link abaixo e envie para ' + email + ':', linkManual);
+          await navigator.clipboard.writeText(linkManual);
+          await (typeof BFModal !== 'undefined'
+            ? BFModal.alert({
+                title: 'Link copiado',
+                icon: '✓',
+                variant: 'success',
+                message: `O link foi copiado para sua área de transferência.\n\nEnvie este link para ${email} por WhatsApp, SMS ou qualquer outro meio:\n\n${linkManual}`,
+              })
+            : Promise.resolve(alert('Link copiado: ' + linkManual)));
+        } catch (err) {
+          // Fallback: mostra o link num BFModal.prompt para copiar manualmente
+          await (typeof BFModal !== 'undefined'
+            ? BFModal.prompt({
+                title: 'Copie o link manualmente',
+                icon: '📋',
+                variant: 'info',
+                message: `Selecione o link abaixo e copie (Ctrl+C ou toque longo):`,
+                defaultValue: linkManual,
+                placeholder: '',
+                okLabel: 'Fechar',
+                cancelLabel: 'Fechar',
+              })
+            : Promise.resolve(prompt('Link: ', linkManual)));
         }
       } else {
         // Descarta convite
         const c = _getConvitesPendentes();
         delete c[token];
         _saveConvitesPendentes(c);
+        if (typeof showToast === 'function') showToast('Convite descartado');
+        // Fecha modal
+        const modalConv = document.getElementById('modal-convidar-guardiao');
+        if (modalConv) modalConv.remove();
       }
     }, 200);
   }
 };
+
+// Traduz erros do Firebase para mensagens amigáveis em pt-BR com diagnóstico
+function _traduzirErroConvite(codigo, msgOriginal) {
+  const cod = (codigo || '').toLowerCase();
+  const msg = (msgOriginal || '').toLowerCase();
+
+  // Sem internet / timeout
+  if (cod === 'bf/offline' || cod.includes('network-request-failed') || msg.includes('network') || msg.includes('timeout') || msg.includes('unreachable')) {
+    return {
+      icon: '📡',
+      variant: 'warn',
+      resumo: 'Sem conexão com a internet',
+      explicacao: 'Não conseguimos enviar o e-mail porque parece que você está sem conexão (ou a internet está instável).\n\n• Verifique sua conexão Wi-Fi ou dados móveis\n• Tente novamente em alguns instantes\n• Em redes corporativas, a empresa pode estar bloqueando o Firebase',
+    };
+  }
+
+  // Firebase não configurado (Email link desabilitado)
+  if (cod.includes('configuration-not-found') || cod.includes('operation-not-allowed') || msg.includes('configuration')) {
+    return {
+      icon: '⚙️',
+      variant: 'warn',
+      resumo: 'Firebase não configurado ainda',
+      explicacao: 'O envio por e-mail depende de uma configuração que o administrador ainda não ativou no painel Firebase.\n\nConsulte o arquivo GUIA_FIREBASE.md para habilitar "Email link (passwordless)".\n\nEnquanto isso, você pode enviar o convite manualmente copiando o link.',
+    };
+  }
+
+  // Domínio não autorizado
+  if (cod.includes('unauthorized-domain') || msg.includes('domain')) {
+    return {
+      icon: '🚫',
+      variant: 'warn',
+      resumo: 'Domínio não autorizado',
+      explicacao: 'O Firebase está configurado, mas o domínio atual não está na lista de domínios permitidos.\n\nAdicione o domínio ao painel Firebase (Authentication → Settings → Authorized domains) ou use o link manual.',
+    };
+  }
+
+  // Firebase indisponível
+  if (cod === 'bf/firebase-unavailable' || msg.includes('firebase não disponível')) {
+    return {
+      icon: '🔌',
+      variant: 'warn',
+      resumo: 'Firebase não carregou',
+      explicacao: 'O serviço Firebase não está disponível no momento (pode ser falha na carga dos scripts, modo offline ou bloqueio).\n\nVocê pode copiar o link manualmente e enviá-lo ao convidado.',
+    };
+  }
+
+  // Quota exceeded
+  if (cod.includes('quota') || msg.includes('quota')) {
+    return {
+      icon: '📊',
+      variant: 'warn',
+      resumo: 'Limite de envios atingido',
+      explicacao: 'O plano Firebase atingiu o limite diário de e-mails.\n\nTente novamente amanhã ou use o link manual.',
+    };
+  }
+
+  // E-mail inválido (Firebase)
+  if (cod.includes('invalid-email')) {
+    return {
+      icon: '✉️',
+      variant: 'danger',
+      resumo: 'E-mail inválido',
+      explicacao: 'O endereço de e-mail informado não é válido segundo o Firebase.\n\nVerifique se foi digitado corretamente.',
+    };
+  }
+
+  // Genérico — erro desconhecido
+  return {
+    icon: '⚠️',
+    variant: 'warn',
+    resumo: 'Não foi possível enviar',
+    explicacao: 'Ocorreu um erro inesperado ao enviar o convite.\n\nDetalhes técnicos: ' + (msgOriginal || codigo || 'desconhecido') + '\n\nVocê pode copiar o link manualmente para enviar.',
+  };
+}
 
 // ═══════════════════════════════════════════════════════════════
 // ACEITAR CONVITE — quando convidado clica no link do email
