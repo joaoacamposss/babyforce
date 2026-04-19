@@ -53,21 +53,24 @@ body{background:#020b18;margin:0;}
   --red-saber:#ff3b3b;--green-saber:#39ff14;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-body{background:var(--blue-deep);color:var(--white);font-family:'Exo 2',sans-serif;min-height:100vh;min-height:-webkit-fill-available;overflow-x:hidden;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom);-webkit-overflow-scrolling:touch;overscroll-behavior-y:none;-webkit-user-select:none;user-select:none;}
+html,body{scrollbar-gutter:auto;}
+body{background:var(--blue-deep);color:var(--white);font-family:'Exo 2',sans-serif;min-height:100vh;min-height:-webkit-fill-available;overflow-x:hidden;overflow-y:auto;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom);-webkit-overflow-scrolling:touch;overscroll-behavior-y:none;-webkit-user-select:none;user-select:none;}
+body::-webkit-scrollbar{width:0;background:transparent;}
+body{scrollbar-width:none;-ms-overflow-style:none;}
 input,textarea,[contenteditable]{-webkit-user-select:text;user-select:text;font-size:16px!important;}
 select{font-size:16px!important;}
-html{height:-webkit-fill-available;}
+html{height:-webkit-fill-available;overflow-x:hidden;}
 .star{position:fixed;background:white;border-radius:50%;animation:twinkle var(--dur) ease-in-out infinite alternate;}
 @keyframes twinkle{from{opacity:0.1;}to{opacity:0.9;}}
 .nebula{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse 60% 40% at 20% 30%,rgba(0,100,200,0.15) 0%,transparent 70%),radial-gradient(ellipse 40% 60% at 80% 70%,rgba(100,30,200,0.1) 0%,transparent 70%),radial-gradient(ellipse 30% 30% at 60% 10%,rgba(0,180,255,0.08) 0%,transparent 60%);}
 .saber-line{height:2px;background:linear-gradient(90deg,transparent,var(--blue-neon),transparent);box-shadow:0 0 8px var(--blue-neon),0 0 20px rgba(0,212,255,0.3);margin:0;}
-header{position:relative;z-index:10;text-align:center;padding:24px 16px 16px;background:linear-gradient(180deg,rgba(0,20,50,0.95) 0%,transparent 100%);}
+header{position:relative;z-index:10;text-align:center;padding:20px 16px 14px;background:linear-gradient(180deg,rgba(0,20,50,0.95) 0%,transparent 100%);}
 @keyframes pulse-glow{0%,100%{filter:drop-shadow(0 0 8px var(--blue-neon));}50%{filter:drop-shadow(0 0 20px var(--blue-neon)) drop-shadow(0 0 40px rgba(0,212,255,0.5));}}
-.header-wordmark{font-family:'Orbitron',monospace;font-size:clamp(1.5rem,5vw,2.1rem);font-weight:900;color:var(--white);text-shadow:0 0 20px var(--blue-glow),0 0 40px rgba(0,180,255,0.4);letter-spacing:0.04em;margin-top:6px;line-height:1;}
+.header-wordmark{font-family:'Orbitron',monospace;font-size:clamp(1.35rem,4.5vw,2rem);font-weight:900;color:var(--white);text-shadow:0 0 18px var(--blue-glow),0 0 32px rgba(0,180,255,0.35);letter-spacing:0.03em;margin-top:10px;margin-bottom:6px;line-height:1.3;padding:2px 4px;display:inline-block;white-space:nowrap;}
 .header-wordmark .bf-blue{color:var(--blue-neon);}
 .header-wordmark .bf-purple{color:var(--purple-glow);}
-.header-baby-name{font-family:'Orbitron',monospace;font-size:clamp(0.75rem,3vw,1rem);color:var(--gold);letter-spacing:0.12em;margin-top:4px;opacity:0.9;}
-.padawan-meta{margin-top:4px;font-family:'Exo 2',sans-serif;font-size:0.78rem;color:var(--text-dim);display:flex;align-items:center;justify-content:center;gap:8px;}
+.header-baby-name{font-family:'Orbitron',monospace;font-size:clamp(0.75rem,3vw,1rem);color:var(--gold);letter-spacing:0.12em;margin-top:8px;opacity:0.9;line-height:1.35;}
+.padawan-meta{margin-top:6px;font-family:'Exo 2',sans-serif;font-size:0.78rem;color:var(--text-dim);display:flex;align-items:center;justify-content:center;gap:8px;line-height:1.4;}
 .padawan-meta .pm-sep{color:rgba(0,180,255,0.25);}
 .padawan-meta .pm-idade{color:var(--gold);font-weight:600;}
 header p.subtitle{font-family:'Orbitron',monospace;font-size:0.58rem;color:rgba(122,179,212,0.5);letter-spacing:0.2em;text-transform:uppercase;margin-top:4px;opacity:0.7;}
@@ -294,10 +297,10 @@ textarea{resize:none;min-height:80px;}
 .emoji-btn{font-size:1.4rem;padding:6px;border-radius:8px;border:2px solid transparent;background:rgba(0,20,50,0.6);cursor:pointer;transition:all 0.15s;text-align:center;line-height:1;-webkit-tap-highlight-color:transparent;min-width:40px;min-height:40px;}
 .emoji-btn.sel{border-color:var(--blue-neon);background:rgba(0,100,200,0.3);box-shadow:0 0 8px rgba(0,180,255,0.3);}
 .btn-novo-guardiao{width:100%;padding:11px;background:transparent;border:1px dashed rgba(0,180,255,0.3);border-radius:10px;color:var(--text-dim);font-family:'Orbitron',monospace;font-size:0.65rem;letter-spacing:0.08em;cursor:pointer;transition:all 0.2s;}
-::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar{width:0;height:0;background:transparent;}
 ::-webkit-scrollbar-track{background:transparent;}
-::-webkit-scrollbar-thumb{background:rgba(0,180,255,0.3);border-radius:2px;}
-@media (max-width:374px){.header-wordmark{font-size:1.2rem;}.stat-value{font-size:1.3rem;}main{padding:10px;}nav button{min-width:60px;font-size:0.48rem;}}
+::-webkit-scrollbar-thumb{background:transparent;border-radius:2px;}
+@media (max-width:374px){.header-wordmark{font-size:1.2rem;letter-spacing:0.02em;margin-top:8px;}.stat-value{font-size:1.3rem;}main{padding:10px;}nav button{min-width:60px;font-size:0.48rem;}.header-baby-name{margin-top:6px;}}
 @media (max-height:500px) and (orientation:landscape){header{padding:8px 16px;}.arthur-photo-wrap{display:none;}header p.subtitle{display:none;}main{padding:8px 14px;}}
 @media (hover:none){.btn:hover{opacity:1;transform:none;}.btn-guardian:hover{transform:none;}}
 
@@ -958,18 +961,37 @@ textarea{resize:none;min-height:80px;}
     <div class="row-2">
       <div class="form-group">
         <label>Tipo</label>
-        <select id="m-tipo">
+        <select id="m-tipo" onchange="_mamadaAtualizarTipo()">
           <option value="peito">🤱 Fonte Natural</option>
           <option value="formula">🥛 Fórmula Alquímica</option>
           <option value="misto">✨ Misto</option>
         </select>
       </div>
-      <div class="form-group">
+      <div class="form-group" id="m-ml-wrap">
         <label>Volume (ml)</label>
         <select id="m-ml"><option value="">— selecionar —</option>
           <script>for(let v=10;v<=500;v+=5)document.write(`<option value="${v}">${v} ml</option>`);</script>
         </select>
       </div>
+    </div>
+    <!-- Campos específicos para MISTO -->
+    <div id="m-misto-wrap" style="display:none;background:rgba(199,125,255,0.08);border:1px solid rgba(199,125,255,0.25);border-radius:10px;padding:10px 12px;margin-bottom:12px">
+      <div style="font-family:'Orbitron',monospace;font-size:0.6rem;color:var(--purple-neon);letter-spacing:0.08em;margin-bottom:8px">✨ MAMADA MISTA · DISCRIMINAR VOLUMES</div>
+      <div class="row-2">
+        <div class="form-group">
+          <label>🤱 Leite Materno (ml)</label>
+          <select id="m-ml-materno"><option value="">— ml —</option>
+            <script>for(let v=5;v<=300;v+=5)document.write(`<option value="${v}">${v} ml</option>`);</script>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>🥛 Fórmula (ml)</label>
+          <select id="m-ml-formula"><option value="">— ml —</option>
+            <script>for(let v=5;v<=300;v+=5)document.write(`<option value="${v}">${v} ml</option>`);</script>
+          </select>
+        </div>
+      </div>
+      <div style="font-size:0.62rem;color:var(--text-dim);line-height:1.4;margin-top:2px">💡 Discriminar ajuda o pediatra a avaliar a proporção de aleitamento materno ao longo do tempo.</div>
     </div>
     <div class="form-group"><label>Observações</label><input type="text" id="m-obs" placeholder="ex: dormiu durante a mamada..."></div>
     <button class="btn btn-primary btn-full" onclick="salvarMamada()">⚡ Registrar</button>
@@ -981,6 +1003,10 @@ textarea{resize:none;min-height:80px;}
     <button class="filter-btn" onclick="filtrarMamadas('misto',this)">✨ Misto</button>
   </div>
   <div id="lista-mamadas"></div>
+  <div style="text-align:center;margin-top:16px;padding-top:14px;border-top:1px dashed rgba(199,125,255,0.2)">
+    <button onclick="window.abrirModalDesmame()" style="background:none;border:1px solid rgba(199,125,255,0.3);color:var(--purple-neon);padding:9px 18px;border-radius:20px;font-family:'Orbitron',monospace;font-size:0.6rem;letter-spacing:0.08em;cursor:pointer">🎉 Registrar fim do aleitamento</button>
+    <div style="font-size:0.58rem;color:var(--text-dim);margin-top:6px;line-height:1.4;max-width:260px;margin-left:auto;margin-right:auto">Quando a amamentação terminar, celebre esta jornada.</div>
+  </div>
   </div>
 
   <div id="nutricao-panel-alimentos" class="nutricao-panel" style="display:none"></div>
@@ -1036,6 +1062,22 @@ textarea{resize:none;min-height:80px;}
     <div id="lista-agenda"></div>
   </div>
   <div id="subpanel-medicacao" class="subpanel">
+    <!-- Card de Vitaminas Profiláticas — referências SBP, Ministério da Saúde, OMS -->
+    <div class="card" style="background:linear-gradient(135deg,rgba(255,200,80,0.12),rgba(100,30,180,0.15));border:1px solid rgba(255,200,80,0.3);margin-bottom:12px">
+      <div class="section-title" style="display:flex;align-items:center;gap:8px">
+        <span>🌟 Vitaminas Profiláticas</span>
+        <span style="font-family:'Orbitron',monospace;font-size:0.52rem;color:var(--gold);background:rgba(255,200,80,0.14);padding:2px 7px;border-radius:8px;letter-spacing:0.08em;font-weight:600">SBP · OMS · MS</span>
+      </div>
+      <div style="font-size:0.7rem;color:var(--text-dim);line-height:1.5;margin-bottom:10px">
+        Suplementos profiláticos recomendados pela <strong style="color:var(--gold)">Sociedade Brasileira de Pediatria</strong> e Ministério da Saúde. Toque em uma para pré-preencher o formulário de registro.
+      </div>
+      <div id="vitaminas-cards" style="display:grid;grid-template-columns:1fr;gap:8px"></div>
+      <div style="font-size:0.6rem;color:var(--text-dim);line-height:1.5;margin-top:10px;padding:7px 9px;background:rgba(0,30,70,0.4);border-radius:6px;border-left:2px solid rgba(0,180,255,0.3)">
+        💡 <b>Vitamina K ao nascer</b>: aplicada <u>na maternidade</u> como medicamento injetável (IM).
+        Não é vacina — por isso fica aqui em <b>Elixires</b>, não em Escudos.
+      </div>
+    </div>
+
     <div class="card">
       <div class="section-title">⚗️ Novo Elixir da Força</div>
       <div class="form-group" style="position:relative">
@@ -1246,22 +1288,36 @@ textarea{resize:none;min-height:80px;}
     
     <div class="card">
       <div class="section-title">🌙 Novo Marco</div>
+      <!-- Sugestões rápidas de marcos comuns -->
+      <div style="margin-bottom:10px">
+        <div style="font-family:'Orbitron',monospace;font-size:0.56rem;color:var(--text-dim);letter-spacing:0.08em;margin-bottom:6px">✨ SUGESTÕES RÁPIDAS</div>
+        <div id="mv-sugestoes" style="display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;-webkit-overflow-scrolling:touch"></div>
+      </div>
       <div class="form-group"><label>Descrição</label><input type="text" id="mv-titulo" placeholder="ex: Primeiro sorriso!"></div>
       <div class="row-2">
         <div class="form-group">
-          <label>Mês de Vida</label>
+          <label>Idade / Período</label>
           <select id="mv-mes">
+            <option value="0">🌟 Nascimento / Maternidade</option>
             <option value="1">1º Mês</option><option value="2">2º Mês</option><option value="3">3º Mês</option>
             <option value="4">4º Mês</option><option value="5">5º Mês</option><option value="6">6º Mês</option>
             <option value="7">7º Mês</option><option value="8">8º Mês</option><option value="9">9º Mês</option>
             <option value="10">10º Mês</option><option value="11">11º Mês</option><option value="12">✨ 1 Aninho</option>
+            <option value="13">13º Mês</option><option value="14">14º Mês</option><option value="15">15º Mês</option>
+            <option value="16">16º Mês</option><option value="17">17º Mês</option><option value="18">18 Meses</option>
+            <option value="20">20 Meses</option><option value="22">22 Meses</option><option value="24">✨ 2 Anos</option>
+            <option value="30">30 Meses</option><option value="36">🎂 3 Anos</option>
+            <option value="48">🎂 4 Anos</option><option value="60">🎂 5 Anos</option>
           </select>
         </div>
         <div class="form-group">
           <label>Categoria</label>
           <select id="mv-cat">
-            <option value="marco">⭐ Marco</option><option value="presente">🎁 Presente</option>
-            <option value="memoria">📸 Memória</option><option value="saude">🏥 Saúde</option>
+            <option value="marco">⭐ Marco</option>
+            <option value="maternidade">🏥 Maternidade</option>
+            <option value="presente">🎁 Presente</option>
+            <option value="memoria">📸 Memória</option>
+            <option value="saude">💉 Saúde</option>
             <option value="outro">💬 Outros</option>
           </select>
         </div>
@@ -1450,7 +1506,11 @@ textarea{resize:none;min-height:80px;}
   <div class="card" style="margin-bottom:12px">
     <div class="section-title">🛡️ Escudos de Proteção</div>
     <div style="font-size:0.72rem;color:var(--text-dim);line-height:1.5">
-      Calendário PNI 2025/2026 + recomendações <strong style="color:var(--gold)">SBP · SBIm</strong>.<br>Toque para marcar como aplicada.
+      Calendário PNI 2025/2026 + recomendações <strong style="color:var(--gold)">SBP · SBIm</strong>.<br>Toque para registrar como aplicada com lote, fabricante e local (igual à caderneta do SUS).
+    </div>
+    <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+      <button class="btn" style="flex:1;min-width:140px;background:linear-gradient(135deg,rgba(0,180,255,0.2),rgba(199,125,255,0.2));border:1px solid rgba(0,180,255,0.4);color:var(--blue-neon);font-size:0.72rem;padding:10px" onclick="exportarCaderneta()">📄 Exportar Caderneta SUS</button>
+      <button class="btn" style="flex:1;min-width:140px;background:rgba(0,30,70,0.5);border:1px solid rgba(0,180,255,0.3);color:var(--text-dim);font-size:0.72rem;padding:10px" onclick="abrirModalRegistroVacinaLivre()">+ Registrar vacina extra</button>
     </div>
   </div>
   <div class="vac-progresso" id="vac-progresso"></div>
@@ -2463,10 +2523,26 @@ function atualizarIdade(){
   const birthISO=getBirthISO();const idade=calcularIdade(birthISO);const el=document.getElementById('hdr-idade');
   if(!el)return;if(!idade||!birthISO){el.textContent='—';return;}
   const{meses,dias}=idade;
-  if(meses===0&&dias===0)el.textContent='recém chegado(a) à Galáxia';
-  else if(meses===0)el.textContent=`${dias} dia${dias!==1?'s':''}`;
-  else if(dias===0)el.textContent=`${meses} ${meses!==1?'meses':'mês'}`;
-  else el.textContent=`${meses} ${meses!==1?'meses':'mês'} e ${dias} dia${dias!==1?'s':''}`;
+  // 0 dias (nascimento) → recém-chegado
+  if(meses===0&&dias===0){el.textContent='recém chegado(a) à Galáxia';return;}
+  // Menos de 1 mês → dias
+  if(meses===0){el.textContent=`${dias} dia${dias!==1?'s':''}`;return;}
+  // Menos de 12 meses → meses (+ dias se aplicável)
+  if(meses<12){
+    if(dias===0)el.textContent=`${meses} ${meses!==1?'meses':'mês'}`;
+    else el.textContent=`${meses} ${meses!==1?'meses':'mês'} e ${dias} dia${dias!==1?'s':''}`;
+    return;
+  }
+  // De 12 a 23 meses → 1 ano e X meses
+  if(meses<24){
+    const mesesRest=meses-12;
+    if(mesesRest===0)el.textContent='1 ano';
+    else el.textContent=`1 ano e ${mesesRest} ${mesesRest!==1?'meses':'mês'}`;
+    return;
+  }
+  // A partir de 2 anos → apenas anos (arredondando pra baixo)
+  const anos=Math.floor(meses/12);
+  el.textContent=`${anos} anos`;
 }
 atualizarIdade();setInterval(atualizarIdade,1800000);
 
@@ -2521,7 +2597,7 @@ const HUB_MAPA = {
     defaultTab: 'dashboard'
   },
   cuidado: {
-    label: 'Cuidado', icon: '🍼',
+    label: 'Cuidado', icon: '🫶',
     subTabs: [
       { id:'mamadas',  label:'🍼 Nutrição', desc:'Mamadas e alimentos' },
       { id:'sono',     label:'😴 Sono',     desc:'Ciclos e descanso' },
@@ -2686,11 +2762,43 @@ function ordenarMamadas(arr){return[...arr].sort((a,b)=>{const da=(a.data||'0000
 function salvarMamada(){
   const data=document.getElementById('m-data').value,hora=document.getElementById('m-hora').value,tipo=document.getElementById('m-tipo').value,ml=document.getElementById('m-ml').value,obs=document.getElementById('m-obs').value;
   if(!data||!hora){alert('⚠️ Defina data e hora!');return;}
-  db.mamadas.push({id:Date.now(),data,hora,tipo,ml:ml?parseInt(ml):null,obs,autor:usuarioAtual});
+  const registro = {id:Date.now(),data,hora,tipo,ml:ml?parseInt(ml):null,obs,autor:usuarioAtual};
+  // Para mistura: captura discriminação leite materno + fórmula
+  if (tipo === 'misto') {
+    const mlMaterno = document.getElementById('m-ml-materno')?.value;
+    const mlFormula = document.getElementById('m-ml-formula')?.value;
+    if (mlMaterno) registro.ml_materno = parseInt(mlMaterno);
+    if (mlFormula) registro.ml_formula = parseInt(mlFormula);
+    // Se usuário informou discriminação, calcula o total automaticamente
+    if (registro.ml_materno || registro.ml_formula) {
+      registro.ml = (registro.ml_materno || 0) + (registro.ml_formula || 0);
+    }
+  }
+  db.mamadas.push(registro);
   db.mamadas=ordenarMamadas(db.mamadas);saveData(db);
   document.getElementById('m-ml').value='';document.getElementById('m-obs').value='';document.getElementById('m-hora').value=nowTime();
+  const mMat = document.getElementById('m-ml-materno'); if (mMat) mMat.value='';
+  const mFor = document.getElementById('m-ml-formula'); if (mFor) mFor.value='';
   renderMamadas();renderDashboard();showToast('⚡ Alimentação registrada!');
 }
+
+// Mostrar/ocultar campos de discriminação conforme tipo
+window._mamadaAtualizarTipo = function() {
+  const tipo = document.getElementById('m-tipo')?.value;
+  const mistoWrap = document.getElementById('m-misto-wrap');
+  const mlWrap = document.getElementById('m-ml-wrap');
+  if (!mistoWrap || !mlWrap) return;
+  if (tipo === 'misto') {
+    mistoWrap.style.display = 'block';
+    // Campo total vira opcional (calculado automaticamente)
+    const label = mlWrap.querySelector('label');
+    if (label) label.textContent = 'Volume total (ml) — opcional';
+  } else {
+    mistoWrap.style.display = 'none';
+    const label = mlWrap.querySelector('label');
+    if (label) label.textContent = 'Volume (ml)';
+  }
+};
 let _pendingDelete=null;
 function confirmarDelete(tipo,id,msg){_pendingDelete={tipo,id};document.getElementById('modal-msg').textContent=msg||'Deseja apagar este registro?';document.getElementById('modal-confirm-btn').onclick=executarDelete;document.getElementById('modal-confirm').style.display='flex';}
 function fecharModal(){document.getElementById('modal-confirm').style.display='none';_pendingDelete=null;_pendingDeleteGuardiao=null;const btn=document.getElementById('modal-confirm-btn');if(btn){btn.textContent='⚡ Excluir';btn.onclick=executarDelete;}}
@@ -2716,7 +2824,17 @@ function renderMamadas(){
   const el=document.getElementById('lista-mamadas');
   if(!list.length){el.innerHTML='<div class="empty"><div class="empty-icon">🍼</div><p>Nenhuma alimentação registrada</p></div>';return;}
   const tipoLabel={peito:'🤱 Natural',formula:'🥛 Fórmula',misto:'✨ Misto'};
-  el.innerHTML=list.map(m=>`<div class="feed-item ${m.tipo}"><div style="flex:1"><div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><span class="badge badge-${m.tipo}">${tipoLabel[m.tipo]||m.tipo}</span>${m.ml?`<span style="color:var(--blue-neon);font-family:'Orbitron',monospace;font-size:0.75rem">${m.ml}ml</span>`:''}</div><div class="feed-meta">${formatDate(m.data)} · ${m.hora}</div>${m.obs?`<div style="font-size:0.8rem;color:#7ab3d4;margin-top:4px">${m.obs}</div>`:''}${m.autor?`<div class="autor-tag">⚔️ ${nomeAutor(m.autor)}</div>`:''}</div><div style="display:flex;flex-direction:column;gap:6px"><button class="btn-edit-mamada" onclick="abrirModalEditarMamada(${m.id})">✏️</button><button class="btn btn-danger btn-sm" onclick="deleteMamada(${m.id})">🗑</button></div></div>`).join('');
+  el.innerHTML=list.map(m=>{
+    // Discriminação específica para mista
+    let discrim = '';
+    if (m.tipo === 'misto' && (m.ml_materno || m.ml_formula)) {
+      const partes = [];
+      if (m.ml_materno) partes.push(`<span style="color:#ff78b4;font-size:0.68rem">🤱 ${m.ml_materno}ml LM</span>`);
+      if (m.ml_formula) partes.push(`<span style="color:#ffc856;font-size:0.68rem">🥛 ${m.ml_formula}ml fórmula</span>`);
+      discrim = `<div style="margin-top:3px;display:flex;gap:10px;flex-wrap:wrap">${partes.join('')}</div>`;
+    }
+    return `<div class="feed-item ${m.tipo}"><div style="flex:1"><div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><span class="badge badge-${m.tipo}">${tipoLabel[m.tipo]||m.tipo}</span>${m.ml?`<span style="color:var(--blue-neon);font-family:'Orbitron',monospace;font-size:0.75rem">${m.ml}ml</span>`:''}</div><div class="feed-meta">${formatDate(m.data)} · ${m.hora}</div>${discrim}${m.obs?`<div style="font-size:0.8rem;color:#7ab3d4;margin-top:4px">${m.obs}</div>`:''}${m.autor?`<div class="autor-tag">⚔️ ${nomeAutor(m.autor)}</div>`:''}</div><div style="display:flex;flex-direction:column;gap:6px"><button class="btn-edit-mamada" onclick="abrirModalEditarMamada(${m.id})">✏️</button><button class="btn btn-danger btn-sm" onclick="deleteMamada(${m.id})">🗑</button></div></div>`;
+  }).join('');
 }
 
 // ── DÚVIDAS ──
@@ -2796,7 +2914,99 @@ function renderDashboard(){
 // ── MESVERSÁRIO ──
 const MV_CATS={marco:'⭐ Marco',presente:'🎁 Presente',memoria:'📸 Memória',saude:'🏥 Saúde',outro:'💬 Outros'};
 let mvFiltroMes='todos';
-function salvarMesversario(){const titulo=document.getElementById('mv-titulo').value.trim(),mes=parseInt(document.getElementById('mv-mes').value),cat=document.getElementById('mv-cat').value,obs=document.getElementById('mv-obs').value.trim();if(!titulo){alert('⚠️ Descreva o marco!');return;}if(!db.mesversario)db.mesversario=[];db.mesversario.push({id:Date.now(),titulo,mes,cat,obs});db.mesversario.sort((a,b)=>a.mes-b.mes||a.id-b.id);saveData(db);document.getElementById('mv-titulo').value='';document.getElementById('mv-obs').value='';renderMesversario();showToast('🌙 Marco registrado!');}
+function salvarMesversario(){const titulo=document.getElementById('mv-titulo').value.trim(),mes=parseInt(document.getElementById('mv-mes').value),cat=document.getElementById('mv-cat').value,obs=document.getElementById('mv-obs').value.trim();if(!titulo){alert('⚠️ Descreva o marco!');return;}if(!db.mesversario)db.mesversario=[];db.mesversario.push({id:Date.now(),titulo,mes,cat,obs});db.mesversario.sort((a,b)=>a.mes-b.mes||a.id-b.id);saveData(db);document.getElementById('mv-titulo').value='';document.getElementById('mv-obs').value='';renderMesversario();renderSugestoesMarcos();showToast('🌙 Marco registrado!');}
+
+// ═══════════════════════════════════════════
+// MARCOS SUGERIDOS — Biblioteca pré-definida
+// Fontes: SBP, CDC Milestones, AAP Bright Futures, Caderneta da Criança (MS)
+// ═══════════════════════════════════════════
+const MARCOS_SUGERIDOS = [
+  // Nascimento / Maternidade (eventos e triagens — NÃO vacinas, NÃO medicamentos)
+  { titulo: 'Nascimento', mes: 0, cat: 'maternidade', icon: '🌟' },
+  { titulo: 'Primeira mamada', mes: 0, cat: 'maternidade', icon: '🤱' },
+  { titulo: 'Primeiro colo da mamãe', mes: 0, cat: 'maternidade', icon: '💕' },
+  { titulo: 'Teste do Pezinho', mes: 0, cat: 'maternidade', icon: '🦶' },
+  { titulo: 'Teste do Olhinho', mes: 0, cat: 'maternidade', icon: '👁' },
+  { titulo: 'Teste da Orelhinha', mes: 0, cat: 'maternidade', icon: '👂' },
+  { titulo: 'Teste do Coraçãozinho', mes: 0, cat: 'maternidade', icon: '❤️' },
+  { titulo: 'Teste da Linguinha', mes: 0, cat: 'maternidade', icon: '👅' },
+  { titulo: 'Alta da maternidade', mes: 0, cat: 'maternidade', icon: '🏥' },
+  { titulo: 'Primeira foto em casa', mes: 0, cat: 'memoria', icon: '📸' },
+  { titulo: 'Primeira consulta pediatra', mes: 0, cat: 'saude', icon: '👨‍⚕️' },
+  { titulo: 'Queda do coto umbilical', mes: 0, cat: 'saude', icon: '🌱' },
+  // 1-3 meses
+  { titulo: 'Primeiro sorriso social', mes: 2, cat: 'marco', icon: '😊' },
+  { titulo: 'Sustenta a cabeça', mes: 3, cat: 'marco', icon: '🧠' },
+  { titulo: 'Primeira gargalhada', mes: 3, cat: 'marco', icon: '🤣' },
+  // 4-6 meses
+  { titulo: 'Rolou sozinho(a)', mes: 4, cat: 'marco', icon: '🔄' },
+  { titulo: 'Primeiros balbucios', mes: 5, cat: 'marco', icon: '🗣' },
+  { titulo: 'Sentou com apoio', mes: 6, cat: 'marco', icon: '🪑' },
+  { titulo: 'Início da introdução alimentar', mes: 6, cat: 'saude', icon: '🍎' },
+  // 7-12 meses
+  { titulo: 'Sentou sem apoio', mes: 7, cat: 'marco', icon: '🧘' },
+  { titulo: 'Engatinhou', mes: 9, cat: 'marco', icon: '🐛' },
+  { titulo: 'Ficou em pé com apoio', mes: 10, cat: 'marco', icon: '🧍' },
+  { titulo: 'Primeira palavra', mes: 12, cat: 'marco', icon: '💬' },
+  { titulo: 'Primeiros passos', mes: 12, cat: 'marco', icon: '👣' },
+  { titulo: 'Primeiro dente', mes: 6, cat: 'marco', icon: '🦷' },
+  { titulo: '✨ 1 Aninho!', mes: 12, cat: 'memoria', icon: '🎂' },
+  // 13-24 meses
+  { titulo: 'Andou sem apoio', mes: 14, cat: 'marco', icon: '🚶' },
+  { titulo: 'Duas palavras juntas', mes: 18, cat: 'marco', icon: '📖' },
+  { titulo: '🎂 2 Anos!', mes: 24, cat: 'memoria', icon: '🎂' },
+  { titulo: 'Frases de 3 palavras', mes: 30, cat: 'marco', icon: '🗨' },
+  { titulo: '🎂 3 Anos!', mes: 36, cat: 'memoria', icon: '🎂' },
+];
+
+function renderSugestoesMarcos(){
+  const el = document.getElementById('mv-sugestoes');
+  if (!el) return;
+  // Pega marcos já registrados para não duplicar como sugestão
+  const ja = new Set((db.mesversario || []).map(m => (m.titulo || '').toLowerCase()));
+  const dias = (typeof getBabyAgeInDays === 'function') ? (getBabyAgeInDays() || 0) : 0;
+  const mesesIdade = Math.floor(dias / 30.44);
+  // Filtrar: mostra sugestões até mesesIdade + 2 meses, que ainda não foram registradas
+  const sugestoes = MARCOS_SUGERIDOS.filter(m =>
+    !ja.has(m.titulo.toLowerCase()) &&
+    m.mes <= Math.max(3, mesesIdade + 2)
+  ).slice(0, 12);
+  if (!sugestoes.length) {
+    el.innerHTML = '<div style="font-size:0.64rem;color:var(--text-dim);padding:6px 2px">Todos os marcos sugeridos já foram registrados 🎉</div>';
+    return;
+  }
+  el.innerHTML = sugestoes.map(s => `
+    <button onclick="_preencherMarco('${s.titulo.replace(/'/g,"\\'")}', ${s.mes}, '${s.cat}')"
+      style="flex-shrink:0;background:rgba(255,200,0,0.1);border:1px solid rgba(255,200,0,0.3);color:var(--gold);padding:6px 11px;border-radius:14px;font-family:'Exo 2',sans-serif;font-size:0.68rem;cursor:pointer;white-space:nowrap;line-height:1.2">
+      ${s.icon} ${s.titulo}
+    </button>
+  `).join('');
+}
+
+window._preencherMarco = function(titulo, mes, cat) {
+  const t = document.getElementById('mv-titulo');
+  const m = document.getElementById('mv-mes');
+  const c = document.getElementById('mv-cat');
+  if (t) t.value = titulo;
+  if (m) m.value = mes;
+  if (c) c.value = cat;
+  if (t) { t.focus(); t.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+};
+
+// Renderizar sugestões quando o painel de marcos abrir
+(function hookSugestoesMarcos(){
+  if (typeof window.showOrbitasTab === 'function') {
+    const orig = window.showOrbitasTab;
+    window.showOrbitasTab = function(tab, el) {
+      orig.apply(this, arguments);
+      if (tab === 'marcos') {
+        setTimeout(renderSugestoesMarcos, 100);
+      }
+    };
+  }
+  // Render inicial também
+  setTimeout(renderSugestoesMarcos, 1800);
+})();
 function deleteMesversario(id){confirmarDelete('mesversario',id,'Apagar este marco?');}
 function renderMesversario(){
   if(!db.mesversario)db.mesversario=[];
@@ -2896,8 +3106,430 @@ let vacStatus={},vacExtras={};
 try{vacStatus=JSON.parse(localStorage.getItem(VAC_KEY))||{};}catch(e){}
 try{vacExtras=JSON.parse(localStorage.getItem(VAC_EX_KEY))||{};}catch(e){}
 function loadVacinasOuter(){loadVacinasDB().then(d=>{vacStatus=d;renderVacinas();});loadExtrasDB().then(d=>{vacExtras=d;renderVacinas();});if(VACINHAS_REF){VACINHAS_REF.onSnapshot(snap=>{if(!snap.exists)return;const novo=snap.data().status||{};if(JSON.stringify(vacStatus)!==JSON.stringify(novo)){vacStatus=novo;localStorage.setItem(VAC_KEY,JSON.stringify(novo));renderVacinas();}},()=>{});}if(EXTRAS_REF){EXTRAS_REF.onSnapshot(snap=>{if(!snap.exists)return;const novo=snap.data().extras||{};if(JSON.stringify(vacExtras)!==JSON.stringify(novo)){vacExtras=novo;localStorage.setItem(VAC_EX_KEY,JSON.stringify(novo));renderVacinas();}},()=>{});}}
-function toggleVacina(id){if(!vacStatus[id]){const hoje=new Date();const d=String(hoje.getDate()).padStart(2,'0'),m=String(hoje.getMonth()+1).padStart(2,'0'),y=hoje.getFullYear();vacStatus[id]={feita:true,data:`${d}/${m}/${y}`};}else{delete vacStatus[id];}saveVacinas(vacStatus);renderVacinas();}
-function toggleVacinaExtra(id){if(!vacStatus[id]){const hoje=new Date();vacStatus[id]={feita:true,data:`${String(hoje.getDate()).padStart(2,'0')}/${String(hoje.getMonth()+1).padStart(2,'0')}/${hoje.getFullYear()}`};}else{delete vacStatus[id];}saveVacinas(vacStatus);renderVacinas();}
+// ─── VACINAS — toggle que abre modal para capturar dados da carteirinha SUS ───
+// Campos obrigatórios conforme caderneta oficial: data, dose, lote, fabricante, local, profissional
+function toggleVacina(id){
+  if(!vacStatus[id]){
+    // Abrir modal de registro completo
+    abrirModalRegistroVacina(id, 'padrao');
+  } else {
+    // Se já feita, pergunta se quer editar ou desmarcar
+    _abrirModalEditarVacina(id);
+  }
+}
+function toggleVacinaExtra(id){
+  if(!vacStatus[id]){
+    abrirModalRegistroVacina(id, 'extra');
+  } else {
+    _abrirModalEditarVacina(id);
+  }
+}
+
+// Modal de registro da vacina (captura lote, fabricante, local, profissional — como na caderneta SUS)
+function abrirModalRegistroVacina(id, tipo){
+  // Achar dados da vacina
+  let vacinaInfo = null;
+  for (const grupo of VACINAS_CALENDARIO) {
+    const v = grupo.vacinas.find(x => x.id === id);
+    if (v) { vacinaInfo = { ...v, grupo: grupo.grupo }; break; }
+  }
+  if (!vacinaInfo && tipo === 'extra') {
+    for (const k of Object.keys(vacExtras || {})) {
+      const v = (vacExtras[k] || []).find(x => x.id === id);
+      if (v) { vacinaInfo = { ...v, grupo: '(extra)' }; break; }
+    }
+  }
+  if (!vacinaInfo) { vacinaInfo = { id, nome: 'Vacina', doenca: '', grupo: '' }; }
+
+  // Remover modal anterior se existir
+  const existente = document.getElementById('modal-registro-vacina');
+  if (existente) existente.remove();
+
+  const hoje = new Date();
+  const dataHoje = `${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2,'0')}-${String(hoje.getDate()).padStart(2,'0')}`;
+
+  const modal = document.createElement('div');
+  modal.id = 'modal-registro-vacina';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,10,30,0.94);z-index:99998;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(8px);overflow-y:auto;';
+  modal.innerHTML = `
+    <div style="max-width:480px;width:100%;background:linear-gradient(135deg,#031027 0%,#0a1a3d 100%);border:1px solid rgba(0,180,255,0.4);border-radius:14px;padding:20px;color:#fff;font-family:'Exo 2',sans-serif;max-height:92vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.6);">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+        <div style="font-size:1.6rem">🛡️</div>
+        <div style="flex:1">
+          <div style="font-family:'Orbitron',monospace;font-size:0.78rem;color:#00d4ff;letter-spacing:0.06em;font-weight:700;line-height:1.2">REGISTRAR VACINA APLICADA</div>
+          <div style="font-size:0.64rem;color:#9eb0c8;margin-top:3px">${vacinaInfo.nome} · ${vacinaInfo.grupo}</div>
+        </div>
+        <button onclick="document.getElementById('modal-registro-vacina').remove()" style="background:rgba(0,30,70,0.5);border:1px solid rgba(0,180,255,0.3);border-radius:6px;color:#00d4ff;width:32px;height:32px;cursor:pointer;font-size:1rem;line-height:1">✕</button>
+      </div>
+
+      <div style="background:rgba(0,40,90,0.4);border-left:3px solid #00d4ff;border-radius:6px;padding:9px 11px;margin-bottom:14px;font-size:0.7rem;line-height:1.5;color:#cbd5e1">
+        Preencha como consta na <strong style="color:#fff">Caderneta de Vacinação do SUS</strong>.
+        Campos marcados com * são obrigatórios.
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+        <div>
+          <label style="display:block;font-family:'Orbitron',monospace;font-size:0.58rem;color:#9eb0c8;letter-spacing:0.06em;margin-bottom:4px">DATA DE APLICAÇÃO *</label>
+          <input type="date" id="vac-reg-data" value="${dataHoje}" style="width:100%;background:rgba(0,20,50,0.8);border:1px solid rgba(0,180,255,0.3);border-radius:8px;color:#fff;padding:9px 11px;font-size:15px;font-family:'Exo 2',sans-serif;outline:none;">
+        </div>
+        <div>
+          <label style="display:block;font-family:'Orbitron',monospace;font-size:0.58rem;color:#9eb0c8;letter-spacing:0.06em;margin-bottom:4px">DOSE *</label>
+          <input type="text" id="vac-reg-dose" value="${_inferirDose(vacinaInfo.nome)}" placeholder="ex: 1ª, 2ª, reforço" style="width:100%;background:rgba(0,20,50,0.8);border:1px solid rgba(0,180,255,0.3);border-radius:8px;color:#fff;padding:9px 11px;font-size:15px;font-family:'Exo 2',sans-serif;outline:none;">
+        </div>
+      </div>
+
+      <div style="margin-bottom:10px">
+        <label style="display:block;font-family:'Orbitron',monospace;font-size:0.58rem;color:#9eb0c8;letter-spacing:0.06em;margin-bottom:4px">LOTE</label>
+        <input type="text" id="vac-reg-lote" placeholder="ex: AE123456" style="width:100%;background:rgba(0,20,50,0.8);border:1px solid rgba(0,180,255,0.3);border-radius:8px;color:#fff;padding:9px 11px;font-size:15px;font-family:'Exo 2',sans-serif;outline:none;text-transform:uppercase;">
+      </div>
+
+      <div style="margin-bottom:10px">
+        <label style="display:block;font-family:'Orbitron',monospace;font-size:0.58rem;color:#9eb0c8;letter-spacing:0.06em;margin-bottom:4px">FABRICANTE / LABORATÓRIO</label>
+        <input type="text" id="vac-reg-fabricante" placeholder="ex: Instituto Butantan, FIOCRUZ, GSK" style="width:100%;background:rgba(0,20,50,0.8);border:1px solid rgba(0,180,255,0.3);border-radius:8px;color:#fff;padding:9px 11px;font-size:15px;font-family:'Exo 2',sans-serif;outline:none;">
+      </div>
+
+      <div style="margin-bottom:10px">
+        <label style="display:block;font-family:'Orbitron',monospace;font-size:0.58rem;color:#9eb0c8;letter-spacing:0.06em;margin-bottom:4px">LOCAL DE APLICAÇÃO</label>
+        <input type="text" id="vac-reg-local" placeholder="ex: UBS Vila Sônia, Hospital Municipal" style="width:100%;background:rgba(0,20,50,0.8);border:1px solid rgba(0,180,255,0.3);border-radius:8px;color:#fff;padding:9px 11px;font-size:15px;font-family:'Exo 2',sans-serif;outline:none;">
+      </div>
+
+      <div style="margin-bottom:10px">
+        <label style="display:block;font-family:'Orbitron',monospace;font-size:0.58rem;color:#9eb0c8;letter-spacing:0.06em;margin-bottom:4px">PROFISSIONAL DE SAÚDE</label>
+        <input type="text" id="vac-reg-profissional" placeholder="Nome do enfermeiro(a) / COREN" style="width:100%;background:rgba(0,20,50,0.8);border:1px solid rgba(0,180,255,0.3);border-radius:8px;color:#fff;padding:9px 11px;font-size:15px;font-family:'Exo 2',sans-serif;outline:none;">
+      </div>
+
+      <div style="margin-bottom:14px">
+        <label style="display:block;font-family:'Orbitron',monospace;font-size:0.58rem;color:#9eb0c8;letter-spacing:0.06em;margin-bottom:4px">VIA DE ADMINISTRAÇÃO</label>
+        <select id="vac-reg-via" style="width:100%;background:rgba(0,20,50,0.8);border:1px solid rgba(0,180,255,0.3);border-radius:8px;color:#fff;padding:9px 11px;font-size:15px;font-family:'Exo 2',sans-serif;outline:none;">
+          <option value="">— selecione —</option>
+          <option value="IM">Intramuscular (IM)</option>
+          <option value="SC">Subcutânea (SC)</option>
+          <option value="ID">Intradérmica (ID) — BCG</option>
+          <option value="VO">Oral (VO) — rotavírus, VOP</option>
+        </select>
+      </div>
+
+      <div style="display:flex;gap:9px;flex-wrap:wrap">
+        <button onclick="_salvarRegistroVacina('${id}')" style="flex:1;min-width:140px;padding:12px;background:linear-gradient(135deg,#00d4ff,#c77dff);border:none;border-radius:8px;color:#fff;font-family:'Orbitron',monospace;font-size:0.68rem;letter-spacing:0.06em;cursor:pointer;font-weight:700">✓ REGISTRAR</button>
+        <button onclick="_salvarRegistroVacinaSimples('${id}')" style="flex:1;min-width:140px;padding:12px;background:rgba(0,60,120,0.6);border:1px solid rgba(0,180,255,0.4);border-radius:8px;color:#00d4ff;font-family:'Orbitron',monospace;font-size:0.65rem;letter-spacing:0.06em;cursor:pointer">SÓ MARCAR COMO FEITA</button>
+      </div>
+
+      <div style="font-size:0.6rem;color:#9eb0c8;text-align:center;margin-top:12px;line-height:1.5">
+        💡 Os dados de lote/fabricante ficam na <strong>Caderneta Completa</strong> (PDF exportável).<br>
+        Fonte oficial: <strong>PNI · Ministério da Saúde</strong>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+  setTimeout(() => document.getElementById('vac-reg-lote')?.focus(), 100);
+}
+
+// Inferir dose a partir do nome da vacina (ex: "Penta (1ª)" → "1ª")
+function _inferirDose(nome) {
+  if (!nome) return '';
+  const m = nome.match(/\((\d+[ª]?|reforço|único|dose única)\)/i);
+  if (m) return m[1];
+  if (/reforço/i.test(nome)) return 'reforço';
+  return '';
+}
+
+window._salvarRegistroVacina = function(id) {
+  const data = document.getElementById('vac-reg-data')?.value;
+  if (!data) { alert('⚠️ Data é obrigatória'); return; }
+  const dtObj = new Date(data + 'T12:00:00');
+  const dataFormatada = `${String(dtObj.getDate()).padStart(2,'0')}/${String(dtObj.getMonth()+1).padStart(2,'0')}/${dtObj.getFullYear()}`;
+  vacStatus[id] = {
+    feita: true,
+    data: dataFormatada,
+    dataIso: data,
+    dose: document.getElementById('vac-reg-dose')?.value || '',
+    lote: (document.getElementById('vac-reg-lote')?.value || '').toUpperCase(),
+    fabricante: document.getElementById('vac-reg-fabricante')?.value || '',
+    local: document.getElementById('vac-reg-local')?.value || '',
+    profissional: document.getElementById('vac-reg-profissional')?.value || '',
+    via: document.getElementById('vac-reg-via')?.value || '',
+    registradoEm: Date.now(),
+    registradoPor: (typeof usuarioAtual !== 'undefined') ? usuarioAtual : null,
+  };
+  saveVacinas(vacStatus);
+  document.getElementById('modal-registro-vacina')?.remove();
+  renderVacinas();
+  if (typeof showToast === 'function') showToast('🛡️ Vacina registrada na carteirinha!');
+};
+
+window._salvarRegistroVacinaSimples = function(id) {
+  const hoje = new Date();
+  const d = String(hoje.getDate()).padStart(2,'0'), m = String(hoje.getMonth()+1).padStart(2,'0'), y = hoje.getFullYear();
+  vacStatus[id] = {
+    feita: true,
+    data: `${d}/${m}/${y}`,
+    dataIso: `${y}-${m}-${d}`,
+    registradoEm: Date.now(),
+    registradoPor: (typeof usuarioAtual !== 'undefined') ? usuarioAtual : null,
+  };
+  saveVacinas(vacStatus);
+  document.getElementById('modal-registro-vacina')?.remove();
+  renderVacinas();
+  if (typeof showToast === 'function') showToast('✓ Marcada como feita');
+};
+
+window._abrirModalEditarVacina = function(id) {
+  const s = vacStatus[id] || {};
+  const opt = confirm(`Esta vacina já está marcada como aplicada em ${s.data || '?'}.\n\nOK = editar os dados\nCancelar = remover da carteirinha`);
+  if (opt) {
+    // Reabrir modal preenchido
+    abrirModalRegistroVacina(id, vacExtras[id] ? 'extra' : 'padrao');
+    setTimeout(() => {
+      if (s.dataIso) document.getElementById('vac-reg-data').value = s.dataIso;
+      if (s.dose) document.getElementById('vac-reg-dose').value = s.dose;
+      if (s.lote) document.getElementById('vac-reg-lote').value = s.lote;
+      if (s.fabricante) document.getElementById('vac-reg-fabricante').value = s.fabricante;
+      if (s.local) document.getElementById('vac-reg-local').value = s.local;
+      if (s.profissional) document.getElementById('vac-reg-profissional').value = s.profissional;
+      if (s.via) document.getElementById('vac-reg-via').value = s.via;
+    }, 150);
+  } else {
+    delete vacStatus[id];
+    saveVacinas(vacStatus);
+    renderVacinas();
+    if (typeof showToast === 'function') showToast('Vacina removida da carteirinha');
+  }
+};
+
+// ═══════════════════════════════════════════
+// EXPORTAR CADERNETA OFICIAL SUS (cópia fiel)
+// ═══════════════════════════════════════════
+// Gera documento que espelha a Caderneta de Vacinação da Criança do SUS:
+// coluna Vacina / Dose / Data / Lote / Assinatura (profissional).
+// Fonte: Programa Nacional de Imunizações (PNI) — Ministério da Saúde.
+
+window.exportarCaderneta = function() {
+  try {
+    // Agregar dados: todas as vacinas aplicadas, ordenadas por data
+    const aplicadas = [];
+    VACINAS_CALENDARIO.forEach(grupo => {
+      grupo.vacinas.forEach(v => {
+        const s = vacStatus[v.id];
+        if (s && s.feita) {
+          aplicadas.push({ ...v, ...s, grupo: grupo.grupo });
+        }
+      });
+    });
+    // Extras
+    Object.values(vacExtras || {}).flat().forEach(v => {
+      const s = vacStatus[v.id];
+      if (s && s.feita) {
+        aplicadas.push({ ...v, ...s, grupo: '(extras)' });
+      }
+    });
+
+    // Dados do bebê
+    const baby = (typeof getBabyConfig === 'function') ? getBabyConfig() : {};
+    const nome = baby.name || '—';
+    const nasc = baby.birthDate ? new Date(baby.birthDate + 'T12:00').toLocaleDateString('pt-BR') : '—';
+    const idade = (typeof getBabyAgeInDays === 'function' && baby.birthDate)
+      ? `${Math.floor(getBabyAgeInDays()/30.44)} meses` : '—';
+
+    // Agrupar por grupo oficial (Ao Nascer, 2 Meses, etc.)
+    const porGrupo = {};
+    VACINAS_CALENDARIO.forEach(g => {
+      porGrupo[g.grupo] = {
+        icone: g.icone,
+        vacinas: g.vacinas.map(v => {
+          const s = vacStatus[v.id] || {};
+          return { ...v, aplicada: !!s.feita, ...s };
+        })
+      };
+    });
+
+    const dataHoje = new Date().toLocaleDateString('pt-BR');
+    const totalAplicadas = aplicadas.length;
+    const totalPrevistas = VACINAS_CALENDARIO.reduce((acc, g) => acc + g.vacinas.length, 0);
+
+    // Construir HTML da caderneta — layout espelhando o modelo SUS
+    const html = `
+<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="utf-8">
+<title>Caderneta de Vacinação — ${nome}</title>
+<style>
+  @page { size: A4 portrait; margin: 14mm; }
+  body { font-family: Arial, Helvetica, sans-serif; color: #000; background: #fff; font-size: 10pt; line-height: 1.4; margin: 0; padding: 0; }
+  .header-sus { text-align: center; border-bottom: 3px solid #006341; padding-bottom: 8pt; margin-bottom: 10pt; }
+  .header-sus .tarja { display:flex; align-items:center; justify-content:center; gap:10pt; margin-bottom:4pt; }
+  .header-sus h1 { font-size: 14pt; margin: 0; color: #006341; letter-spacing: 0.5pt; }
+  .header-sus .sub { font-size: 9pt; color: #333; margin-top: 2pt; }
+  .header-sus .pni { font-size: 8pt; color: #666; margin-top: 2pt; font-style: italic; }
+  .bebe-box { border: 1.5pt solid #000; padding: 6pt 8pt; margin-bottom: 10pt; }
+  .bebe-box h2 { font-size: 10pt; margin: 0 0 4pt; color: #006341; border-bottom: 1pt solid #ccc; padding-bottom: 2pt; }
+  .bebe-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4pt 10pt; font-size: 9pt; }
+  .bebe-grid b { color: #555; font-weight: normal; font-size: 8pt; display: block; }
+  .bebe-grid .v { font-weight: bold; font-size: 10pt; }
+  .progresso { margin: 8pt 0; text-align: center; font-size: 9pt; }
+  .progresso .barra { display: inline-block; width: 200pt; height: 10pt; background: #e0e0e0; border-radius: 5pt; position: relative; margin: 0 6pt; vertical-align: middle; overflow: hidden; }
+  .progresso .fill { height: 100%; background: linear-gradient(90deg, #006341, #2e8b57); border-radius: 5pt; }
+  h3.grupo-h { background: #006341; color: white; font-size: 10pt; padding: 4pt 8pt; margin: 10pt 0 0; border-radius: 3pt 3pt 0 0; letter-spacing: 0.5pt; }
+  table.cart-tabela { width: 100%; border-collapse: collapse; margin-bottom: 8pt; font-size: 8.5pt; }
+  table.cart-tabela th { background: #e8f4ed; color: #006341; border: 1pt solid #006341; padding: 4pt 5pt; text-align: left; font-size: 8pt; letter-spacing: 0.3pt; font-weight: bold; }
+  table.cart-tabela td { border: 0.5pt solid #999; padding: 4pt 5pt; vertical-align: top; }
+  table.cart-tabela tr.aplicada td { background: #f0f7f3; }
+  table.cart-tabela tr.pendente td { background: #fff; color: #777; }
+  table.cart-tabela tr.pendente td.vac-nome { color: #000; }
+  .col-vacina { width: 30%; }
+  .col-dose { width: 9%; text-align: center; }
+  .col-data { width: 15%; text-align: center; }
+  .col-lote { width: 13%; }
+  .col-fabr { width: 15%; }
+  .col-local { width: 11%; }
+  .col-prof { width: 12%; }
+  .status-check { color: #006341; font-weight: bold; }
+  .status-pend { color: #999; font-style: italic; }
+  .footer-doc { margin-top: 16pt; padding-top: 8pt; border-top: 1pt solid #006341; font-size: 7.5pt; color: #555; text-align: center; line-height: 1.5; }
+  .aviso-legal { margin-top: 10pt; background: #fff8e1; border-left: 2pt solid #f57c00; padding: 5pt 7pt; font-size: 7.5pt; color: #444; }
+  @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } button { display: none; } }
+  .print-btn { position: fixed; top: 14px; right: 14px; z-index: 999; background: #006341; color: white; border: none; padding: 10px 18px; border-radius: 6px; font-size: 11pt; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+</style>
+</head><body>
+  <button class="print-btn" onclick="window.print()">🖨️ Imprimir / Salvar PDF</button>
+
+  <div class="header-sus">
+    <div class="tarja">
+      <span style="font-size:20pt">🇧🇷</span>
+      <h1>MINISTÉRIO DA SAÚDE</h1>
+    </div>
+    <div class="sub"><b>CADERNETA DE VACINAÇÃO DA CRIANÇA</b></div>
+    <div class="pni">Programa Nacional de Imunizações (PNI) · Sistema Único de Saúde (SUS)</div>
+  </div>
+
+  <div class="bebe-box">
+    <h2>IDENTIFICAÇÃO DA CRIANÇA</h2>
+    <div class="bebe-grid">
+      <div><b>Nome completo:</b><span class="v">${_escCart(nome)}</span></div>
+      <div><b>Data de nascimento:</b><span class="v">${nasc}</span></div>
+      <div><b>Idade atual:</b><span class="v">${idade}</span></div>
+      <div><b>Sexo:</b><span class="v">${baby.genero === 'F' ? 'Feminino' : baby.genero === 'M' ? 'Masculino' : '—'}</span></div>
+    </div>
+  </div>
+
+  <div class="progresso">
+    <b>Vacinas aplicadas: ${totalAplicadas} / ${totalPrevistas}</b>
+    <span class="barra"><span class="fill" style="width:${Math.round((totalAplicadas/totalPrevistas)*100)}%;display:block"></span></span>
+    <b>${Math.round((totalAplicadas/totalPrevistas)*100)}%</b>
+  </div>
+
+  ${Object.entries(porGrupo).map(([nomeGrupo, g]) => `
+    <h3 class="grupo-h">${g.icone} ${nomeGrupo.toUpperCase()}</h3>
+    <table class="cart-tabela">
+      <thead>
+        <tr>
+          <th class="col-vacina">VACINA</th>
+          <th class="col-dose">DOSE</th>
+          <th class="col-data">DATA APLICAÇÃO</th>
+          <th class="col-lote">LOTE</th>
+          <th class="col-fabr">FABRICANTE</th>
+          <th class="col-local">LOCAL</th>
+          <th class="col-prof">PROFISSIONAL</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${g.vacinas.map(v => {
+          if (v.aplicada) {
+            return `<tr class="aplicada">
+              <td class="vac-nome"><b>${_escCart(v.nome)}</b><br><small style="color:#555">${_escCart(v.doenca)}</small></td>
+              <td><span class="status-check">${_escCart(v.dose || '—')}</span></td>
+              <td><b>${_escCart(v.data || '—')}</b></td>
+              <td>${_escCart(v.lote || '—')}</td>
+              <td>${_escCart(v.fabricante || '—')}</td>
+              <td>${_escCart(v.local || '—')}</td>
+              <td>${_escCart(v.profissional || '—')}</td>
+            </tr>`;
+          } else {
+            return `<tr class="pendente">
+              <td class="vac-nome"><b>${_escCart(v.nome)}</b><br><small style="color:#888">${_escCart(v.doenca)}</small></td>
+              <td colspan="6"><span class="status-pend">☐ Pendente · ${_escCart(v.obs || 'Aguardando aplicação')}</span></td>
+            </tr>`;
+          }
+        }).join('')}
+      </tbody>
+    </table>
+  `).join('')}
+
+  <div class="aviso-legal">
+    <b>AVISO LEGAL:</b> Este documento é uma <b>cópia fiel</b> dos registros inseridos no aplicativo BabyForce.
+    Não substitui a Caderneta de Vacinação oficial emitida pelo SUS. Para fins legais (matrícula escolar, viagens,
+    benefícios sociais) apresente sempre a caderneta original carimbada pela unidade de saúde. Em caso de
+    divergência entre este documento e a caderneta oficial, prevalece esta última.
+  </div>
+
+  <div class="footer-doc">
+    <b>Gerado pelo BabyForce</b> em ${dataHoje}<br>
+    Fontes: PNI/MS · Sociedade Brasileira de Pediatria (SBP) · Sociedade Brasileira de Imunizações (SBIm)<br>
+    <i>Documento para referência pessoal. Apresentar caderneta oficial quando exigida.</i>
+  </div>
+
+</body></html>`;
+
+    // Abrir em nova janela
+    const w = window.open('', '_blank');
+    if (!w) {
+      alert('⚠️ Pop-ups bloqueados. Permita pop-ups para gerar a caderneta.');
+      return;
+    }
+    w.document.write(html);
+    w.document.close();
+
+    if (typeof BFAudit !== 'undefined') {
+      BFAudit.log('caderneta_exportada', { aplicadas: totalAplicadas });
+    }
+
+  } catch (e) {
+    console.error('[Caderneta]', e);
+    alert('Erro ao gerar caderneta: ' + e.message);
+  }
+};
+
+function _escCart(s) {
+  if (s == null) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// Registro de vacina extra livre (quando quer adicionar fora do calendário oficial)
+window.abrirModalRegistroVacinaLivre = function() {
+  const existente = document.getElementById('modal-vac-livre');
+  if (existente) existente.remove();
+
+  const modal = document.createElement('div');
+  modal.id = 'modal-vac-livre';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,10,30,0.94);z-index:99998;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(8px);';
+  modal.innerHTML = `
+    <div style="max-width:420px;width:100%;background:linear-gradient(135deg,#031027,#0a1a3d);border:1px solid rgba(0,180,255,0.4);border-radius:14px;padding:20px;color:#fff;font-family:'Exo 2',sans-serif">
+      <div style="font-family:'Orbitron',monospace;font-size:0.76rem;color:#00d4ff;letter-spacing:0.06em;margin-bottom:12px">+ NOVA VACINA (FORA DO CALENDÁRIO)</div>
+      <div style="font-size:0.7rem;color:#9eb0c8;margin-bottom:14px;line-height:1.5">Use para vacinas particulares (SBIm) ou específicas que não estão no PNI.</div>
+      <label style="display:block;font-size:0.62rem;color:#9eb0c8;margin-bottom:3px">NOME DA VACINA *</label>
+      <input type="text" id="vl-nome" placeholder="ex: Meningocócica B, HPV quadri" style="width:100%;background:rgba(0,20,50,0.8);border:1px solid rgba(0,180,255,0.3);border-radius:8px;color:#fff;padding:9px 11px;font-size:15px;outline:none;margin-bottom:10px;font-family:'Exo 2'">
+      <label style="display:block;font-size:0.62rem;color:#9eb0c8;margin-bottom:3px">PROTEGE CONTRA</label>
+      <input type="text" id="vl-doenca" placeholder="ex: Meningite B" style="width:100%;background:rgba(0,20,50,0.8);border:1px solid rgba(0,180,255,0.3);border-radius:8px;color:#fff;padding:9px 11px;font-size:15px;outline:none;margin-bottom:14px;font-family:'Exo 2'">
+      <div style="display:flex;gap:8px">
+        <button onclick="_criarVacinaLivre()" style="flex:1;padding:11px;background:linear-gradient(135deg,#00d4ff,#c77dff);border:none;border-radius:8px;color:#fff;font-family:'Orbitron',monospace;font-size:0.68rem;cursor:pointer;font-weight:700">CRIAR E REGISTRAR</button>
+        <button onclick="document.getElementById('modal-vac-livre').remove()" style="flex:1;padding:11px;background:rgba(0,60,120,0.6);border:1px solid rgba(0,180,255,0.3);border-radius:8px;color:#00d4ff;font-family:'Orbitron',monospace;font-size:0.68rem;cursor:pointer">Cancelar</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+  setTimeout(() => document.getElementById('vl-nome')?.focus(), 100);
+};
+
+window._criarVacinaLivre = function() {
+  const nome = document.getElementById('vl-nome')?.value.trim();
+  if (!nome) { alert('⚠️ Nome obrigatório'); return; }
+  const doenca = document.getElementById('vl-doenca')?.value.trim() || '';
+  const id = 'livre_' + Date.now();
+  if (!vacExtras['_livres']) vacExtras['_livres'] = [];
+  vacExtras['_livres'].push({ id, nome, doenca, obs: 'Vacina adicional (fora do PNI)', fonte: 'Usuário' });
+  saveExtras(vacExtras);
+  document.getElementById('modal-vac-livre').remove();
+  renderVacinas();
+  setTimeout(() => abrirModalRegistroVacina(id, 'extra'), 200);
+};
 function deleteVacinaExtra(grupoIdx,id){confirmarDelete('vacina_extra',id+'|'+grupoIdx,'Remover esta vacina?');}
 let _novaVacGrupoIdx=null;
 function abrirModalNovaVacina(grupoIdx){_novaVacGrupoIdx=grupoIdx;const g=VACINAS_CALENDARIO[grupoIdx];document.getElementById('modal-nova-vac-grupo').textContent=g.icone+' '+g.grupo;document.getElementById('nv-step-1').style.display='block';document.getElementById('nv-step-2').style.display='none';document.getElementById('nv-step-1').innerHTML=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><div style="font-size:0.65rem;color:var(--text-dim);font-family:'Orbitron',monospace;letter-spacing:0.06em;flex:1">VACINAS DISPONÍVEIS</div><input id="nv-busca-sug" type="text" placeholder="🔍 buscar..." oninput="filtrarVacinasSugestoes(${grupoIdx},this.value)" style="font-size:0.7rem;padding:4px 8px;background:rgba(0,30,70,0.6);border:1px solid rgba(0,180,255,0.2);border-radius:6px;color:var(--white);width:130px;outline:none"></div><div id="nv-sugestoes-lista" style="max-height:50vh;overflow-y:auto;-webkit-overflow-scrolling:touch"></div><div style="margin-top:10px;border-top:1px solid rgba(0,180,255,0.15);padding-top:10px"><button class="btn btn-full" style="background:rgba(0,60,130,0.4);border:1px dashed rgba(0,180,255,0.35);color:var(--blue-neon);font-size:0.68rem" onclick="abrirFormNovaVacina(null)">✏️ Vacina personalizada</button></div><div style="margin-top:8px"><button class="btn btn-full" style="background:transparent;border:1px solid rgba(0,180,255,0.15);color:var(--text-dim);font-size:0.68rem" onclick="fecharModalNovaVacina()">Cancelar</button></div>`;document.getElementById('nv-step-2').style.display='none';document.getElementById('modal-nova-vacina').style.display='flex';setTimeout(()=>renderVacinasSugestoes(grupoIdx),50);}
@@ -2935,10 +3567,28 @@ function renderVacinas(){
   const prog=document.getElementById('vac-progresso');
   if(prog)prog.innerHTML=`<div class="vac-prog-texto"><span>⚡ Escudos ativados</span><span class="vac-prog-pct">${pct}%</span></div><div class="vac-prog-bar-wrap"><div class="vac-prog-bar" style="width:${pct}%"></div></div><div class="vac-prog-texto"><span>${feitas} de ${total} vacinas</span><span>${total-feitas} aguardando</span></div>`;
   const el=document.getElementById('lista-vacinas');if(!el)return;
+  // Renderizar info extra de registro completo quando houver lote/fabricante
+  const renderInfoExtra = (s) => {
+    const parts = [];
+    if (s.dose) parts.push(`<span style="color:var(--gold)">Dose: ${s.dose}</span>`);
+    if (s.lote) parts.push(`Lote: <b>${s.lote}</b>`);
+    if (s.fabricante) parts.push(`<span style="color:#9eb0c8">${s.fabricante}</span>`);
+    if (s.local) parts.push(`📍 ${s.local}`);
+    if (!parts.length) return '';
+    return `<div class="vac-detalhes-reg" style="font-size:0.6rem;color:var(--text-dim);margin-top:3px;line-height:1.5;display:flex;gap:8px;flex-wrap:wrap">${parts.join('<span style="color:#4a5568"> · </span>')}</div>`;
+  };
   el.innerHTML=VACINAS_CALENDARIO.map((grupo,grupoIdx)=>{
     const extras=vacExtras[String(grupoIdx)]||[];const todasNoGrupo=[...grupo.vacinas,...extras];const feitasGrupo=todasNoGrupo.filter(v=>vacStatus[v.id]?.feita).length;
-    const vacinasHTML=grupo.vacinas.map(v=>{const feita=!!vacStatus[v.id]?.feita;return`<div class="vac-item ${feita?'feita':''}" onclick="toggleVacina('${v.id}')"><div class="vac-check">${feita?'✓':''}</div><div class="vac-body"><div class="vac-nome">${v.nome}</div><div class="vac-doenca">${v.doenca}</div>${v.obs?`<div class="vac-obs">⚠ ${v.obs}</div>`:''}<div class="vac-fonte">📡 ${v.fonte}</div>${feita?`<div class="vac-data-aplicacao">🛡️ Aplicada em ${vacStatus[v.id].data}</div>`:''}</div></div>`;}).join('');
-    const extrasHTML=extras.map(v=>{const feita=!!vacStatus[v.id]?.feita;return`<div class="vac-item vac-item-extra ${feita?'feita':''}" onclick="toggleVacinaExtra('${v.id}')"><div class="vac-check">${feita?'✓':''}</div><div class="vac-body" style="flex:1"><div class="vac-nome">${v.nome}</div><div class="vac-doenca">${v.doenca}</div>${v.obs?`<div class="vac-obs">⚠ ${v.obs}</div>`:''}<div class="vac-fonte">📡 ${v.fonte}</div>${feita?`<div class="vac-data-aplicacao">🛡️ Aplicada em ${vacStatus[v.id].data}</div>`:''}</div><button class="btn-del-vac-extra" onclick="event.stopPropagation();deleteVacinaExtra(${grupoIdx},'${v.id}')">🗑</button></div>`;}).join('');
+    const vacinasHTML=grupo.vacinas.map(v=>{
+      const s = vacStatus[v.id] || {};
+      const feita=!!s.feita;
+      return`<div class="vac-item ${feita?'feita':''}" onclick="toggleVacina('${v.id}')"><div class="vac-check">${feita?'✓':''}</div><div class="vac-body"><div class="vac-nome">${v.nome}</div><div class="vac-doenca">${v.doenca}</div>${v.obs?`<div class="vac-obs">⚠ ${v.obs}</div>`:''}<div class="vac-fonte">📡 ${v.fonte}</div>${feita?`<div class="vac-data-aplicacao">🛡️ Aplicada em ${s.data}</div>${renderInfoExtra(s)}`:''}</div></div>`;
+    }).join('');
+    const extrasHTML=extras.map(v=>{
+      const s = vacStatus[v.id] || {};
+      const feita=!!s.feita;
+      return`<div class="vac-item vac-item-extra ${feita?'feita':''}" onclick="toggleVacinaExtra('${v.id}')"><div class="vac-check">${feita?'✓':''}</div><div class="vac-body" style="flex:1"><div class="vac-nome">${v.nome}</div><div class="vac-doenca">${v.doenca}</div>${v.obs?`<div class="vac-obs">⚠ ${v.obs}</div>`:''}<div class="vac-fonte">📡 ${v.fonte}</div>${feita?`<div class="vac-data-aplicacao">🛡️ Aplicada em ${s.data}</div>${renderInfoExtra(s)}`:''}</div><button class="btn-del-vac-extra" onclick="event.stopPropagation();deleteVacinaExtra(${grupoIdx},'${v.id}')">🗑</button></div>`;
+    }).join('');
     return`<div class="vac-grupo"><div class="vac-grupo-header"><span>${grupo.icone} ${grupo.grupo}</span><span class="vac-grupo-count">${feitasGrupo}/${todasNoGrupo.length}</span></div><div class="vac-grupo-items">${vacinasHTML}${extrasHTML}<button class="btn-add-vac" onclick="abrirModalNovaVacina(${grupoIdx})">＋ Adicionar vacina</button></div></div>`;
   }).join('');
 }
@@ -3251,6 +3901,162 @@ function salvarMedicacao(){
   medicacoes.unshift({id:Date.now(),nome,generico:document.getElementById('med-generico').value.trim(),dose:document.getElementById('med-dose').value.trim(),freq:document.getElementById('med-freq').value,inicio:document.getElementById('med-inicio').value,fim:document.getElementById('med-fim').value,indicado:document.getElementById('med-indicado').value,obs:document.getElementById('med-obs').value.trim(),autor:usuarioAtual});
   saveMedicacao(medicacoes);['med-nome','med-generico','med-dose','med-obs','med-fim'].forEach(id=>{document.getElementById(id).value='';});renderMedicacao();showToast('⚗️ Elixir registrado!');
 }
+
+// ═══════════════════════════════════════════
+// VITAMINAS PROFILÁTICAS — Referências SBP/MS/OMS
+// ═══════════════════════════════════════════
+// Fontes: SBP - Manual de Orientação 2021; MS - Caderneta da Criança 6ª ed 2023;
+// OMS/UNICEF Nurturing Care Framework; Portaria SAS/MS nº 2.975/2011
+const VITAMINAS_PROFILATICAS = [
+  {
+    id: 'vitk_neonatal',
+    nome: 'Vitamina K1 (Kanakion)',
+    icon: '💉',
+    generico: 'Fitomenadiona 1mg IM',
+    dose: '1mg (0,1ml) IM — dose única',
+    freq: 'se_necessario',
+    indicado: 'prevencao_vkdb',
+    obs: 'Profilaxia da Doença Hemorrágica do Recém-Nascido. Aplicação IM ainda na sala de parto (primeiras 6h de vida).',
+    periodo: 'Ao nascer · maternidade',
+    idadeInicio: 0, idadeFim: 0,
+    fonte: 'SBP · AAP · MS',
+    cor: '#ff78b4'
+  },
+  {
+    id: 'vitd_profilaxia',
+    nome: 'Vitamina D (Colecalciferol)',
+    icon: '☀️',
+    generico: 'Colecalciferol 400 UI',
+    dose: '400 UI/dia (8 gotas ou 1 gota concentrada)',
+    freq: '24h',
+    indicado: 'prevencao_raquitismo',
+    obs: 'Suplementação profilática obrigatória do 1º mês aos 24 meses. Dose pode variar: 400 UI/dia até 12m; 600 UI/dia de 12-24m (SBP 2021). Ajuste com pediatra.',
+    periodo: '1 mês → 24 meses',
+    idadeInicio: 30, idadeFim: 730,
+    fonte: 'SBP · MS · OMS',
+    cor: '#ffc856'
+  },
+  {
+    id: 'ferro_profilaxia',
+    nome: 'Ferro (Sulfato Ferroso)',
+    icon: '💪',
+    generico: 'Sulfato Ferroso 25mg/ml',
+    dose: '1 mg/kg/dia de ferro elementar',
+    freq: '24h',
+    indicado: 'prevencao_anemia',
+    obs: 'Profilaxia da anemia ferropriva. SBP 2021: iniciar aos 4m para RN a termo amamentados e seguir até 24m (dose 1mg/kg/dia). RN prematuros: iniciar aos 30 dias de vida com 2 mg/kg/dia.',
+    periodo: '4 meses → 24 meses (RN a termo)',
+    idadeInicio: 120, idadeFim: 730,
+    fonte: 'SBP · MS',
+    cor: '#c77dff'
+  },
+  {
+    id: 'vita_megadose',
+    nome: 'Vitamina A (Megadose)',
+    icon: '👁',
+    generico: 'Retinol Palmitato',
+    dose: '100.000 UI (6-11m) · 200.000 UI (12-59m)',
+    freq: '24h',
+    indicado: 'suplementacao_vitamina_a',
+    obs: 'Programa Nacional de Suplementação de Vitamina A do MS. Aplicação semestral a partir dos 6 meses até 5 anos. Disponível gratuitamente nas UBS.',
+    periodo: '6 meses → 5 anos · semestral',
+    idadeInicio: 180, idadeFim: 1825,
+    fonte: 'MS · PNSVA · OMS',
+    cor: '#78ff99'
+  },
+];
+
+function renderVitaminasCards() {
+  const el = document.getElementById('vitaminas-cards');
+  if (!el) return;
+  const dias = (typeof getBabyAgeInDays === 'function') ? (getBabyAgeInDays() || 0) : 0;
+  el.innerHTML = VITAMINAS_PROFILATICAS.map(v => {
+    const recomendadoAgora = (dias >= v.idadeInicio && dias <= v.idadeFim);
+    const badge = recomendadoAgora
+      ? `<span style="font-size:0.52rem;color:#78ff99;background:rgba(120,255,153,0.2);padding:2px 6px;border-radius:8px;font-family:'Orbitron',monospace;letter-spacing:0.06em;font-weight:700">⚡ AGORA</span>`
+      : dias < v.idadeInicio
+        ? `<span style="font-size:0.52rem;color:#9eb0c8;background:rgba(158,176,200,0.15);padding:2px 6px;border-radius:8px;font-family:'Orbitron',monospace;letter-spacing:0.06em">FUTURO</span>`
+        : `<span style="font-size:0.52rem;color:#9eb0c8;background:rgba(158,176,200,0.1);padding:2px 6px;border-radius:8px;font-family:'Orbitron',monospace;letter-spacing:0.06em">PASSOU</span>`;
+    return `
+      <div onclick="_preencherVitamina('${v.id}')" style="background:rgba(0,20,50,0.5);border-radius:10px;padding:11px 13px;border:1px solid ${v.cor}40;cursor:pointer;transition:transform 0.12s,box-shadow 0.12s" onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 4px 14px ${v.cor}30'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='none'">
+        <div style="display:flex;align-items:flex-start;gap:10px">
+          <div style="font-size:1.4rem;flex-shrink:0">${v.icon}</div>
+          <div style="flex:1;min-width:0">
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:3px">
+              <strong style="color:${v.cor};font-size:0.85rem">${v.nome}</strong>
+              ${badge}
+            </div>
+            <div style="font-size:0.66rem;color:var(--text-dim);line-height:1.4;margin-bottom:3px">📏 <b>${v.dose}</b></div>
+            <div style="font-size:0.62rem;color:var(--text-dim);line-height:1.4">⏰ ${v.periodo}</div>
+            <div style="font-size:0.58rem;color:var(--text-dim);margin-top:4px;line-height:1.4">📡 ${v.fonte}</div>
+          </div>
+          <div style="color:${v.cor};font-size:1.3rem;flex-shrink:0">+</div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+window._preencherVitamina = function(id) {
+  const v = VITAMINAS_PROFILATICAS.find(x => x.id === id);
+  if (!v) return;
+  // Alert informativo detalhado
+  const confirmar = confirm(
+    `${v.nome}\n\n` +
+    `${v.obs}\n\n` +
+    `Dose: ${v.dose}\n` +
+    `Período: ${v.periodo}\n` +
+    `Fonte: ${v.fonte}\n\n` +
+    `Deseja pré-preencher o formulário com estes dados?`
+  );
+  if (!confirmar) return;
+
+  // Pré-preencher o formulário
+  const nomeEl = document.getElementById('med-nome');
+  const genEl = document.getElementById('med-generico');
+  const doseEl = document.getElementById('med-dose');
+  const freqEl = document.getElementById('med-freq');
+  const indicadoEl = document.getElementById('med-indicado');
+  const obsEl = document.getElementById('med-obs');
+  const inicioEl = document.getElementById('med-inicio');
+
+  if (nomeEl) nomeEl.value = v.nome;
+  if (genEl) genEl.value = v.generico;
+  if (doseEl) doseEl.value = v.dose;
+  if (freqEl) {
+    // Se a opção existe, seleciona; senão mantém padrão
+    const options = Array.from(freqEl.options).map(o => o.value);
+    if (options.includes(v.freq)) freqEl.value = v.freq;
+  }
+  if (obsEl) obsEl.value = v.obs;
+  if (inicioEl && !inicioEl.value) {
+    const hoje = new Date();
+    inicioEl.value = `${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2,'0')}-${String(hoje.getDate()).padStart(2,'0')}`;
+  }
+
+  // Scroll até o formulário
+  setTimeout(() => {
+    const form = document.querySelector('#subpanel-medicacao .card:nth-of-type(2)');
+    if (form) form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (doseEl) doseEl.focus();
+  }, 100);
+
+  if (typeof showToast === 'function') showToast(`${v.icon} ${v.nome} pré-preenchido!`);
+};
+
+// Renderizar cards quando o painel medicacao abrir
+(function hookVitaminas() {
+  if (typeof window.showSubTabMissoes === 'function') {
+    const orig = window.showSubTabMissoes;
+    window.showSubTabMissoes = function(tab) {
+      orig.apply(this, arguments);
+      if (tab === 'medicacao') {
+        setTimeout(renderVitaminasCards, 100);
+      }
+    };
+  }
+  // Render inicial também
+  setTimeout(renderVitaminasCards, 2000);
+})();
 function deleteMedicacao(id){confirmarDelete('medicacao',id,'Remover este remédio?');}
 const FREQ_LABEL={se_necessario:'Se necessário','4h':'A cada 4h','6h':'A cada 6h','8h':'A cada 8h','12h':'A cada 12h','24h':'1x ao dia',outro:'Outra'};
 function renderMedicacao(){
@@ -4389,6 +5195,10 @@ function _showQuickToast(emoji, texto, opcoes) {
   }
   if (opcoes && opcoes.edit) {
     actions += `<button onclick="${opcoes.edit}" style="background:rgba(0,212,255,0.15);border:1px solid rgba(0,212,255,0.35);color:var(--blue-neon);padding:6px 10px;border-radius:6px;font-size:0.7rem;cursor:pointer;font-family:'Orbitron',monospace;letter-spacing:0.05em">✏ EDITAR</button>`;
+  }
+  if (opcoes && opcoes.cta) {
+    const cta = opcoes.cta;
+    actions += `<button onclick="${cta.fn};document.getElementById('quick-toast-float')?.remove()" style="background:rgba(120,255,153,0.15);border:1px solid rgba(120,255,153,0.4);color:#78ff99;padding:6px 10px;border-radius:6px;font-size:0.7rem;cursor:pointer;font-family:'Orbitron',monospace;letter-spacing:0.05em">→ ${cta.label}</button>`;
   }
   t.innerHTML = `<span style="font-size:1.2rem">${emoji}</span><span style="flex:1">${texto}</span>${actions}`;
   document.body.appendChild(t);
@@ -12889,6 +13699,258 @@ function showNutricaoTab(tab, btn) {
   const panel = document.getElementById('nutricao-panel-' + tab);
   if (panel) panel.style.display = 'block';
   if (tab === 'alimentos') renderAlimentosPanel();
+  if (tab === 'mamadas') _aplicarLockDesmame();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DESMAME — Lock da sub-aba Mamadas após registro de fim de amamentação
+// Fluxo: guardião registra data de desmame → sub-aba trava com card comemorativo
+// ═══════════════════════════════════════════════════════════════
+const DESMAME_KEY = 'babyforce_desmame_v1';
+
+function getDesmameInfo() {
+  try { return JSON.parse(localStorage.getItem(DESMAME_KEY)) || null; } catch { return null; }
+}
+function setDesmameInfo(info) {
+  try { localStorage.setItem(DESMAME_KEY, info ? JSON.stringify(info) : null); } catch {}
+  if (!info) { try { localStorage.removeItem(DESMAME_KEY); } catch {} }
+}
+
+function _aplicarLockDesmame() {
+  const info = getDesmameInfo();
+  const panel = document.getElementById('nutricao-panel-mamadas');
+  const btn = document.getElementById('nstab-mamadas');
+  if (!panel) return;
+  // Remover lock visual anterior se não estiver desmamado
+  const existingLock = document.getElementById('desmame-lock-card');
+  if (existingLock) existingLock.remove();
+  // Re-exibir os cards originais
+  Array.from(panel.children).forEach(c => {
+    if (c.id !== 'desmame-lock-card') c.style.display = '';
+  });
+  if (!info || !info.encerrado) {
+    if (btn) btn.innerHTML = '🍼 Mamadas';
+    return;
+  }
+  // Estado desmamado: esconder conteúdo original, mostrar card
+  Array.from(panel.children).forEach(c => {
+    if (c.id !== 'desmame-lock-card') c.style.display = 'none';
+  });
+  const dataFmt = info.data ? new Date(info.data + 'T12:00').toLocaleDateString('pt-BR', { day:'2-digit', month:'long', year:'numeric' }) : '—';
+  const duracao = info.duracaoMeses ? `${info.duracaoMeses} ${info.duracaoMeses===1?'mês':'meses'}` : '—';
+  const nome = (typeof getBabyName === 'function') ? getBabyName() : 'Seu bebê';
+  const card = document.createElement('div');
+  card.id = 'desmame-lock-card';
+  card.innerHTML = `
+    <div class="card" style="background:linear-gradient(145deg,rgba(100,30,180,0.22),rgba(0,80,160,0.18));border:2px solid rgba(199,125,255,0.4);text-align:center;padding:28px 18px">
+      <div style="font-size:3.6rem;margin-bottom:8px;filter:drop-shadow(0 0 16px rgba(199,125,255,0.4))">🎉</div>
+      <div style="font-family:'Orbitron',monospace;font-size:0.62rem;color:var(--purple-neon);letter-spacing:0.12em;margin-bottom:6px">ALEITAMENTO CONCLUÍDO</div>
+      <div style="font-family:'Orbitron',monospace;font-size:1.1rem;color:var(--white);font-weight:700;line-height:1.3;margin-bottom:14px">
+        ${nome} vive uma nova fase! 🌟
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+        <div style="background:rgba(0,20,50,0.5);padding:10px;border-radius:10px">
+          <div style="font-size:0.54rem;color:var(--text-dim);font-family:'Orbitron',monospace;letter-spacing:0.08em">DURAÇÃO</div>
+          <div style="font-size:0.9rem;color:var(--gold);font-weight:700;margin-top:3px">${duracao}</div>
+        </div>
+        <div style="background:rgba(0,20,50,0.5);padding:10px;border-radius:10px">
+          <div style="font-size:0.54rem;color:var(--text-dim);font-family:'Orbitron',monospace;letter-spacing:0.08em">ENCERRADO EM</div>
+          <div style="font-size:0.78rem;color:var(--blue-neon);font-weight:600;margin-top:3px">${dataFmt}</div>
+        </div>
+      </div>
+      <div style="font-size:0.74rem;color:var(--text-dim);line-height:1.55;margin-bottom:16px;padding:0 4px">
+        Esta sub-aba foi <strong style="color:var(--white)">travada</strong> porque ${nome} encerrou o aleitamento. 🥣 <strong style="color:var(--blue-neon)">Alimentos</strong> segue ativa para os novos registros.
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <button onclick="window._reverterDesmame()" style="padding:10px;background:rgba(0,60,120,0.5);border:1px solid rgba(0,180,255,0.3);border-radius:10px;color:var(--blue-neon);font-family:'Orbitron',monospace;font-size:0.64rem;letter-spacing:0.06em;cursor:pointer">↩ REGISTREI POR ENGANO — DESFAZER</button>
+      </div>
+    </div>
+  `;
+  panel.appendChild(card);
+  if (btn) btn.innerHTML = '🔒 Mamadas';
+}
+
+// Registrar fim de amamentação (abre modal)
+window.abrirModalDesmame = function() {
+  const existente = document.getElementById('modal-desmame');
+  if (existente) existente.remove();
+  const hoje = new Date();
+  const dataHoje = `${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2,'0')}-${String(hoje.getDate()).padStart(2,'0')}`;
+  const modal = document.createElement('div');
+  modal.id = 'modal-desmame';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,10,30,0.94);z-index:99998;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(8px);';
+  modal.innerHTML = `
+    <div style="max-width:420px;width:100%;background:linear-gradient(135deg,#031027,#0a1a3d);border:1px solid rgba(199,125,255,0.4);border-radius:14px;padding:22px;color:#fff;font-family:'Exo 2',sans-serif;max-height:92vh;overflow-y:auto">
+      <div style="text-align:center;font-size:2.6rem;margin-bottom:10px">🎉</div>
+      <div style="text-align:center;font-family:'Orbitron',monospace;font-size:0.78rem;color:var(--purple-neon);letter-spacing:0.08em;font-weight:700;margin-bottom:6px">REGISTRAR FIM DO ALEITAMENTO</div>
+      <div style="font-size:0.74rem;color:var(--text-dim);line-height:1.55;margin-bottom:16px;text-align:center">
+        Uma fase se encerra e outra começa. Vamos celebrar essa jornada! ✨
+      </div>
+      <label style="display:block;font-family:'Orbitron',monospace;font-size:0.58rem;color:#9eb0c8;letter-spacing:0.08em;margin-bottom:4px">DATA DO ÚLTIMO ALEITAMENTO</label>
+      <input type="date" id="desm-data" value="${dataHoje}" style="width:100%;background:rgba(0,20,50,0.8);border:1px solid rgba(0,180,255,0.3);border-radius:8px;color:#fff;padding:10px 12px;font-size:15px;font-family:'Exo 2',sans-serif;outline:none;margin-bottom:12px">
+      <label style="display:block;font-family:'Orbitron',monospace;font-size:0.58rem;color:#9eb0c8;letter-spacing:0.08em;margin-bottom:4px">OBSERVAÇÃO (opcional)</label>
+      <textarea id="desm-obs" placeholder="Uma palavra, uma lembrança desse momento..." style="width:100%;background:rgba(0,20,50,0.8);border:1px solid rgba(0,180,255,0.3);border-radius:8px;color:#fff;padding:10px 12px;font-size:14px;font-family:'Exo 2',sans-serif;outline:none;margin-bottom:14px;min-height:64px;resize:vertical"></textarea>
+      <div style="background:rgba(255,200,80,0.08);border-left:3px solid rgba(255,200,80,0.4);padding:9px 11px;border-radius:6px;margin-bottom:16px;font-size:0.68rem;color:var(--text-dim);line-height:1.5">
+        ⚠ Ao confirmar, a sub-aba <strong>Mamadas</strong> ficará travada. Os registros anteriores ficam preservados no histórico.
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button onclick="window._confirmarDesmame()" style="flex:1;min-width:140px;padding:12px;background:linear-gradient(135deg,#ff78b4,#c77dff,#00d4ff);background-size:200% 200%;border:none;border-radius:8px;color:#fff;font-family:'Orbitron',monospace;font-size:0.66rem;letter-spacing:0.06em;cursor:pointer;font-weight:700">🎉 CELEBRAR E ENCERRAR</button>
+        <button onclick="document.getElementById('modal-desmame').remove()" style="flex:1;min-width:120px;padding:12px;background:rgba(0,60,120,0.6);border:1px solid rgba(0,180,255,0.4);border-radius:8px;color:#00d4ff;font-family:'Orbitron',monospace;font-size:0.66rem;letter-spacing:0.06em;cursor:pointer">Cancelar</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+};
+
+window._confirmarDesmame = function() {
+  const data = document.getElementById('desm-data')?.value;
+  if (!data) { alert('⚠️ Escolha a data'); return; }
+  const obs = document.getElementById('desm-obs')?.value || '';
+  // Calcular duração em meses desde nascimento
+  let duracaoMeses = null;
+  try {
+    const birthISO = (typeof getBirthISO === 'function') ? getBirthISO() : null;
+    if (birthISO) {
+      const nasc = new Date(birthISO + 'T00:00');
+      const fim = new Date(data + 'T00:00');
+      duracaoMeses = (fim.getFullYear()-nasc.getFullYear())*12 + (fim.getMonth()-nasc.getMonth());
+      if (fim.getDate() < nasc.getDate()) duracaoMeses--;
+    }
+  } catch {}
+  setDesmameInfo({
+    encerrado: true,
+    data,
+    obs,
+    duracaoMeses,
+    registradoEm: Date.now(),
+    registradoPor: (typeof usuarioAtual !== 'undefined') ? usuarioAtual : null,
+  });
+  document.getElementById('modal-desmame')?.remove();
+  // Também adicionar como marco de memória
+  if (typeof db !== 'undefined' && db.mesversario) {
+    db.mesversario.push({
+      id: Date.now(),
+      titulo: '🎉 Fim do aleitamento',
+      mes: duracaoMeses || 0,
+      cat: 'memoria',
+      obs: obs || `Jornada de amamentação concluída após ${duracaoMeses || '?'} meses`,
+    });
+    if (typeof saveData === 'function') saveData(db);
+  }
+  // Disparar celebração com fogos
+  _celebrarDesmame(duracaoMeses);
+  // Aplicar lock na aba
+  _aplicarLockDesmame();
+  if (typeof BFAudit !== 'undefined') BFAudit.log('desmame_registrado', { duracaoMeses });
+};
+
+window._reverterDesmame = function() {
+  if (!confirm('Desfazer registro de fim de aleitamento? A sub-aba de Mamadas voltará a ficar ativa.')) return;
+  setDesmameInfo(null);
+  _aplicarLockDesmame();
+  if (typeof showToast === 'function') showToast('↩ Registro de desmame desfeito');
+};
+
+function _celebrarDesmame(duracaoMeses) {
+  const nome = (typeof getBabyName === 'function') ? getBabyName() : 'seu bebê';
+  const overlay = document.createElement('div');
+  overlay.className = 'alim-celebracao-overlay';
+  const durText = duracaoMeses ? `${duracaoMeses} ${duracaoMeses===1?'mês':'meses'}` : 'toda essa jornada';
+  overlay.innerHTML = `
+    <div class="alim-celebracao-modal">
+      <div class="alim-emoji-big">🎉</div>
+      <div class="alim-celeb-title">Que jornada linda!</div>
+      <div style="color:var(--white);font-size:0.92rem;margin-top:16px;line-height:1.5;font-weight:500">
+        <strong style="color:var(--blue-neon)">${nome}</strong> completou ${durText} de aleitamento! 🤱
+      </div>
+      <div style="color:var(--text-dim);font-size:0.74rem;margin-top:10px;line-height:1.6;padding:0 6px">
+        Cada mamada foi um ato de amor, proteção e descoberta. Uma etapa se encerra e novas aventuras gastronômicas continuam em 🥣 Alimentos.
+      </div>
+      <div style="margin-top:16px;padding:10px 12px;background:rgba(0,20,50,0.45);border-radius:10px;font-size:0.7rem;color:var(--text-dim);line-height:1.55">
+        <strong style="color:#FAC775">✨ A OMS recomenda</strong> aleitamento exclusivo até 6 meses e complementado até 2 anos. Cada família escreve sua história.
+      </div>
+      <button class="alim-celeb-btn" onclick="document.querySelector('.alim-celebracao-overlay')?.remove()">✨ CELEBRAR ESTA FASE</button>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  if (typeof _dispararConfetes === 'function') _dispararConfetes(overlay);
+  if (typeof _tocarCelebracaoSound === 'function') _tocarCelebracaoSound();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CELEBRAÇÃO A CADA 10 ALIMENTOS "AMOU"
+// Contador incrementa quando aceitacao === 'amou' é salvo
+// A cada múltiplo de 10, dispara modal de fogos com frase motivacional
+// ═══════════════════════════════════════════════════════════════
+const AMOU_COUNTER_KEY = 'babyforce_amou_counter_v1';
+const AMOU_ULTIMA_CELEB_KEY = 'babyforce_amou_ultima_celeb_v1';
+
+// Frases motivacionais temáticas de descoberta alimentar
+// Estrutura: [emoji_destaque, titulo_curto, mensagem]
+const FRASES_ALIMENTOS_AMOU = [
+  { emoji:'🌟', titulo:'Paladar explorador!', msg:'Cada sabor novo é uma aventura. Você está construindo uma relação saudável com a comida.' },
+  { emoji:'🎨', titulo:'Palheta de sabores crescendo!', msg:'Quanto mais variedade, mais riqueza nutricional e cultural. Continue oferecendo cores e texturas.' },
+  { emoji:'🧠', titulo:'Neurônios do paladar se conectando!', msg:'Expor a sabores variados até os 2 anos molda preferências para a vida toda. Vocês estão indo muito bem.' },
+  { emoji:'💪', titulo:'Força que vem do prato!', msg:'Cada alimento amado é ferro, vitaminas e fibras virando desenvolvimento. Parabéns pela persistência.' },
+  { emoji:'🌈', titulo:'Arco-íris no prato!', msg:'Vegetais, frutas, proteínas, carboidratos. A diversidade alimentar é um superpoder.' },
+  { emoji:'🏆', titulo:'Família que come junto, ama junto!', msg:'Refeições compartilhadas ensinam mais que nutrição — ensinam vínculo, cultura, afeto.' },
+  { emoji:'🌱', titulo:'Semente de bons hábitos!', msg:'O que é amado na infância se torna escolha natural na vida adulta. Vocês estão plantando bem.' },
+  { emoji:'✨', titulo:'Paladar aberto ao mundo!', msg:'Cada "amou" é coragem para experimentar. Isso é um presente que vai durar décadas.' },
+  { emoji:'🍽️', titulo:'Chef descobridor em ação!', msg:'Texturas, temperaturas, aromas. Que sorte de quem prepara e de quem come.' },
+  { emoji:'💖', titulo:'Amor em cada garfada!', msg:'A comida que é oferecida com carinho alimenta muito além do corpo. Vocês sabem disso.' },
+];
+
+function _pegarContadorAmou() {
+  try { return parseInt(localStorage.getItem(AMOU_COUNTER_KEY) || '0', 10) || 0; } catch { return 0; }
+}
+function _salvarContadorAmou(n) {
+  try { localStorage.setItem(AMOU_COUNTER_KEY, String(n)); } catch {}
+}
+
+window._contabilizarAlimentoAmou = function() {
+  const atual = _pegarContadorAmou() + 1;
+  _salvarContadorAmou(atual);
+  // Celebrar a cada múltiplo de 10
+  if (atual % 10 === 0) {
+    // Verificar se não celebrou esta milestone (proteção contra duplicatas)
+    let ultimaCeleb = 0;
+    try { ultimaCeleb = parseInt(localStorage.getItem(AMOU_ULTIMA_CELEB_KEY) || '0', 10) || 0; } catch {}
+    if (ultimaCeleb === atual) return;
+    try { localStorage.setItem(AMOU_ULTIMA_CELEB_KEY, String(atual)); } catch {}
+    setTimeout(() => _celebrarMilestoneAmou(atual), 350);
+  }
+};
+
+function _celebrarMilestoneAmou(total) {
+  const nome = (typeof getBabyName === 'function') ? getBabyName() : 'seu bebê';
+  // Escolher frase por índice (rotaciona a cada marco)
+  const idx = ((total / 10) - 1) % FRASES_ALIMENTOS_AMOU.length;
+  const frase = FRASES_ALIMENTOS_AMOU[idx];
+
+  const overlay = document.createElement('div');
+  overlay.className = 'alim-celebracao-overlay';
+  overlay.innerHTML = `
+    <div class="alim-celebracao-modal">
+      <div class="alim-emoji-big">${frase.emoji}</div>
+      <div class="alim-celeb-title">${frase.titulo}</div>
+      <div style="margin-top:14px;padding:10px 14px;background:rgba(250,199,117,0.1);border:1px solid rgba(250,199,117,0.35);border-radius:14px">
+        <div style="font-family:'Orbitron',monospace;font-size:0.58rem;color:var(--gold);letter-spacing:0.1em;margin-bottom:4px">🏅 MARCO</div>
+        <div style="font-family:'Orbitron',monospace;font-size:1.6rem;color:var(--white);font-weight:700;letter-spacing:0.02em">${total} alimentos amados!</div>
+        <div style="font-size:0.66rem;color:var(--text-dim);margin-top:4px">${nome} conquistou o paladar</div>
+      </div>
+      <div style="color:var(--white);font-size:0.82rem;margin-top:14px;line-height:1.5;padding:0 4px">
+        ${frase.msg}
+      </div>
+      <div style="color:var(--text-dim);font-size:0.64rem;margin-top:12px;line-height:1.5;padding:8px 12px;background:rgba(0,20,50,0.45);border-radius:8px;border-left:3px solid var(--blue-neon)">
+        💡 <strong style="color:var(--blue-neon)">SBP</strong> recomenda oferecer um alimento novo a cada 2-3 dias para ampliar repertório.
+      </div>
+      <button class="alim-celeb-btn" onclick="document.querySelector('.alim-celebracao-overlay')?.remove()">🎉 CONTINUAR A AVENTURA</button>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  if (typeof _dispararConfetes === 'function') _dispararConfetes(overlay);
+  if (typeof _tocarCelebracaoSound === 'function') _tocarCelebracaoSound();
+  if (typeof BFAudit !== 'undefined') BFAudit.log('milestone_alimentos_amou', { total });
 }
 
 // ══════════════════════════════════════════════════════════
@@ -13016,6 +14078,11 @@ function salvarRefeicao() {
   document.getElementById('alim-lista').innerHTML = _renderListaRefeicoes(refs);
 
   if (typeof showToast === 'function') showToast('🥣 Refeição registrada!');
+
+  // Incrementar contador de "amou" e celebrar a cada 10
+  if (aceitacao === 'amou' && typeof window._contabilizarAlimentoAmou === 'function') {
+    setTimeout(() => window._contabilizarAlimentoAmou(), 500);
+  }
 
   // Alerta se foi reação
   if (aceitacao === 'reacao') {
@@ -14642,18 +15709,20 @@ function _renderSecaoEvitar() {
   const items = ALIMENTOS_A_EVITAR;
 
   const gravidadeConfig = {
-    'critico':   { cor:'#ff3344', bg:'rgba(255,51,68,0.14)',  label:'CRÍTICO',   emoji:'🚨' },
-    'alto':      { cor:'#ff8855', bg:'rgba(255,136,85,0.14)',  label:'ALTO RISCO', emoji:'⚠' },
-    'moderado':  { cor:'#FAC775', bg:'rgba(250,199,117,0.14)', label:'MODERAR',    emoji:'⚡' },
-    'leve':      { cor:'#7adb8f', bg:'rgba(122,219,143,0.14)', label:'LEVE',       emoji:'ℹ' },
+    'critico':  { cor:'#ff3344', bg:'rgba(255,51,68,0.14)',  label:'CRÍTICO',   emoji:'🚨' },
+    'alto':     { cor:'#ff8855', bg:'rgba(255,136,85,0.14)',  label:'ALTO RISCO', emoji:'⚠' },
+    'moderar':  { cor:'#FAC775', bg:'rgba(250,199,117,0.14)', label:'MODERAR',    emoji:'⚡' },
+    'moderado': { cor:'#FAC775', bg:'rgba(250,199,117,0.14)', label:'MODERAR',    emoji:'⚡' },
+    'leve':     { cor:'#7adb8f', bg:'rgba(122,219,143,0.14)', label:'LEVE',       emoji:'ℹ' },
   };
 
   const categoriaLabel = {
-    'proibido-12m':   { emoji:'🚫', titulo:'Proibidos antes de 12 meses' },
-    'evitar-2a':      { emoji:'⛔', titulo:'Evitar até 2 anos (SBP)' },
-    'evitar-sempre':  { emoji:'🚷', titulo:'Evitar em qualquer idade pediátrica' },
-    'engasgo-4a':     { emoji:'🫁', titulo:'Risco de engasgo até 4-5 anos' },
-    'limitar':        { emoji:'⚖', titulo:'Limitar / Moderar' },
+    'proibido_12m':     { emoji:'🚫', titulo:'Proibidos antes de 12 meses' },
+    'proibido_2a':      { emoji:'⛔', titulo:'Evitar até 2 anos (SBP)' },
+    'evitar_sempre':    { emoji:'🚷', titulo:'Evitar em qualquer idade pediátrica' },
+    'engasgo_4a':       { emoji:'🫁', titulo:'Risco de engasgo até 4-5 anos' },
+    'mercurio_moderar': { emoji:'🐟', titulo:'Peixes com mercúrio — moderar' },
+    'limitar':          { emoji:'⚖', titulo:'Limitar / Moderar' },
   };
 
   // Filtros
@@ -14669,18 +15738,21 @@ function _renderSecaoEvitar() {
     porCategoria[i.categoria].push(i);
   });
 
-  const ordemCategorias = ['proibido-12m', 'evitar-2a', 'evitar-sempre', 'engasgo-4a', 'limitar'];
+  const ordemCategorias = ['proibido_12m', 'proibido_2a', 'evitar_sempre', 'engasgo_4a', 'mercurio_moderar', 'limitar'];
 
-  // Contagem por gravidade
-  const contGrav = { critico:0, alto:0, moderado:0, leve:0 };
-  items.forEach(i => { if (contGrav[i.gravidade] !== undefined) contGrav[i.gravidade]++; });
+  // Contagem por gravidade (aceita 'moderar' OU 'moderado')
+  const contGrav = { critico:0, alto:0, moderar:0, leve:0 };
+  items.forEach(i => {
+    const g = i.gravidade === 'moderado' ? 'moderar' : i.gravidade;
+    if (contGrav[g] !== undefined) contGrav[g]++;
+  });
 
   // Filtro pills
   const pills = [
     ['todos', 'TODOS', 'var(--blue-neon)', items.length],
     ['critico', '🚨 CRÍTICO', '#ff3344', contGrav.critico],
     ['alto', '⚠ ALTO', '#ff8855', contGrav.alto],
-    ['moderado', '⚡ MODERAR', '#FAC775', contGrav.moderado],
+    ['moderar', '⚡ MODERAR', '#FAC775', contGrav.moderar],
   ].map(([k, lab, cor, n]) => `
     <button onclick="_setEvitarFiltro('${k}')" style="padding:5px 10px;border-radius:12px;border:1px solid ${_evitarFiltro===k?cor:'rgba(0,180,255,0.2)'};background:${_evitarFiltro===k?cor+'33':'rgba(0,20,50,0.5)'};color:${_evitarFiltro===k?'var(--white)':'var(--text-dim)'};font-family:'Orbitron',monospace;font-size:0.54rem;letter-spacing:0.05em;white-space:nowrap;cursor:pointer;font-weight:600">${lab} <span style="opacity:0.7">(${n})</span></button>
   `).join('');
@@ -15332,10 +16404,38 @@ window.quickLogRefeicao = function() {
     const ativo = document.querySelector('.ql-acc-btn[style*="100,30,180"]');
     const aceit = ativo ? ativo.dataset.acc : 'aceitou';
     const _reg = _qlPush(QL_KEYS.refeicao, { id: Date.now(), data: iso, hora: hm, item, aceitacao: aceit, autor: usuarioAtual || '' });
+    // Sincronizar com a aba Alimentos — usar mesma chave que renderAlimentosUnlocked consome
+    try {
+      if (typeof _alimCarregarRefeicoes === 'function' && typeof _alimSalvarRefeicoes === 'function') {
+        const refs = _alimCarregarRefeicoes();
+        refs.push({ id: _reg.id, data: iso, hora: hm, comida: item, textura: '', aceitacao: aceit, obs: '' });
+        refs.sort((a,b) => (b.data + b.hora).localeCompare(a.data + a.hora));
+        _alimSalvarRefeicoes(refs);
+      }
+    } catch (e) { console.warn('[QL refeicao sync alimentos]', e); }
     _qlFecharModal();
     if (typeof renderDashboard === 'function') renderDashboard();
-    _showQuickToast('🥗', `Refeição registrada às ${hm}`, { undo: `_qlUndo(QL_KEYS.refeicao, ${_reg.id})` });
+    _showQuickToast('🥗', `Refeição salva em 🥣 Alimentos`, {
+      undo: `_qlUndo(QL_KEYS.refeicao, ${_reg.id})`,
+      cta: { label: 'VER', fn: "window._irParaAbaAlimentos()" }
+    });
+    // Incrementar contador de "amou" e celebrar a cada 10
+    if (aceit === 'amou' && typeof window._contabilizarAlimentoAmou === 'function') {
+      setTimeout(() => window._contabilizarAlimentoAmou(), 400);
+    }
   });
+};
+
+// Helper para ir para a aba Alimentos (usado pelo CTA do toast)
+window._irParaAbaAlimentos = function() {
+  if (typeof showHub === 'function') showHub('cuidado');
+  setTimeout(() => {
+    if (typeof showTab === 'function') showTab('mamadas');
+    setTimeout(() => {
+      const btn = document.getElementById('nstab-alimentos');
+      if (btn && typeof showNutricaoTab === 'function') showNutricaoTab('alimentos', btn);
+    }, 150);
+  }, 100);
 };
 
 // ──────────────────────────────────────────
@@ -15548,8 +16648,12 @@ window.quickLogEsporte = function() {
         </select>
       </div>
     </div>
-    <label style="display:flex;align-items:center;gap:6px;font-size:0.7rem;color:var(--text-dim);cursor:pointer">
-      <input type="checkbox" id="ql-esp-treino" style="width:16px;height:16px"> É aula/treino regular
+    <label style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(120,255,153,0.08);border:1px solid rgba(120,255,153,0.25);border-radius:10px;cursor:pointer;transition:all 0.15s" onclick="setTimeout(()=>{const cb=document.getElementById('ql-esp-treino');if(cb){this.style.background=cb.checked?'rgba(120,255,153,0.2)':'rgba(120,255,153,0.08)';this.style.borderColor=cb.checked?'rgba(120,255,153,0.6)':'rgba(120,255,153,0.25)';}},0)">
+      <input type="checkbox" id="ql-esp-treino" style="width:20px;height:20px;accent-color:#78ff99;cursor:pointer;margin:0;flex-shrink:0">
+      <div style="flex:1">
+        <div style="font-size:0.8rem;color:var(--white);font-weight:600">🏋️ É aula/treino regular</div>
+        <div style="font-size:0.62rem;color:var(--text-dim);margin-top:2px">Marque se for uma prática semanal constante</div>
+      </div>
     </label>
   `;
   _qlModalBase('Esporte', '⚽', '#78ff99', corpo, () => {
@@ -17101,28 +18205,32 @@ window.trocarCriancaAtiva = function(babyId) {
 // ──────────────────────────────────────────────────────────
 function renderSeletorCriancaHeader() {
   const lista = getBabies();
-  if (lista.length < 2) return;
+  // Mostrar sempre que estiver logado (mesmo com 1 criança — permite cadastrar outra)
+  if (!lista.length) return;
+  if (typeof usuarioAtual === 'undefined' || !usuarioAtual) return;
 
-  // Achar container do header — vamos inserir um badge clicável no user-badge
-  const userBadge = document.querySelector('.user-badge');
-  if (!userBadge) return;
+  // Achar container do header
+  const header = document.querySelector('header');
+  if (!header) return;
 
   // Se já existe, só atualiza
   let sel = document.getElementById('header-baby-selector');
   if (!sel) {
     sel = document.createElement('button');
     sel.id = 'header-baby-selector';
-    sel.title = 'Trocar criança ativa';
-    sel.style.cssText = 'position:absolute;top:8px;left:8px;background:rgba(0,30,70,0.85);border:1px solid rgba(0,180,255,0.35);border-radius:18px;padding:4px 10px 4px 6px;color:var(--white);font-family:\'Orbitron\',monospace;font-size:0.64rem;letter-spacing:0.05em;cursor:pointer;display:flex;align-items:center;gap:6px;z-index:20;backdrop-filter:blur(6px);box-shadow:0 2px 10px rgba(0,0,0,0.3)';
-    sel.onclick = abrirGestaoCriancas;
-    const header = document.querySelector('header');
-    if (header) header.appendChild(sel);
+    sel.title = lista.length > 1 ? 'Trocar criança ativa' : 'Gerenciar crianças';
+    sel.style.cssText = 'position:absolute;top:10px;left:10px;background:rgba(0,30,70,0.92);border:1px solid rgba(0,180,255,0.45);border-radius:18px;padding:5px 11px 5px 7px;color:var(--white);font-family:Orbitron,monospace;font-size:0.62rem;letter-spacing:0.04em;cursor:pointer;display:flex;align-items:center;gap:6px;z-index:25;backdrop-filter:blur(6px);box-shadow:0 2px 10px rgba(0,0,0,0.35);max-width:52vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;';
+    sel.onclick = window.abrirGestaoCriancas;
+    header.appendChild(sel);
   }
 
   const activeId = getActiveBabyId();
   const ativo = lista.find(b => b.id === activeId) || lista[0];
-  const icon = ativo.foto ? `<img src="${ativo.foto}" style="width:20px;height:20px;border-radius:50%;object-fit:cover">` : `<span style="font-size:1rem">${_criGeneroIcon(ativo.genero)}</span>`;
-  sel.innerHTML = `${icon}<span>${_rcEsc ? _rcEsc(ativo.nome) : ativo.nome}</span><span style="opacity:0.6;margin-left:3px">▾</span>`;
+  const icon = ativo.foto ? `<img src="${ativo.foto}" style="width:22px;height:22px;border-radius:50%;object-fit:cover;flex-shrink:0">` : `<span style="font-size:1rem;flex-shrink:0">${_criGeneroIcon(ativo.genero)}</span>`;
+  const nomeEsc = (typeof _rcEsc === 'function' && ativo.nome) ? _rcEsc(ativo.nome) : (ativo.nome || '—');
+  const badgeCount = lista.length > 1 ? `<span style="background:rgba(0,180,255,0.25);color:var(--blue-neon);padding:1px 5px;border-radius:8px;font-size:0.54rem;margin-left:4px">${lista.length}</span>` : '';
+  sel.innerHTML = `${icon}<span style="overflow:hidden;text-overflow:ellipsis">${nomeEsc}</span>${badgeCount}<span style="opacity:0.65;margin-left:2px;font-size:0.7rem">▾</span>`;
+  sel.title = lista.length > 1 ? `Trocar criança (${lista.length} cadastradas)` : 'Gerenciar crianças';
 }
 
 // Hook no atualizarHeaderBebe para re-render o seletor
@@ -17137,6 +18245,38 @@ function renderSeletorCriancaHeader() {
 
 // Inicializa seletor após delay (garante que header existe)
 setTimeout(renderSeletorCriancaHeader, 1500);
+
+// Re-render quando algo relevante acontecer
+(function reforcarSeletor(){
+  // Hook em efetivarLoginComCrianca
+  if (typeof window.efetivarLoginComCrianca === 'function') {
+    const orig = window.efetivarLoginComCrianca;
+    window.efetivarLoginComCrianca = function() {
+      const r = orig.apply(this, arguments);
+      setTimeout(renderSeletorCriancaHeader, 400);
+      setTimeout(renderSeletorCriancaHeader, 1200);
+      return r;
+    };
+  }
+  // Hook em trocarCriancaAtiva
+  if (typeof window.trocarCriancaAtiva === 'function') {
+    const orig = window.trocarCriancaAtiva;
+    window.trocarCriancaAtiva = function() {
+      const r = orig.apply(this, arguments);
+      setTimeout(renderSeletorCriancaHeader, 300);
+      return r;
+    };
+  }
+  // Hook em sairSessao — remove o seletor ao deslogar
+  if (typeof window.sairSessao === 'function') {
+    const orig = window.sairSessao;
+    window.sairSessao = function() {
+      const el = document.getElementById('header-baby-selector');
+      if (el) el.remove();
+      return orig.apply(this, arguments);
+    };
+  }
+})();
 
 // ═══════════════════════════════════════════════════════════════
 // LIVE PRESENCE — Indica outros guardiões online ao mesmo tempo
@@ -18564,63 +19704,105 @@ const BFPrivacy = (() => {
     const existente = document.getElementById('bf-consent-modal');
     if (existente) existente.remove();
 
+    // Injetar CSS dedicado (uma vez) para evitar conflito com vars
+    if (!document.getElementById('bf-consent-css')) {
+      const style = document.createElement('style');
+      style.id = 'bf-consent-css';
+      style.textContent = `
+#bf-consent-modal{position:fixed;inset:0;background:rgba(0,10,30,0.94);z-index:99999;overflow-y:auto;padding:20px;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-sizing:border-box;font-family:'Exo 2',-apple-system,BlinkMacSystemFont,sans-serif;}
+#bf-consent-modal *{box-sizing:border-box;}
+.bf-cm-box{max-width:540px;width:100%;background:linear-gradient(135deg,#031027 0%,#0f0630 100%);border:1px solid rgba(0,180,255,0.4);border-radius:14px;padding:22px;color:#ffffff;max-height:92vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.6);}
+.bf-cm-box::-webkit-scrollbar{width:6px;}
+.bf-cm-box::-webkit-scrollbar-thumb{background:rgba(0,180,255,0.3);border-radius:3px;}
+.bf-cm-head{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+.bf-cm-icon{font-size:1.9rem;flex-shrink:0;}
+.bf-cm-title{font-family:'Orbitron',monospace;font-size:0.82rem;color:#00d4ff;letter-spacing:0.06em;font-weight:700;line-height:1.2;}
+.bf-cm-sub{font-size:0.64rem;color:#9eb0c8;margin-top:3px;letter-spacing:0.03em;}
+.bf-cm-intro{background:rgba(0,40,90,0.5);border-left:3px solid #00d4ff;border-radius:6px;padding:11px 13px;margin-bottom:14px;font-size:0.76rem;line-height:1.55;color:#e2e8f0;}
+.bf-cm-intro strong{color:#fff;}
+.bf-cm-item{background:rgba(0,30,70,0.55);border-radius:10px;padding:11px 13px;margin-bottom:9px;border:1px solid rgba(0,180,255,0.18);}
+.bf-cm-label{display:flex;align-items:flex-start;gap:11px;cursor:pointer;margin:0;}
+.bf-cm-label.disabled{cursor:default;}
+.bf-cm-check{margin-top:3px;cursor:pointer;flex-shrink:0;width:16px;height:16px;accent-color:#00d4ff;}
+.bf-cm-check:disabled{cursor:default;opacity:0.7;}
+.bf-cm-text{flex:1;min-width:0;}
+.bf-cm-name{font-size:0.82rem;font-weight:600;margin-bottom:4px;color:#fff;line-height:1.35;display:flex;align-items:center;flex-wrap:wrap;gap:6px;}
+.bf-cm-badge{font-size:0.54rem;color:#78ff99;background:rgba(120,255,153,0.16);padding:2px 7px;border-radius:10px;font-family:'Orbitron',monospace;letter-spacing:0.06em;font-weight:700;}
+.bf-cm-desc{font-size:0.7rem;color:#9eb0c8;line-height:1.5;}
+.bf-cm-rights{background:rgba(120,255,153,0.08);border-left:3px solid #78ff99;border-radius:6px;padding:10px 12px;margin:14px 0;font-size:0.68rem;color:#cbd5e1;line-height:1.6;}
+.bf-cm-rights b{color:#78ff99;}
+.bf-cm-actions{display:flex;gap:9px;margin-top:18px;flex-wrap:wrap;}
+.bf-cm-btn{flex:1;padding:12px;border-radius:8px;font-family:'Orbitron',monospace;font-size:0.68rem;letter-spacing:0.06em;cursor:pointer;font-weight:700;min-width:140px;border:none;transition:opacity 0.15s;}
+.bf-cm-btn:active{opacity:0.8;}
+.bf-cm-btn-primary{background:linear-gradient(135deg,#00d4ff 0%,#c77dff 100%);color:#fff;}
+.bf-cm-btn-secondary{background:rgba(0,60,120,0.7);border:1px solid rgba(0,180,255,0.5);color:#00d4ff;}
+.bf-cm-links{margin-top:14px;display:flex;gap:12px;justify-content:center;font-size:0.68rem;flex-wrap:wrap;}
+.bf-cm-links a{color:#9eb0c8;text-decoration:underline;cursor:pointer;}
+.bf-cm-links a:hover{color:#00d4ff;}
+.bf-cm-links .sep{color:#4a5568;}
+@media (max-width:380px){.bf-cm-box{padding:18px 16px;}.bf-cm-title{font-size:0.76rem;}.bf-cm-name{font-size:0.78rem;}}
+      `;
+      document.head.appendChild(style);
+    }
+
     const modal = document.createElement('div');
     modal.id = 'bf-consent-modal';
-    modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,10,30,0.92);z-index:99999;overflow-y:auto;padding:20px;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px)';
+
+    // Construir o HTML de maneira limpa
+    const itemsHTML = Object.entries(CONSENT_TIPOS).map(([id, info]) => {
+      const ativo = (c.consents && c.consents[id]) || info.obrigatorio;
+      const checked = ativo ? ' checked' : '';
+      const disabled = info.obrigatorio ? ' disabled' : '';
+      const disabledCls = info.obrigatorio ? ' disabled' : '';
+      const badge = info.obrigatorio ? '<span class="bf-cm-badge">OBRIGATÓRIO</span>' : '';
+      return `
+        <div class="bf-cm-item">
+          <label class="bf-cm-label${disabledCls}">
+            <input type="checkbox" class="bf-cm-check" id="bf-consent-${id}"${checked}${disabled}>
+            <div class="bf-cm-text">
+              <div class="bf-cm-name">${info.label}${badge}</div>
+              <div class="bf-cm-desc">${info.desc}</div>
+            </div>
+          </label>
+        </div>`;
+    }).join('');
+
     modal.innerHTML = `
-      <div style="max-width:540px;width:100%;background:linear-gradient(135deg,rgba(0,20,50,0.98),rgba(20,10,60,0.98));border:1px solid rgba(0,180,255,0.4);border-radius:14px;padding:20px;color:var(--white,#fff);font-family:'Exo 2',sans-serif;max-height:90vh;overflow-y:auto">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
-          <div style="font-size:1.8rem">🔒</div>
+      <div class="bf-cm-box">
+        <div class="bf-cm-head">
+          <div class="bf-cm-icon">🔒</div>
           <div>
-            <div style="font-family:'Orbitron',monospace;font-size:0.82rem;color:#00d4ff;letter-spacing:0.06em;font-weight:700">PRIVACIDADE E PROTEÇÃO DE DADOS</div>
-            <div style="font-size:0.66rem;color:#9eb0c8;margin-top:2px">LGPD · GDPR · Transparência total</div>
+            <div class="bf-cm-title">PRIVACIDADE E PROTEÇÃO DE DADOS</div>
+            <div class="bf-cm-sub">LGPD · GDPR · Transparência total</div>
           </div>
         </div>
 
-        <div style="background:rgba(0,40,90,0.4);border-left:3px solid #00d4ff;border-radius:6px;padding:10px 12px;margin-bottom:14px;font-size:0.78rem;line-height:1.5">
+        <div class="bf-cm-intro">
           O BabyForce leva a sério a privacidade dos seus dados e dos do seu bebê.
           Precisamos do seu consentimento para alguns tratamentos. Você pode mudar estas
-          escolhas a qualquer momento em <strong>Configurações → Privacidade</strong>.
+          escolhas a qualquer momento em <strong>Menu Guardião → Privacidade e Segurança</strong>.
         </div>
 
-        <div id="bf-consent-items">
-          ${Object.entries(CONSENT_TIPOS).map(([id, info]) => `
-            <div style="background:rgba(0,30,70,0.5);border-radius:8px;padding:10px 12px;margin-bottom:8px;border:1px solid rgba(0,180,255,0.15)">
-              <label style="display:flex;align-items:flex-start;gap:10px;cursor:${info.obrigatorio ? 'default' : 'pointer'}">
-                <input type="checkbox" id="bf-consent-${id}"
-                  ${(c.consents && c.consents[id]) || info.obrigatorio ? 'checked' : ''}
-                  ${info.obrigatorio ? 'disabled' : ''}
-                  style="margin-top:3px;cursor:${info.obrigatorio ? 'default' : 'pointer'}">
-                <div style="flex:1">
-                  <div style="font-size:0.82rem;font-weight:600;margin-bottom:3px">
-                    ${info.label}
-                    ${info.obrigatorio ? '<span style="font-size:0.58rem;color:#78ff99;background:rgba(120,255,153,0.15);padding:2px 6px;border-radius:10px;margin-left:6px;font-family:Orbitron,monospace;letter-spacing:0.05em">OBRIGATÓRIO</span>' : ''}
-                  </div>
-                  <div style="font-size:0.7rem;color:#9eb0c8;line-height:1.45">${info.desc}</div>
-                </div>
-              </label>
-            </div>
-          `).join('')}
+        <div id="bf-consent-items">${itemsHTML}</div>
+
+        <div class="bf-cm-rights">
+          <b>🔐 Seus direitos garantidos:</b><br>
+          • <strong>Acesso e portabilidade:</strong> baixe todos seus dados em JSON<br>
+          • <strong>Correção:</strong> editável no app a qualquer momento<br>
+          • <strong>Exclusão:</strong> apagar tudo (local + nuvem) em 1 clique<br>
+          • <strong>Revogação:</strong> retirar consentimentos quando quiser<br>
+          • <strong>Transparência:</strong> histórico auditável de todas as ações
         </div>
 
-        <div style="background:rgba(120,255,153,0.08);border-left:3px solid #78ff99;border-radius:6px;padding:9px 11px;margin:12px 0;font-size:0.68rem;color:#cbd5e1;line-height:1.5">
-          <strong style="color:#78ff99">🔐 Seus direitos garantidos:</strong><br>
-          • <strong>Acesso e portabilidade:</strong> baixe todos seus dados em JSON quando quiser<br>
-          • <strong>Correção:</strong> editável dentro do app a qualquer momento<br>
-          • <strong>Exclusão:</strong> apagar tudo definitivamente (local + nuvem) em 1 clique<br>
-          • <strong>Revogação:</strong> retirar consentimentos a qualquer momento<br>
-          • <strong>Transparência:</strong> histórico de todas as ações em log auditável
+        <div class="bf-cm-actions">
+          <button id="bf-consent-aceitar-todos" class="bf-cm-btn bf-cm-btn-primary">✓ ACEITAR TODOS</button>
+          <button id="bf-consent-salvar" class="bf-cm-btn bf-cm-btn-secondary">SALVAR SELEÇÃO</button>
         </div>
 
-        <div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap">
-          <button id="bf-consent-aceitar-todos" style="flex:1;padding:11px;background:linear-gradient(135deg,#00d4ff,#c77dff);border:none;border-radius:8px;color:#fff;font-family:'Orbitron',monospace;font-size:0.7rem;letter-spacing:0.06em;cursor:pointer;font-weight:700;min-width:140px">✓ ACEITAR TODOS</button>
-          <button id="bf-consent-salvar" style="flex:1;padding:11px;background:rgba(0,60,120,0.6);border:1px solid rgba(0,180,255,0.4);border-radius:8px;color:#00d4ff;font-family:'Orbitron',monospace;font-size:0.7rem;letter-spacing:0.06em;cursor:pointer;min-width:140px">SALVAR SELEÇÃO</button>
-        </div>
-
-        <div style="margin-top:12px;display:flex;gap:10px;justify-content:center;font-size:0.68rem">
-          <a href="#" onclick="BFPrivacy.mostrarPolitica();return false;" style="color:#9eb0c8;text-decoration:underline">Política de Privacidade</a>
-          <span style="color:#4a5568">·</span>
-          <a href="#" onclick="BFPrivacy.mostrarTermos();return false;" style="color:#9eb0c8;text-decoration:underline">Termos de Uso</a>
+        <div class="bf-cm-links">
+          <a onclick="BFPrivacy.mostrarPolitica();return false;">Política de Privacidade</a>
+          <span class="sep">·</span>
+          <a onclick="BFPrivacy.mostrarTermos();return false;">Termos de Uso</a>
         </div>
       </div>
     `;
