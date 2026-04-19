@@ -25,6 +25,7 @@
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap"></noscript>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
 <title>BabyForce · v1.0</title>
@@ -294,7 +295,9 @@ textarea{resize:none;min-height:80px;}
 .lembrar-label{font-family:'Orbitron',monospace;font-size:0.58rem;color:var(--text-dim);letter-spacing:0.07em;}
 .btn-faceid{width:100%;padding:14px;background:linear-gradient(135deg,rgba(0,60,120,0.5),rgba(0,30,70,0.6));border:1px solid rgba(0,180,255,0.4);border-radius:12px;color:var(--white);font-family:'Orbitron',monospace;font-size:0.72rem;letter-spacing:0.08em;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:all 0.2s;margin-bottom:10px;}
 .btn-faceid .faceid-icon{font-size:1.4rem;filter:drop-shadow(0 0 6px var(--blue-neon));}
-.emoji-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;max-width:260px;margin:0 auto;}
+.emoji-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;max-width:300px;margin:0 auto;max-height:280px;overflow-y:auto;padding:4px;scrollbar-width:thin;scrollbar-color:rgba(0,180,255,0.4) transparent;}
+.emoji-grid::-webkit-scrollbar{width:6px;}
+.emoji-grid::-webkit-scrollbar-thumb{background:rgba(0,180,255,0.4);border-radius:3px;}
 .emoji-btn{font-size:1.4rem;padding:6px;border-radius:8px;border:2px solid transparent;background:rgba(0,20,50,0.6);cursor:pointer;transition:all 0.15s;text-align:center;line-height:1;-webkit-tap-highlight-color:transparent;min-width:40px;min-height:40px;}
 .emoji-btn.sel{border-color:var(--blue-neon);background:rgba(0,100,200,0.3);box-shadow:0 0 8px rgba(0,180,255,0.3);}
 .btn-novo-guardiao{width:100%;padding:11px;background:transparent;border:1px dashed rgba(0,180,255,0.3);border-radius:10px;color:var(--text-dim);font-family:'Orbitron',monospace;font-size:0.65rem;letter-spacing:0.08em;cursor:pointer;transition:all 0.2s;}
@@ -648,6 +651,7 @@ html.bf-tema-claro [style*="color: var(--white)"] { color: var(--white) !importa
 
 </head>
 <body>
+<a href="#main-content" class="skip-link">Pular para o conteúdo principal</a>
 
 <!-- Badge flutuante "Modo madrugada" (visível só quando ativo) -->
 <div class="madrugada-badge" id="madrugada-badge" onclick="ModoMadrugada.toggle()" title="Toque para desativar (voltar ao tema padrão)">🌙 Modo madrugada · toque para sair</div>
@@ -748,7 +752,7 @@ html.bf-tema-claro [style*="color: var(--white)"] { color: var(--white) !importa
     <div class="ob-step" id="ob-step-3-bebe">
       <div class="ob-photo-circle" id="ob-photo-circle" onclick="document.getElementById('ob-input-foto').click()">
         <span id="ob-photo-emoji">🛸</span>
-        <img id="ob-photo-preview" style="display:none">
+        <img id="ob-photo-preview" style="display:none" alt="Foto">
       </div>
       <input type="file" id="ob-input-foto" accept="image/*" style="display:none" onchange="obPreviewFoto(this)">
       <div style="font-family:'Orbitron',monospace;font-size:0.58rem;color:var(--text-dim);letter-spacing:0.08em;margin-bottom:16px;cursor:pointer" onclick="document.getElementById('ob-input-foto').click()">📷 Adicionar foto (opcional)</div>
@@ -812,7 +816,7 @@ html.bf-tema-claro [style*="color: var(--white)"] { color: var(--white) !importa
         <label class="ob-label">EMBLEMA (OPCIONAL)</label>
         <div class="emoji-grid" id="ob-emoji-grid" style="max-width:100%;margin-top:4px"></div>
       </div>
-      <button class="ob-btn ob-btn-done" onclick="obFinalizar()" style="margin-top:14px"><img src="" id="btn-icon-galaxia" style="width:20px;height:20px;vertical-align:middle;border-radius:4px;margin-right:6px"> Entrar na Galáxia</button>
+      <button class="ob-btn ob-btn-done" onclick="obFinalizar()" style="margin-top:14px"><img src="" id="btn-icon-galaxia" style="width:20px;height:20px;vertical-align:middle;border-radius:4px;margin-right:6px" alt=""> Entrar na Galáxia</button>
     </div>
   </div>
 </div>
@@ -968,7 +972,7 @@ html.bf-tema-claro [style*="color: var(--white)"] { color: var(--white) !importa
   <div class="arthur-photo-wrap" onclick="abrirFotoArthur()">
     <div class="arthur-photo" id="arthur-photo-el">
       <span id="arthur-photo-emoji">🛸</span>
-      <img id="arthur-photo-img" style="display:none;width:100%;height:100%;object-fit:cover;border-radius:50%">
+      <img id="arthur-photo-img" style="display:none;width:100%;height:100%;object-fit:cover;border-radius:50%" alt="Foto">
     </div>
     <div class="arthur-photo-edit">✏️</div>
   </div>
@@ -983,7 +987,7 @@ html.bf-tema-claro [style*="color: var(--white)"] { color: var(--white) !importa
   <div class="user-badge" id="user-badge">
     <div class="user-badge-avatar" id="user-badge-avatar" onclick="abrirMenuGuardiao(event)" style="overflow:hidden;position:relative">
       <span id="ubadge-emoji">?</span>
-      <img id="ubadge-foto" style="display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%">
+      <img id="ubadge-foto" style="display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%" alt="Foto">
     </div>
     <span class="user-badge-name" id="user-badge-name" onclick="abrirMenuGuardiao(event)">—</span>
     <span class="user-badge-exit" onclick="sairSessao()" style="cursor:pointer;padding:4px">↩</span>
@@ -1024,12 +1028,12 @@ html.bf-tema-claro [style*="color: var(--white)"] { color: var(--white) !importa
 
 <nav>
   <button class="active" onclick="showHub('hoje')" data-hub="hoje"><span class="nav-icon">🌌</span>Hoje</button>
-  <button onclick="showHub('cuidado')" data-hub="cuidado"><span class="nav-icon">🍼</span>Cuidado</button>
+  <button onclick="showHub('cuidado')" data-hub="cuidado"><span class="nav-icon">🫶</span>Cuidado</button>
   <button onclick="showHub('saude')" data-hub="saude"><span class="nav-icon">🛡️</span>Saúde</button>
   <button onclick="showHub('desenvolvimento')" data-hub="desenvolvimento"><span class="nav-icon">🚀</span>Desenvolvimento</button>
   <button onclick="showHub('apoio')" data-hub="apoio"><span class="nav-icon">💬</span>Apoio</button>
 </nav>
-<main>
+<main id="main-content" tabindex="-1">
 
 <!-- GALÁXIA (DASHBOARD) -->
 <div id="tab-dashboard" class="tab-panel active">
@@ -1116,8 +1120,8 @@ html.bf-tema-claro [style*="color: var(--white)"] { color: var(--white) !importa
       <!-- CONTROLES PRINCIPAIS -->
       <div style="display:flex;gap:8px;margin-top:14px">
         <button class="btn btn-primary" style="flex:1;min-width:0" id="btn-timer-mama-start" onclick="toggleTimerMama()">▶ Iniciar</button>
-        <button class="btn" style="flex:0 0 44px;padding:10px 0;background:rgba(0,50,100,0.5);border:1px solid rgba(0,180,255,0.3);color:var(--text-dim)" onclick="trocarLadoAtivo()" title="Trocar para o outro lado">🔄</button>
-        <button class="btn" style="flex:0 0 44px;padding:10px 0;background:rgba(0,50,100,0.5);border:1px solid rgba(0,180,255,0.3);color:var(--text-dim)" onclick="resetTimerMama()" title="Zerar sessão">↺</button>
+        <button class="btn" style="flex:0 0 44px;padding:10px 0;background:rgba(0,50,100,0.5);border:1px solid rgba(0,180,255,0.3);color:var(--text-dim)" onclick="trocarLadoAtivo()" title="Trocar para o outro lado" aria-label="Recarregar">🔄</button>
+        <button class="btn" style="flex:0 0 44px;padding:10px 0;background:rgba(0,50,100,0.5);border:1px solid rgba(0,180,255,0.3);color:var(--text-dim)" onclick="resetTimerMama()" title="Zerar sessão" aria-label="Atualizar">↺</button>
         <button class="btn btn-gold" style="flex:1;min-width:0" id="btn-timer-mama-salvar" onclick="salvarDoTimer()" disabled>⚡ Salvar</button>
       </div>
 
@@ -1370,7 +1374,7 @@ html.bf-tema-claro [style*="color: var(--white)"] { color: var(--white) !importa
             <div style="font-family:'Orbitron',monospace;font-size:0.75rem;color:var(--purple-neon);letter-spacing:0.08em;font-weight:600">ORÁCULO</div>
             <div style="font-size:0.64rem;color:var(--text-dim);margin-top:1px">IA Pediátrica · Orientação entre consultas</div>
           </div>
-          <button class="btn" style="background:rgba(0,50,100,0.5);border:1px solid rgba(0,180,255,0.3);color:var(--text-dim);padding:4px 8px;font-size:0.64rem" onclick="oraculoConfigKey()">⚙</button>
+          <button class="btn" style="background:rgba(0,50,100,0.5);border:1px solid rgba(0,180,255,0.3);color:var(--text-dim);padding:4px 8px;font-size:0.64rem" onclick="oraculoConfigKey()" aria-label="Configurações">⚙</button>
         </div>
         <div style="font-size:0.62rem;color:var(--text-dim);font-style:italic;padding:6px 10px;background:rgba(255,200,80,0.08);border-left:2px solid rgba(255,200,80,0.4);border-radius:4px;line-height:1.4">
           ⚠ O Oráculo não substitui o pediatra. Em emergências, procure atendimento médico. Conversas ficam no seu dispositivo.
@@ -1398,7 +1402,7 @@ html.bf-tema-claro [style*="color: var(--white)"] { color: var(--white) !importa
         <div id="oraculo-prompts-bar" style="display:flex;gap:6px;padding:10px 12px;overflow-x:auto;scrollbar-width:none;border-top:1px dashed rgba(0,180,255,0.12);border-bottom:1px dashed rgba(0,180,255,0.12);margin-top:6px"></div>
         <div style="border-top:1px solid rgba(0,180,255,0.1);padding:10px;display:flex;gap:6px;align-items:flex-end;background:rgba(0,20,50,0.4)">
           <textarea id="oraculo-input" placeholder="Pergunte ao Oráculo..." rows="1" style="flex:1;background:rgba(0,30,70,0.5);border:1px solid rgba(0,180,255,0.25);color:var(--white);padding:10px 12px;border-radius:10px;font-family:inherit;font-size:0.82rem;resize:none;max-height:120px;outline:none" onkeydown="oraculoHandleKey(event)"></textarea>
-          <button class="oraculo-voice-btn" id="oraculo-voice" onclick="oraculoToggleVoice()" title="Falar (PT-BR)">🎤</button><button class="btn btn-primary" id="oraculo-send" onclick="oraculoEnviar()" style="padding:10px 14px;white-space:nowrap">➤</button>
+          <button class="oraculo-voice-btn" id="oraculo-voice" onclick="oraculoToggleVoice()" title="Falar (PT-BR)" aria-label="Gravar áudio">🎤</button><button class="btn btn-primary" id="oraculo-send" onclick="oraculoEnviar()" style="padding:10px 14px;white-space:nowrap" aria-label="Enviar">➤</button>
         </div>
       </div>
     </div>
@@ -1930,7 +1934,7 @@ html.bf-tema-claro [style*="color: var(--white)"] { color: var(--white) !importa
   <div class="modal-box">
     <div class="modal-icon">⚠️</div>
     <div class="modal-title">CONFIRMAR EXCLUSÃO</div>
-    <div class="modal-msg" id="modal-msg">Deseja apagar este registro? Esta ação não pode ser desfeita.</div>
+    <div role="dialog" aria-modal="true" aria-label="Msg" class="modal-msg" id="modal-msg">Deseja apagar este registro? Esta ação não pode ser desfeita.</div>
     <div class="modal-btns">
       <button class="btn btn-danger" id="modal-confirm-btn">⚡ Excluir</button>
       <button class="btn" style="background:rgba(0,50,100,0.5);border:1px solid rgba(0,180,255,0.3);color:var(--text-dim)" onclick="fecharModal()">Cancelar</button>
@@ -1974,9 +1978,9 @@ html.bf-tema-claro [style*="color: var(--white)"] { color: var(--white) !importa
       <button onclick="fecharRelatorio()" style="background:rgba(0,50,100,0.4);border:1px solid rgba(0,180,255,0.2);border-radius:8px;color:var(--text-dim);width:32px;height:32px;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;flex-shrink:0" aria-label="Fechar">✕</button>
     </div>
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
-      <button onclick="relNavDia(-1)" style="background:rgba(0,50,100,0.4);border:1px solid rgba(0,180,255,0.2);border-radius:8px;color:var(--blue-neon);padding:6px 12px;cursor:pointer;font-size:1rem">‹</button>
+      <button onclick="relNavDia(-1)" style="background:rgba(0,50,100,0.4);border:1px solid rgba(0,180,255,0.2);border-radius:8px;color:var(--blue-neon);padding:6px 12px;cursor:pointer;font-size:1rem" aria-label="Anterior">‹</button>
       <input type="date" id="rel-data-input" onchange="renderRelatorio()" style="flex:1;text-align:center;font-family:'Orbitron',monospace;font-size:0.75rem;background:rgba(0,20,50,0.6);border:1px solid rgba(0,180,255,0.25);border-radius:8px;color:var(--white);padding:7px">
-      <button onclick="relNavDia(+1)" style="background:rgba(0,50,100,0.4);border:1px solid rgba(0,180,255,0.2);border-radius:8px;color:var(--blue-neon);padding:6px 12px;cursor:pointer;font-size:1rem">›</button>
+      <button onclick="relNavDia(+1)" style="background:rgba(0,50,100,0.4);border:1px solid rgba(0,180,255,0.2);border-radius:8px;color:var(--blue-neon);padding:6px 12px;cursor:pointer;font-size:1rem" aria-label="Próximo">›</button>
     </div>
     <div id="rel-conteudo"></div>
     <div class="modal-btns" style="margin-top:16px">
@@ -2061,7 +2065,7 @@ html.bf-tema-claro [style*="color: var(--white)"] { color: var(--white) !importa
     <div style="text-align:center;margin-bottom:14px">
       <div class="ob-photo-circle" id="cfg-photo-circle" onclick="document.getElementById('cfg-input-foto').click()" style="margin-bottom:6px">
         <span id="cfg-photo-emoji">🛸</span>
-        <img id="cfg-photo-preview" style="display:none;width:100%;height:100%;object-fit:cover;border-radius:50%">
+        <img id="cfg-photo-preview" style="display:none;width:100%;height:100%;object-fit:cover;border-radius:50%" alt="Foto">
       </div>
       <input type="file" id="cfg-input-foto" accept="image/*" style="display:none" onchange="cfgPreviewFoto(this)">
       <div style="font-size:0.6rem;color:var(--text-dim);font-family:'Orbitron',monospace;letter-spacing:0.06em;cursor:pointer" onclick="document.getElementById('cfg-input-foto').click()">📷 Alterar foto</div>
@@ -2099,7 +2103,7 @@ html.bf-tema-claro [style*="color: var(--white)"] { color: var(--white) !importa
     <div class="modal-icon">🛸</div>
     <div class="modal-title" style="color:var(--blue-neon);margin-bottom:14px">FOTO DO BEBÊ</div>
     <div class="foto-preview-wrap">
-      <div class="foto-preview-circle" onclick="document.getElementById('input-foto-arthur').click()"><span id="arthur-preview-emoji">🛸</span><img id="arthur-preview-img" style="display:none;width:100%;height:100%;object-fit:cover"></div>
+      <div class="foto-preview-circle" onclick="document.getElementById('input-foto-arthur').click()"><span id="arthur-preview-emoji">🛸</span><img id="arthur-preview-img" style="display:none;width:100%;height:100%;object-fit:cover" alt="Foto"></div>
       <button class="foto-upload-btn" onclick="document.getElementById('input-foto-arthur').click()">📷 Escolher Foto</button>
       <button class="foto-remove-btn" id="arthur-remove-btn" onclick="removerFotoArthur()" style="display:none">🗑 Remover</button>
     </div>
@@ -2116,7 +2120,7 @@ html.bf-tema-claro [style*="color: var(--white)"] { color: var(--white) !importa
     <div class="modal-icon">📷</div>
     <div class="modal-title" style="color:var(--blue-neon);margin-bottom:14px">FOTO DO GUARDIÃO</div>
     <div class="foto-preview-wrap">
-      <div class="foto-preview-circle" onclick="document.getElementById('input-foto-guardiao').click()"><span id="guardiao-preview-emoji">👤</span><img id="guardiao-preview-img" style="display:none;width:100%;height:100%;object-fit:cover"></div>
+      <div class="foto-preview-circle" onclick="document.getElementById('input-foto-guardiao').click()"><span id="guardiao-preview-emoji">👤</span><img id="guardiao-preview-img" style="display:none;width:100%;height:100%;object-fit:cover" alt=""></div>
       <button class="foto-upload-btn" onclick="document.getElementById('input-foto-guardiao').click()">📷 Escolher Foto</button>
       <button class="foto-remove-btn" id="guardiao-remove-btn" onclick="removerFotoGuardiao()" style="display:none">🗑 Remover</button>
     </div>
@@ -2423,7 +2427,22 @@ function getBirthISO(){return getBabyConfig().birthDate||null;}
 function getAppPIN(){return getAppConfig().pin||'000000';}
 
 // ── GUARDIÕES ──
-const EMOJIS_DISPONIVEIS=['🧔','👩','👨','👱','🧕','👴','👵','🧑','🧒','👦','👧','🧔‍♀️','👨‍🦱','👩‍🦱','👨‍🦳','👩‍🦳','🧑‍🚀','🧙','🧝','🦸','🧑‍⚕️','🧑‍🏫','⚔️','🛸','🌟','💫'];
+const // Lista expandida (80+ emblemas) atendendo a todos os públicos:
+// família, profissões, sci-fi, fantasia, animais, abstratos, natureza
+EMOJIS_DISPONIVEIS=[
+  // Família clássica
+  '👩','👨','🧔','👱','🧕','👴','👵','🧑','👩‍🦱','👨‍🦱','👩‍🦳','👨‍🦳','👩‍🦰','👨‍🦰','🧒','👦','👧',
+  // Profissões
+  '🧑‍⚕️','👩‍⚕️','👨‍⚕️','🧑‍🏫','👩‍🏫','👨‍🏫','🧑‍💻','🧑‍🍳','🧑‍🌾','🧑‍🎨','🧑‍🚀','🧑‍🔬','🧑‍✈️','🧑‍⚖️','🧑‍🚒',
+  // Sci-fi / fantasia
+  '🦸','🦸‍♀️','🦸‍♂️','🧙','🧙‍♀️','🧙‍♂️','🧝','🧝‍♀️','🧚','🧞','🤖','👽','👾','🛸','⚔️','🌌','🌠','💫','⭐','🌟',
+  // Animais (favoritos de bebês/crianças)
+  '🦁','🐯','🐻','🐼','🐨','🦊','🐶','🐱','🐰','🦄','🐝','🦋','🐙','🐳','🦖','🐢','🦉','🦔',
+  // Natureza & abstratos
+  '🌸','🌻','🌈','☀️','🌙','🌊','🔥','❄️','💎','🎨','🎵','📚','⚽','🎮','🚀','🎪','🎭',
+  // Corações/símbolos afetivos
+  '💖','💗','💙','💜','💚','🧡','💛','🫶','👑'
+];
 
 // ═══════════════════════════════════════════════════════════════
 // FASE 2 — Migração suave + autenticação por senha
@@ -3297,7 +3316,7 @@ window.abrirConvitesPendentes = function() {
           <div style="display:flex;gap:6px;margin-top:8px">
             <button onclick="window._reenviarConvite('${c.token}')" style="flex:1;padding:6px;background:rgba(0,180,255,0.15);border:1px solid rgba(0,180,255,0.4);border-radius:6px;color:var(--blue-neon);font-size:0.62rem;cursor:pointer;font-family:'Orbitron',monospace;letter-spacing:0.04em">🔄 Reenviar</button>
             <button onclick="window._copiarLinkConvite('${c.token}')" style="flex:1;padding:6px;background:rgba(199,125,255,0.15);border:1px solid rgba(199,125,255,0.4);border-radius:6px;color:var(--purple-neon);font-size:0.62rem;cursor:pointer;font-family:'Orbitron',monospace;letter-spacing:0.04em">🔗 Copiar link</button>
-            <button onclick="window._cancelarConvite('${c.token}')" style="padding:6px 10px;background:rgba(255,100,100,0.15);border:1px solid rgba(255,100,100,0.4);border-radius:6px;color:#ff8080;font-size:0.62rem;cursor:pointer;font-family:'Orbitron',monospace;letter-spacing:0.04em">🗑</button>
+            <button onclick="window._cancelarConvite('${c.token}')" style="padding:6px 10px;background:rgba(255,100,100,0.15);border:1px solid rgba(255,100,100,0.4);border-radius:6px;color:#ff8080;font-size:0.62rem;cursor:pointer;font-family:'Orbitron',monospace;letter-spacing:0.04em" aria-label="Excluir">🗑</button>
           </div>
         </div>
       `;
@@ -6890,12 +6909,16 @@ window._removerGuardiao = function(id) {
 // Convidar novo guardião (abre o form de cadastro)
 window._convidarNovoGuardiao = function() {
   if (!window.ehAdmin()) { alert('⚠️ Apenas administradores podem convidar'); return; }
-  document.getElementById('modal-gestao-familia').remove();
-  if (typeof abrirCadastroGuardiaoFromLogin === 'function') {
-    abrirCadastroGuardiaoFromLogin();
+  // Fecha modal de gestão antes de abrir o de convite
+  const modalGestao = document.getElementById('modal-gestao-familia');
+  if (modalGestao) modalGestao.remove();
+  // Chama o fluxo correto de convite com email/token
+  if (typeof window.abrirConvidarGuardiao === 'function') {
+    window.abrirConvidarGuardiao();
+  } else if (typeof abrirConvidarGuardiao === 'function') {
+    abrirConvidarGuardiao();
   } else {
-    // Fallback: abre o onboarding step de cadastro
-    alert('Na tela de login, clique em "＋ Novo Guardião" para convidar.');
+    alert('⚠️ Função de convite indisponível. Recarregue o app.');
   }
 };
 
@@ -7382,6 +7405,45 @@ function iniciarApp(){
 }
 document.addEventListener('DOMContentLoaded',iniciarApp);
 
+// ═══════════════════════════════════════════════════════════════
+// BUG 1 — Detector de protocolo file:// (alerta sobre persistência)
+// Alguns navegadores não persistem localStorage em file:// ao fechar
+// aba, causando perda de dados. Avisa o usuário apenas 1x.
+// ═══════════════════════════════════════════════════════════════
+(function detectarFileProtocol() {
+  try {
+    if (window.location.protocol !== 'file:') return;
+    // Flag para não avisar 2x na mesma sessão
+    if (sessionStorage.getItem('bf_file_warn_shown') === '1') return;
+    sessionStorage.setItem('bf_file_warn_shown', '1');
+
+    // Aguarda app carregar antes de avisar
+    setTimeout(() => {
+      const banner = document.createElement('div');
+      banner.id = 'bf-file-warning';
+      banner.setAttribute('role', 'alert');
+      banner.setAttribute('aria-live', 'polite');
+      banner.style.cssText = 'position:fixed;bottom:12px;left:12px;right:12px;z-index:99990;background:linear-gradient(135deg,rgba(250,199,117,0.95),rgba(230,150,60,0.95));color:#1a0f00;padding:14px 16px;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.4);font-family:"Exo 2",sans-serif;font-size:0.82rem;line-height:1.55;max-width:600px;margin:auto;';
+      banner.innerHTML = `
+        <div style="display:flex;align-items:flex-start;gap:10px">
+          <div style="font-size:1.6rem;flex-shrink:0">⚠️</div>
+          <div style="flex:1">
+            <div style="font-weight:700;margin-bottom:4px">Você abriu o app como arquivo local (file://)</div>
+            <div style="font-size:0.78rem;margin-bottom:8px">Em alguns navegadores, os dados podem ser perdidos ao fechar a aba. Para persistência garantida, use um servidor (ex: <code style="background:rgba(0,0,0,0.15);padding:2px 6px;border-radius:3px">python -m http.server</code>) ou publique como PWA.</div>
+            <button onclick="document.getElementById('bf-file-warning').remove()" style="background:rgba(0,0,0,0.15);border:none;padding:6px 14px;border-radius:6px;color:#1a0f00;font-weight:700;cursor:pointer;font-size:0.75rem">Entendi</button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(banner);
+      // Auto-dismiss em 15s
+      setTimeout(() => {
+        const el = document.getElementById('bf-file-warning');
+        if (el) { el.style.opacity = '0'; el.style.transition = 'opacity 1s'; setTimeout(() => el.remove(), 1000); }
+      }, 15000);
+    }, 1500);
+  } catch (e) { console.warn('[file detect]', e); }
+})();
+
 function mostrarStatusConexao(online){
   let el=document.getElementById('status-conexao');
   if(!el){el=document.createElement('div');el.id='status-conexao';el.style.cssText="position:fixed;top:0;left:0;right:0;z-index:99999;text-align:center;font-family:'Orbitron',monospace;font-size:0.6rem;padding:4px;letter-spacing:0.08em;transition:all 0.3s;";document.body.prepend(el);}
@@ -7789,7 +7851,7 @@ function renderMamadas(){
       if (m.ml_formula) partes.push(`<span style="color:#ffc856;font-size:0.68rem">🥛 ${m.ml_formula}ml fórmula</span>`);
       discrim = `<div style="margin-top:3px;display:flex;gap:10px;flex-wrap:wrap">${partes.join('')}</div>`;
     }
-    return `<div class="feed-item ${m.tipo}"><div style="flex:1"><div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><span class="badge badge-${m.tipo}">${tipoLabel[m.tipo]||m.tipo}</span>${m.ml?`<span style="color:var(--blue-neon);font-family:'Orbitron',monospace;font-size:0.75rem">${m.ml}ml</span>`:''}</div><div class="feed-meta">${formatDate(m.data)} · ${m.hora}</div>${discrim}${m.obs?`<div style="font-size:0.8rem;color:#7ab3d4;margin-top:4px">${m.obs}</div>`:''}${m.autor?`<div class="autor-tag">⚔️ ${nomeAutor(m.autor)}</div>`:''}</div><div style="display:flex;flex-direction:column;gap:6px"><button class="btn-edit-mamada" onclick="abrirModalEditarMamada(${m.id})">✏️</button><button class="btn btn-danger btn-sm" onclick="deleteMamada(${m.id})" aria-label="Remover">🗑</button></div></div>`;
+    return `<div class="feed-item ${m.tipo}"><div style="flex:1"><div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><span class="badge badge-${m.tipo}">${tipoLabel[m.tipo]||m.tipo}</span>${m.ml?`<span style="color:var(--blue-neon);font-family:'Orbitron',monospace;font-size:0.75rem">${m.ml}ml</span>`:''}</div><div class="feed-meta">${formatDate(m.data)} · ${m.hora}</div>${discrim}${m.obs?`<div style="font-size:0.8rem;color:#7ab3d4;margin-top:4px">${m.obs}</div>`:''}${m.autor?`<div class="autor-tag">⚔️ ${nomeAutor(m.autor)}</div>`:''}</div><div style="display:flex;flex-direction:column;gap:6px"><button class="btn-edit-mamada" onclick="abrirModalEditarMamada(${m.id})" aria-label="Editar">✏️</button><button class="btn btn-danger btn-sm" onclick="deleteMamada(${m.id})" aria-label="Remover">🗑</button></div></div>`;
   }).join('');
 }
 
@@ -7850,7 +7912,7 @@ function renderAgenda(){
   if(!list.length){el.innerHTML=`<div class="empty"><div class="empty-icon">🗺️</div><p>Nenhuma missão registrada</p></div>`;return;}
   const futuros=db.eventos.filter(e=>e.data>=hoje);
   const btnExp=futuros.length>0?`<button onclick="exportarAgendaICS()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:11px;margin-bottom:12px;background:linear-gradient(135deg,rgba(0,60,130,0.5),rgba(0,30,80,0.6));border:1px solid rgba(0,180,255,0.3);border-radius:10px;color:var(--blue-neon);font-family:'Orbitron',monospace;font-size:0.65rem;letter-spacing:0.06em;cursor:pointer;">📅 Exportar ${futuros.length} missão(ões) para Calendário</button>`:'';
-  el.innerHTML=btnExp+list.map(e=>`<div class="evento-item ${e.data<hoje?'passado':''}"><div style="flex:1"><div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><span style="font-size:1.1rem">${tipoEvIcon(e.tipo)}</span><span class="feed-title">${e.titulo}</span></div><div class="evento-date">${formatDate(e.data)}${e.hora?' · '+e.hora:''}</div>${e.local?`<div style="font-size:0.78rem;color:var(--text-dim);margin-top:3px">📍 ${e.local}</div>`:''} ${e.profissional?`<div style="font-size:0.72rem;color:rgba(0,212,255,0.6);margin-top:3px">👨‍⚕️ ${e.profissional}</div>`:''}</div><div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">${e.data>=hoje?`<button onclick="adicionarEventoCalendario(${e.id})" style="background:rgba(0,80,180,0.3);border:1px solid rgba(0,180,255,0.3);color:var(--blue-neon);border-radius:8px;padding:6px 10px;font-size:0.68rem;font-family:'Orbitron',monospace;cursor:pointer;">📅</button>`:''}<button class="btn btn-danger btn-sm" onclick="deleteEvento(${e.id})" aria-label="Remover">🗑</button></div></div>`).join('');
+  el.innerHTML=btnExp+list.map(e=>`<div class="evento-item ${e.data<hoje?'passado':''}"><div style="flex:1"><div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><span style="font-size:1.1rem">${tipoEvIcon(e.tipo)}</span><span class="feed-title">${e.titulo}</span></div><div class="evento-date">${formatDate(e.data)}${e.hora?' · '+e.hora:''}</div>${e.local?`<div style="font-size:0.78rem;color:var(--text-dim);margin-top:3px">📍 ${e.local}</div>`:''} ${e.profissional?`<div style="font-size:0.72rem;color:rgba(0,212,255,0.6);margin-top:3px">👨‍⚕️ ${e.profissional}</div>`:''}</div><div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">${e.data>=hoje?`<button onclick="adicionarEventoCalendario(${e.id})" style="background:rgba(0,80,180,0.3);border:1px solid rgba(0,180,255,0.3);color:var(--blue-neon);border-radius:8px;padding:6px 10px;font-size:0.68rem;font-family:'Orbitron',monospace;cursor:pointer;" aria-label="Adicionar ao calendário">📅</button>`:''}<button class="btn btn-danger btn-sm" onclick="deleteEvento(${e.id})" aria-label="Remover">🗑</button></div></div>`).join('');
 }
 
 // ── DASHBOARD ──
@@ -10754,6 +10816,30 @@ const ORACULO_PROVIDER_STORAGE = 'babyforce_ai_provider_v1';
 const ORACULO_MODEL = 'claude-haiku-4-5-20251001';
 const ORACULO_API_URL = 'https://api.anthropic.com/v1/messages';
 
+// ═══════════════════════════════════════════════════════════════
+// BUG 5 — API Claude nativa (chave embutida) para testes
+// ⚠️ ATENÇÃO: em builds de TESTE, a chave BabyForce fica visível no
+// código. Em produção (Capacitor/Electron ou proxy server-side),
+// substituir esta abordagem por endpoint backend seguro.
+// O usuário pode sobrescrever colando sua própria chave em Settings.
+// ═══════════════════════════════════════════════════════════════
+// Chave BabyForce default — para que o Oráculo funcione out-of-the-box
+// Troque esta string por sua chave real "sk-ant-..." antes de distribuir
+// OU deixe vazia para exigir que cada usuário configure a sua.
+const BABYFORCE_DEFAULT_API_KEY = ''; // ← COLE AQUI SUA CHAVE DE TESTE: 'sk-ant-api03-...'
+
+// Helper centralizado: retorna a chave efetiva (usuário > default > null)
+function getEffectiveApiKey() {
+  // 1. Chave do usuário (salva por ele via oraculoConfigKey)
+  const userKey = localStorage.getItem(ORACULO_KEY_STORAGE) || localStorage.getItem('oraculo_api_key_v1');
+  if (userKey && userKey.startsWith('sk-ant-')) return userKey;
+  // 2. Chave default embutida (BabyForce)
+  if (BABYFORCE_DEFAULT_API_KEY && BABYFORCE_DEFAULT_API_KEY.startsWith('sk-ant-')) return BABYFORCE_DEFAULT_API_KEY;
+  // 3. Sem chave
+  return null;
+}
+window.getEffectiveApiKey = getEffectiveApiKey;
+
 let oraculoHistory = [];
 let oraculoBusy = false;
 
@@ -10869,33 +10955,40 @@ function oraculoConfigKey() {
   if (typeof fecharMenuGuardiao === 'function') fecharMenuGuardiao();
   const existing = localStorage.getItem(ORACULO_KEY_STORAGE) || '';
   const current = existing ? existing.slice(0, 12) + '...' + existing.slice(-4) : '(nenhuma)';
+  const hasDefault = BABYFORCE_DEFAULT_API_KEY && BABYFORCE_DEFAULT_API_KEY.startsWith('sk-ant-');
+  const statusDefault = hasDefault
+    ? '✓ BabyForce tem uma chave DEFAULT embutida. O Oráculo já funciona sem você configurar nada.\n'
+    : '⚠ BabyForce NÃO tem chave default embutida. Você precisa configurar uma chave sua para usar o Oráculo.\n';
   const help = `🔮 Configurar Oráculo (AI)\n\n` +
-    `O Oráculo usa a API do Claude (Anthropic) direto do seu dispositivo.\n` +
+    statusDefault + '\n' +
+    `Se quiser usar SUA PRÓPRIA chave (por exemplo, para separar custos):\n` +
     `A chave é salva LOCALMENTE (nada vai para servidores nossos).\n\n` +
-    `Chave atual: ${current}\n\n` +
+    `Chave atual do usuário: ${current}\n\n` +
     `Como obter uma chave:\n` +
     `1. Acesse: https://console.anthropic.com/\n` +
     `2. Crie uma conta (aceita email pessoal)\n` +
     `3. Adicione créditos (US$ 5 dura MUITO tempo)\n` +
     `4. Settings → API Keys → Create Key\n` +
     `5. Cole aqui embaixo (começa com "sk-ant-...")\n\n` +
-    `Depois de configurada, a AI ficará disponível em:\n` +
+    `Depois de configurada, a AI fica disponível em:\n` +
     `• Oráculo (Hub Apoio)\n` +
     `• Sleep AI (Hub Cuidado)\n` +
     `• Crescimento AI (Hub Saúde)\n` +
     `• Relatórios Clínicos com análise AI\n\n` +
-    `Deixe em branco para REMOVER. Cancelar para fechar.`;
+    `Deixe em branco para REMOVER sua chave (volta a usar a default). Cancelar para fechar.`;
   const novaKey = prompt(help, existing);
   if (novaKey === null) return; // cancelou
   if (!novaKey.trim()) {
     localStorage.removeItem(ORACULO_KEY_STORAGE);
-    alert('✓ Chave removida. O Oráculo ficará em modo demo (sem AI).');
+    alert(hasDefault
+      ? '✓ Sua chave foi removida. O Oráculo voltará a usar a chave DEFAULT do BabyForce.'
+      : '✓ Chave removida. O Oráculo ficará em modo demo (sem AI) até você configurar uma.');
   } else if (!/^sk-ant-/.test(novaKey.trim())) {
     alert('⚠ Chave inválida — deve começar com "sk-ant-".\n\nPegue em: console.anthropic.com → Settings → API Keys');
     return;
   } else {
     localStorage.setItem(ORACULO_KEY_STORAGE, novaKey.trim());
-    alert('✓ Chave salva com sucesso!\n\nEla fica SÓ no seu dispositivo (nunca sai daqui).\n\nAgora você pode:\n• Perguntar ao Oráculo no Hub Apoio\n• Gerar Relatórios Clínicos com análise AI\n• Usar Sleep AI e Crescimento AI');
+    alert('✓ Sua chave salva!\n\nEla fica SÓ no seu dispositivo (nunca sai daqui).\nEla sobrescreve a chave default do BabyForce.\n\nAgora você pode:\n• Perguntar ao Oráculo\n• Gerar Relatórios Clínicos com análise AI\n• Usar Sleep AI e Crescimento AI');
     if (typeof BFAudit !== 'undefined') BFAudit.log('oraculo_api_key_configurada');
   }
   if (typeof oraculoRenderSuggestions === 'function') oraculoRenderSuggestions();
@@ -11607,7 +11700,7 @@ async function gerarAtividadesAI() {
     return;
   }
 
-  const apiKey = localStorage.getItem('babyforce_ai_key_v1');
+  const apiKey = getEffectiveApiKey();
   if (!apiKey) {
     // Sem chave — mostrar sugestões demo
     const demo = _ativDemoPorIdade(ctx.idadeMeses, _ativFilter);
@@ -12547,7 +12640,7 @@ function renderPlanoSemanal() {
     <div class="section-title" style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
       <span>📅 Plano da Semana</span>
       <span style="font-family:'Orbitron',monospace;font-size:0.52rem;color:var(--blue-neon);background:rgba(0,180,255,0.14);padding:2px 7px;border-radius:8px;letter-spacing:0.08em">${completados}/7 · ${porcentagem}%</span>
-      <button onclick="gerarPlanoSemanal(true);renderPlanoSemanal()" style="margin-left:auto;background:none;border:1px solid rgba(0,180,255,0.3);border-radius:6px;color:var(--text-dim);font-size:0.56rem;padding:4px 8px;cursor:pointer;font-family:'Orbitron',monospace;letter-spacing:0.06em" title="Regenerar plano">🔄</button>
+      <button onclick="gerarPlanoSemanal(true);renderPlanoSemanal()" style="margin-left:auto;background:none;border:1px solid rgba(0,180,255,0.3);border-radius:6px;color:var(--text-dim);font-size:0.56rem;padding:4px 8px;cursor:pointer;font-family:'Orbitron',monospace;letter-spacing:0.06em" title="Regenerar plano" aria-label="Recarregar">🔄</button>
     </div>
     <div style="height:4px;background:rgba(0,30,70,0.6);border-radius:3px;overflow:hidden;margin-bottom:10px">
       <div style="height:100%;background:linear-gradient(90deg,#00d4ff,#c77dff);width:${porcentagem}%;transition:width 0.4s"></div>
@@ -13893,7 +13986,7 @@ async function generateSleepDebriefing(force = false) {
     }
   }
 
-  const apiKey = localStorage.getItem('babyforce_ai_key_v1') || localStorage.getItem('oraculo_api_key_v1');
+  const apiKey = getEffectiveApiKey();
 
   if (!apiKey) {
     // Modo demo
@@ -14306,7 +14399,7 @@ function computeRegularidadeSono(dias = 7) {
 // ── 3. PLANO DE AJUSTE IA ──
 // Geração via Claude Haiku 4.5 com base no diagnóstico acima
 async function gerarPlanoAjusteSonoIA() {
-  const apiKey = localStorage.getItem('babyforce_ai_key_v1') || localStorage.getItem('oraculo_api_key_v1');
+  const apiKey = getEffectiveApiKey();
   if (!apiKey) return null;
 
   // Coleta de contexto
@@ -14498,7 +14591,7 @@ async function _sleepAIGerarPlano() {
   const body = document.getElementById('sleep-ai-plano-body');
   if (!body) return;
 
-  const apiKey = localStorage.getItem('babyforce_ai_key_v1') || localStorage.getItem('oraculo_api_key_v1');
+  const apiKey = getEffectiveApiKey();
   if (!apiKey) {
     body.innerHTML = `<div style="padding:10px;background:rgba(250,199,117,0.12);border-left:3px solid rgba(250,199,117,0.5);border-radius:6px;font-size:0.68rem;color:var(--text-dim);line-height:1.5">Configure a chave da Claude API no Oráculo para habilitar o plano de ajuste por IA.</div>`;
     return;
@@ -14863,7 +14956,7 @@ function oraculoToggleVoice() {
 
 // ── STREAMING (SSE da Claude API) ──
 async function oraculoEnviarStream(userMsg, historyArr, systemPrompt) {
-  const apiKey = localStorage.getItem('babyforce_ai_key_v1') || localStorage.getItem('oraculo_api_key_v1');
+  const apiKey = getEffectiveApiKey();
   if (!apiKey) throw new Error('no-key');
 
   const res = await fetch('https://api.anthropic.com/v1/messages', {
@@ -15518,7 +15611,7 @@ function renderPlaylistDoDia() {
         <button onclick="_ativFeedback('${a._id}', '${a.area}', '${tituloRaw}', 'adoramos')" class="btn" style="flex:1;background:rgba(255,200,80,0.18);border:1px solid rgba(255,200,80,0.35);color:#FAC775;padding:7px;font-size:0.64rem;font-family:'Orbitron',monospace;letter-spacing:0.04em">⭐ ADOREI</button>
         <button onclick="_ativFeedback('${a._id}', '${a.area}', '${tituloRaw}', 'fizemos')" class="btn" style="flex:1;background:rgba(0,212,255,0.18);border:1px solid rgba(0,212,255,0.35);color:var(--blue-neon);padding:7px;font-size:0.64rem;font-family:'Orbitron',monospace;letter-spacing:0.04em">✅ FIZ</button>
         <button onclick="_ativFeedback('${a._id}', '${a.area}', '${tituloRaw}', 'dificil')" class="btn" style="flex:1;background:rgba(255,140,80,0.15);border:1px solid rgba(255,140,80,0.3);color:#ff9c6a;padding:7px;font-size:0.64rem;font-family:'Orbitron',monospace;letter-spacing:0.04em">⚠ DIFÍCIL</button>
-        <button onclick="anexarFotoAtividade('${a._id}', '${a.area}', '${tituloRaw}')" class="btn" style="flex:0 0 auto;background:rgba(199,125,255,0.2);border:1px solid rgba(199,125,255,0.4);color:var(--purple-neon);padding:7px 10px;font-size:0.64rem;font-family:'Orbitron',monospace;letter-spacing:0.04em" title="Adicionar foto ao álbum">📸</button>
+        <button onclick="anexarFotoAtividade('${a._id}', '${a.area}', '${tituloRaw}')" class="btn" style="flex:0 0 auto;background:rgba(199,125,255,0.2);border:1px solid rgba(199,125,255,0.4);color:var(--purple-neon);padding:7px 10px;font-size:0.64rem;font-family:'Orbitron',monospace;letter-spacing:0.04em" title="Adicionar foto ao álbum" aria-label="Ação">📸</button>
       </div>`;
 
     return `
@@ -16253,7 +16346,7 @@ function _fotoVerFoto(src, titulo, data) {
   overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;cursor:pointer';
   overlay.innerHTML = `
     <div style="position:absolute;top:14px;right:14px;font-size:1.6rem;color:#fff;cursor:pointer;padding:4px 10px;background:rgba(0,0,0,0.5);border-radius:20px">×</div>
-    <img src="${src}" style="max-width:100%;max-height:78vh;border-radius:12px;box-shadow:0 0 28px rgba(0,212,255,0.3)"/>
+    <img src="${src}" style="max-width:100%;max-height:78vh;border-radius:12px;box-shadow:0 0 28px rgba(0,212,255,0.3)"/ alt="">
     <div style="margin-top:12px;text-align:center;max-width:90%">
       <div style="color:#fff;font-weight:600;font-size:0.92rem">${titulo}</div>
       <div style="color:#888;font-size:0.72rem;margin-top:3px;font-family:'Orbitron',monospace;letter-spacing:0.05em">${data}</div>
@@ -17249,7 +17342,7 @@ window.oraculoEnviar = async function oraculoEnviarV3() {
   msgs.scrollTop = msgs.scrollHeight;
 
   // 4. Checar API key
-  const apiKey = localStorage.getItem('babyforce_ai_key_v1') || localStorage.getItem('oraculo_api_key_v1');
+  const apiKey = getEffectiveApiKey();
 
   if (!apiKey) {
     // Modo demo — cai pro oraculoEnviar original (sem tool use)
@@ -20443,9 +20536,14 @@ function _coletarDadosCrianca(baby) {
     data: ultima.data ? new Date(ultima.data + 'T12:00').toLocaleDateString('pt-BR') : null,
   };
 
-  // Vacinas
-  const vacinas = ler('babyforce_vacinas_v1', []) || [];
-  const vacinasTomadas = vacinas.filter(v => v && v.aplicada).length;
+  // Vacinas — normaliza: pode ser objeto {id: status} ou array. Usamos Object.values para funcionar em ambos.
+  const vacinasRaw = ler('babyforce_vacinas_v1', {}) || {};
+  let vacinasArr = [];
+  try {
+    if (Array.isArray(vacinasRaw)) vacinasArr = vacinasRaw;
+    else if (typeof vacinasRaw === 'object') vacinasArr = Object.values(vacinasRaw);
+  } catch {}
+  const vacinasTomadas = vacinasArr.filter(v => v && (v.aplicada || v.dataAplicacao || v.data)).length;
 
   // Gênero
   const generoIcon = baby.genero === 'M' ? '👦' : (baby.genero === 'F' ? '👧' : '🧒');
@@ -23682,7 +23780,7 @@ async function rcGerarAnalise() {
   const aiBox = document.getElementById('rc-ai-box');
   const btnGerar = document.getElementById('rc-btn-gerar');
 
-  const apiKey = (typeof localStorage !== 'undefined') ? (localStorage.getItem('babyforce_ai_key_v1') || localStorage.getItem('oraculo_api_key_v1') || '') : '';
+  const apiKey = (typeof localStorage !== 'undefined') ? (getEffectiveApiKey() || '') : '';
   if (!apiKey) {
     if (aiBox) aiBox.innerHTML = `<div style="font-size:0.72rem;color:#FAC775;line-height:1.55"><strong>⚠ Chave de API não configurada.</strong><br>Configure no Oráculo (aba Missões) para usar a análise IA. O relatório ainda pode ser gerado sem IA.</div>`;
     _rcAnaliseAtual = '(Análise por IA não disponível — chave de API não configurada.)\n\nO relatório abaixo contém apenas os dados brutos do período.';
@@ -23946,12 +24044,24 @@ function _removerProfissional(id) {
 
 function _mvChecarMesversario() {
   try {
+    // BUG 2: Não mostrar se não estiver logado
+    if (typeof usuarioAtual === 'undefined' || !usuarioAtual) return;
+    // Não mostrar se tela de onboarding/login visível
+    const telaOb = document.getElementById('tela-onboarding');
+    const telaLogin = document.getElementById('tela-login');
+    if (telaOb && telaOb.style.display !== 'none') return;
+    if (telaLogin && telaLogin.style.display !== 'none') return;
+
     if (localStorage.getItem(RC_KEY_MV_DISMISS) === 'true') return;
     const idadeDias = (typeof getBabyAgeInDays === 'function') ? getBabyAgeInDays() : null;
     if (idadeDias === null || idadeDias < 28) return; // só começa a avisar após ~1 mês
 
     const mesesCompletos = Math.floor(idadeDias / 30);
     if (mesesCompletos < 1) return;
+
+    // BUG 4: Só sugerir se há consulta médica em ≤ 48h
+    const temConsultaProxima = _mvHaConsultaEm48h();
+    if (!temConsultaProxima) return;
 
     const ultimoMesNotificado = parseInt(localStorage.getItem(RC_KEY_ULTIMO_RELATORIO_MES) || '-1', 10);
     if (mesesCompletos > ultimoMesNotificado) {
@@ -23962,6 +24072,29 @@ function _mvChecarMesversario() {
       }
     }
   } catch (e) { console.warn('[MV]', e); }
+}
+
+// Verifica se há consulta médica agendada nas próximas 48h (agenda/missões)
+function _mvHaConsultaEm48h() {
+  try {
+    const agenda = JSON.parse(localStorage.getItem('babyforce_agenda_v1') || '[]');
+    const agora = Date.now();
+    const em48h = agora + (48 * 60 * 60 * 1000);
+    for (const ev of agenda) {
+      if (!ev || !ev.data) continue;
+      // Considera eventos do tipo consulta, medico, pediatra, exame
+      const tipo = (ev.tipo || '').toLowerCase();
+      const titulo = (ev.titulo || ev.descricao || '').toLowerCase();
+      const ehConsulta = /consulta|m[ée]dico|pediatra|exame|check[\s-]?up/.test(tipo + ' ' + titulo);
+      if (!ehConsulta) continue;
+      // Converte data do evento para timestamp
+      const dtEv = new Date(ev.data + (ev.hora ? 'T' + ev.hora : 'T12:00')).getTime();
+      if (dtEv >= agora && dtEv <= em48h) return true;
+    }
+    return false;
+  } catch {
+    return false;
+  }
 }
 
 function _mvMostrarPopup(meses) {
@@ -24026,8 +24159,15 @@ function _mvNuncaMais() {
       return r;
     };
   } else {
-    // Fallback: disparar no DOMContentLoaded
-    document.addEventListener('DOMContentLoaded', () => setTimeout(_mvChecarMesversario, 2500));
+    // Fallback: disparar no DOMContentLoaded MAS só depois de garantir que usuarioAtual existe
+    document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(() => {
+        // Verificação dupla: só dispara se há sessão ativa
+        if (typeof usuarioAtual !== 'undefined' && usuarioAtual) {
+          _mvChecarMesversario();
+        }
+      }, 2500);
+    });
   }
 })();
 
@@ -24307,6 +24447,139 @@ body.modo-madrugada .madrugada-badge {
 .madrugada-badge:hover {
   background: linear-gradient(135deg, rgba(80,40,20,0.95), rgba(60,30,12,0.95));
 }
+
+/* ═══════════════════════════════════════════════════════════════ */
+/* BUG 7 — Melhorias de acessibilidade WCAG 2.1 AA                */
+/* ═══════════════════════════════════════════════════════════════ */
+
+/* Foco visível em todos os elementos interativos (WCAG 2.4.7) */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[role="button"]:focus-visible,
+[tabindex]:focus-visible {
+  outline: 3px solid #00d4ff !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 0 0 4px rgba(0, 212, 255, 0.25) !important;
+}
+
+/* Remove outline padrão mas mantém focus-visible */
+button:focus:not(:focus-visible),
+a:focus:not(:focus-visible),
+input:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Skip link — leva direto ao conteúdo via Tab */
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: 0;
+  background: #00d4ff;
+  color: #000;
+  padding: 12px 20px;
+  font-family: 'Orbitron', monospace;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-decoration: none;
+  z-index: 99999;
+  border-radius: 0 0 8px 0;
+  transition: top 0.2s;
+}
+.skip-link:focus {
+  top: 0;
+}
+
+/* Alto contraste (toggle no modal de acessibilidade) */
+html.bf-high-contrast {
+  --text-dim: #c4e3f5 !important;
+  --white: #ffffff !important;
+}
+html.bf-high-contrast body,
+html.bf-high-contrast .ob-label,
+html.bf-high-contrast .login-label,
+html.bf-high-contrast .ng-label {
+  color: #ffffff !important;
+}
+html.bf-high-contrast .ng-hint,
+html.bf-high-contrast .ob-hint {
+  color: #a8d4ff !important;
+}
+
+/* Texto grande — aumenta fontes em 20% */
+html.bf-text-large {
+  font-size: 120% !important;
+}
+html.bf-text-large input,
+html.bf-text-large button,
+html.bf-text-large select,
+html.bf-text-large textarea {
+  font-size: 1em !important;
+}
+
+/* Reduzir movimento (toggle no modal de acessibilidade) */
+html.bf-reduce-motion *,
+html.bf-reduce-motion *::before,
+html.bf-reduce-motion *::after {
+  animation-duration: 0.01s !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01s !important;
+  scroll-behavior: auto !important;
+}
+
+/* Respeita preferência do SO */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01s !important;
+  }
+}
+
+/* Touch targets mínimo 44x44px (WCAG 2.5.5) */
+@media (pointer: coarse) {
+  button, a[role="button"], input[type="checkbox"], input[type="radio"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  /* Exceções: botões de emoji do grid que já tem tamanho fixo */
+  .emoji-btn {
+    min-height: 32px;
+    min-width: 32px;
+  }
+  /* Exceções: botões do PIN display */
+  .pin-key {
+    min-height: 54px;
+    min-width: 54px;
+  }
+}
+
+/* Classe sr-only (screen reader only) */
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+/* Tema claro (experimental) */
+html.bf-tema-claro body {
+  background: #f0f4f8 !important;
+  color: #1a2a3d !important;
+}
+html.bf-tema-claro .ob-box,
+html.bf-tema-claro .login-box,
+html.bf-tema-claro [role="dialog"] > div {
+  background: #ffffff !important;
+  color: #1a2a3d !important;
+}
 </style>
 
 <script>
@@ -24425,7 +24698,7 @@ function renderListaCriancas() {
     return `
       <div class="cri-card ${principal ? 'principal' : ''}">
         <div class="cri-foto">
-          ${b.foto ? `<img src="${b.foto}" style="width:100%;height:100%;object-fit:cover">` : `<span>${icon}</span>`}
+          ${b.foto ? `<img src="${b.foto}" style="width:100%;height:100%;object-fit:cover" alt="">` : `<span>${icon}</span>`}
         </div>
         <div class="cri-body">
           <div class="cri-nome">${_rcEsc ? _rcEsc(b.nome) : b.nome}</div>
@@ -24433,7 +24706,7 @@ function renderListaCriancas() {
           <span class="cri-badge ${principal ? '' : 'cri-badge-novo'}">${principal ? '⭐ PRINCIPAL' : '👶 PREVIEW'}</span>
         </div>
         <div class="cri-actions">
-          <button class="cri-action-btn" onclick="editarCrianca('${b.id}')" title="Editar">✏️</button>
+          <button class="cri-action-btn" onclick="editarCrianca('${b.id}')" title="Editar" aria-label="Editar">✏️</button>
           ${principal ? '' : `<button class="cri-action-btn danger" onclick="removerCrianca('${b.id}')" title="Remover" aria-label="Remover">🗑</button>`}
         </div>
       </div>
@@ -24933,7 +25206,7 @@ function renderSeletorCriancaHeader() {
 
   const activeId = getActiveBabyId();
   const ativo = lista.find(b => b.id === activeId) || lista[0];
-  const icon = ativo.foto ? `<img src="${ativo.foto}" style="width:22px;height:22px;border-radius:50%;object-fit:cover;flex-shrink:0">` : `<span style="font-size:1rem;flex-shrink:0">${_criGeneroIcon(ativo.genero)}</span>`;
+  const icon = ativo.foto ? `<img src="${ativo.foto}" style="width:22px;height:22px;border-radius:50%;object-fit:cover;flex-shrink:0" alt="">` : `<span style="font-size:1rem;flex-shrink:0">${_criGeneroIcon(ativo.genero)}</span>`;
   const nomeEsc = (typeof _rcEsc === 'function' && ativo.nome) ? _rcEsc(ativo.nome) : (ativo.nome || '—');
   const badgeCount = lista.length > 1 ? `<span style="background:rgba(0,180,255,0.25);color:var(--blue-neon);padding:1px 5px;border-radius:8px;font-size:0.54rem;margin-left:4px">${lista.length}</span>` : '';
   sel.innerHTML = `${icon}<span style="overflow:hidden;text-overflow:ellipsis">${nomeEsc}</span>${badgeCount}<span style="opacity:0.65;margin-left:2px;font-size:0.7rem">▾</span>`;
@@ -25201,7 +25474,7 @@ function _alertaColetarContexto() {
 }
 
 async function gerarAlertaContextualAI() {
-  const apiKey = localStorage.getItem('babyforce_ai_key_v1') || localStorage.getItem('oraculo_api_key_v1');
+  const apiKey = getEffectiveApiKey();
   if (!apiKey) {
     console.log('[ALERTA] Sem API key — não gera');
     return null;
@@ -25330,7 +25603,7 @@ function _pintarAlerta(card, alerta) {
           <div style="font-size:0.72rem;color:var(--white);line-height:1.55;opacity:0.95">${_rcEsc ? _rcEsc(alerta.corpo) : alerta.corpo}</div>
           <div style="display:flex;gap:8px;margin-top:8px;align-items:center">
             <button onclick="_alertaDismiss()" style="background:rgba(0,20,50,0.5);border:1px solid rgba(0,180,255,0.2);color:var(--text-dim);padding:4px 10px;border-radius:14px;font-family:'Orbitron',monospace;font-size:0.56rem;letter-spacing:0.06em;cursor:pointer">✓ ENTENDI</button>
-            <button onclick="_alertaRegenerar()" style="background:transparent;border:none;color:var(--text-dim);padding:4px 6px;font-size:0.62rem;cursor:pointer;opacity:0.7" title="Gerar nova análise">🔄</button>
+            <button onclick="_alertaRegenerar()" style="background:transparent;border:none;color:var(--text-dim);padding:4px 6px;font-size:0.62rem;cursor:pointer;opacity:0.7" title="Gerar nova análise" aria-label="Recarregar">🔄</button>
           </div>
         </div>
       </div>
@@ -25772,7 +26045,7 @@ function renderListaCriancasLogin() {
 
   wrap.innerHTML = lista.map(b => {
     const icon = b.foto
-      ? `<img src="${b.foto}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`
+      ? `<img src="${b.foto}" style="width:100%;height:100%;object-fit:cover;border-radius:50%" alt="">`
       : `<span>${(typeof _criGeneroIcon==='function')?_criGeneroIcon(b.genero):'🧒'}</span>`;
     const idade = (typeof _criIdade==='function') ? _criIdade(b.nasc) : '';
     const ehAtivo = b.id === activeId;
