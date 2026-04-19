@@ -734,6 +734,7 @@ html.bf-tema-claro [style*="color: var(--white)"] { color: var(--white) !importa
       </div>
       <div class="ob-pin-status" id="ob-admin-error"></div>
       <button class="ob-btn ob-btn-primary" id="ob-btn-enviar-codigo" onclick="obEnviarCodigoVerificacao()">📧 Enviar código de verificação</button>
+      <button class="ob-btn ob-btn-secondary" onclick="obProximo(-1)" style="font-size:0.7rem;margin-top:8px">← Voltar</button>
     </div>
 
     <!-- Step 2: Validação de email (refinado C1) -->
@@ -799,7 +800,9 @@ html.bf-tema-claro [style*="color: var(--white)"] { color: var(--white) !importa
         </div>
         <div style="font-size:0.62rem;color:var(--text-dim);margin-top:6px;line-height:1.4;font-style:italic">A paleta de cores do app poderá ser personalizada conforme sua escolha.</div>
       </div>
-      <button class="ob-btn ob-btn-primary" onclick="obProximo(1)" style="margin-top:14px">Continuar →</button>
+      <div id="ob-step3-error" role="alert" aria-live="polite" style="color:#ff8080;font-size:0.76rem;text-align:center;min-height:20px;margin-top:8px;line-height:1.4"></div>
+      <button class="ob-btn ob-btn-primary" onclick="obProximo(1)" style="margin-top:8px">Continuar →</button>
+      <button class="ob-btn ob-btn-secondary" onclick="obProximo(-3)" style="font-size:0.7rem;margin-top:8px">← Voltar</button>
     </div>
     <!-- Step 4: PIN de acesso rápido -->
     <div class="ob-step" id="ob-step-4-pin">
@@ -824,6 +827,7 @@ html.bf-tema-claro [style*="color: var(--white)"] { color: var(--white) !importa
       </div>
       <div class="ob-pin-status" id="ob-pin-status"></div>
       <button class="ob-btn ob-btn-primary" id="ob-btn-confirmar-pin" onclick="obConfirmarPin()" disabled style="opacity:0.4">Confirmar PIN →</button>
+      <button class="ob-btn ob-btn-secondary" onclick="obProximo(-4)" style="font-size:0.7rem;margin-top:8px">← Voltar</button>
     </div>
     <!-- Step 5: Emoji do administrador (simplificado) -->
     <div class="ob-step" id="ob-step-5-emoji">
@@ -835,6 +839,7 @@ html.bf-tema-claro [style*="color: var(--white)"] { color: var(--white) !importa
         <div class="emoji-grid" id="ob-emoji-grid" style="max-width:100%;margin-top:4px"></div>
       </div>
       <button class="ob-btn ob-btn-done" onclick="obFinalizar()" style="margin-top:14px"><img src="" id="btn-icon-galaxia" style="width:20px;height:20px;vertical-align:middle;border-radius:4px;margin-right:6px" alt=""> Entrar na Galáxia</button>
+      <button class="ob-btn ob-btn-secondary" onclick="obProximo(-5)" style="font-size:0.7rem;margin-top:8px">← Voltar</button>
     </div>
   </div>
 </div>
@@ -970,6 +975,7 @@ html.bf-tema-claro [style*="color: var(--white)"] { color: var(--white) !importa
       </div>
 
       <div class="login-saber" style="margin:18px 0"></div>
+      <div id="ng-form-error" role="alert" aria-live="polite" style="color:#ff8080;font-size:0.78rem;text-align:center;min-height:20px;margin-bottom:8px;line-height:1.4"></div>
       <div class="ng-btns">
         <button class="btn btn-primary ng-btn-primary" onclick="salvarNovoGuardiao()">⚡ Criar Guardião</button>
         <button class="btn ng-btn-secondary" onclick="voltarLogin()">Cancelar</button>
@@ -2109,6 +2115,7 @@ html.bf-tema-claro [style*="color: var(--white)"] { color: var(--white) !importa
     <div style="font-family:'Orbitron',monospace;font-size:0.62rem;color:var(--text-dim);margin-bottom:8px">ALTERAR PIN (opcional)</div>
     <div class="form-group"><label>NOVO PIN (6 dígitos)</label><input type="tel" id="cfg-novo-pin" maxlength="6" inputmode="numeric" pattern="[0-9]*" placeholder="——————"></div>
     <div class="form-group"><label>CONFIRMAR NOVO PIN</label><input type="tel" id="cfg-confirmar-pin" maxlength="6" inputmode="numeric" pattern="[0-9]*" placeholder="——————"></div>
+    <div id="cfg-form-error" role="alert" aria-live="polite" style="color:#ff8080;font-size:0.78rem;text-align:center;min-height:20px;margin-top:10px;margin-bottom:4px;line-height:1.4"></div>
     <div class="modal-btns" style="margin-top:14px">
       <button class="btn btn-primary" style="flex:1" onclick="salvarConfiguracaoBebe()">💾 Salvar</button>
       <button class="btn" style="background:rgba(0,50,100,0.5);border:1px solid rgba(0,180,255,0.3);color:var(--text-dim)" onclick="fecharConfiguracaoBebe()">Cancelar</button>
@@ -3896,23 +3903,48 @@ window._revogarAdmin = function(guardiaoId) {
   if (typeof showToast === 'function') showToast(`↓ ${g.nome} não é mais admin`);
 };
 
-window._removerGuardiao = function(guardiaoId) {
+window._removerGuardiao = async function(guardiaoId) {
   const g = GUARDIOES[guardiaoId];
   if (!g) return;
   // Proteção: não permite remover a si mesmo
   if (guardiaoId === usuarioAtual) {
-    alert('⚠️ Você não pode remover o próprio perfil. Peça a outro admin ou transfira administração primeiro.');
+    await (typeof BFModal !== 'undefined'
+      ? BFModal.alert({
+          title: 'Não pode remover a si mesmo',
+          icon: '🔒',
+          variant: 'warn',
+          message: 'Você não pode remover seu próprio perfil.\n\nPeça a outro administrador para fazer isso, ou transfira a administração primeiro em "Gestão de Administradores".',
+        })
+      : Promise.resolve(alert('Não pode remover a si mesmo.')));
     return;
   }
   // Proteção: se for o único admin além do atual, bloquear
   if (g.isAdmin) {
     const admins = Object.keys(GUARDIOES).filter(id => GUARDIOES[id].isAdmin);
     if (admins.length <= 1) {
-      alert('⚠️ Este é o último admin. Revogue o admin primeiro ou promova outro antes.');
+      await (typeof BFModal !== 'undefined'
+        ? BFModal.alert({
+            title: 'Último administrador',
+            icon: '👑',
+            variant: 'warn',
+            message: 'Este é o último admin do app.\n\nRevogue o admin primeiro OU promova outro guardião a admin antes de remover.',
+          })
+        : Promise.resolve(alert('Último admin — não pode remover.')));
       return;
     }
   }
-  if (!confirm(`Remover ${g.nome} permanentemente?\n\n⚠️ Esta ação apaga o cadastro dela no app. Os DADOS das crianças NÃO são apagados — ficam preservados.\n\nContinuar?`)) return;
+  const confirmacao = await (typeof BFModal !== 'undefined'
+    ? BFModal.confirm({
+        title: 'Remover ' + g.nome + '?',
+        icon: '🗑',
+        variant: 'danger',
+        message: 'Esta ação apaga o cadastro de ' + g.nome + ' no app permanentemente.\n\n✓ Os registros das crianças (mamadas, sono, vacinas etc.) NÃO são apagados — ficam preservados.\n\n⚠️ Esta ação NÃO pode ser desfeita.',
+        okLabel: 'Sim, remover',
+        cancelLabel: 'Cancelar',
+      })
+    : Promise.resolve(confirm('Remover ' + g.nome + '?')));
+  if (!confirmacao) return;
+
   delete GUARDIOES[guardiaoId];
   saveGuardioes(GUARDIOES);
   if (typeof BFAudit !== 'undefined') BFAudit.log('guardiao_removido', { guardiaoId, por: usuarioAtual, nome: g.nome });
@@ -4293,20 +4325,41 @@ window._detectarLinkConvite = async function() {
   const convite = convites[token];
 
   if (!convite) {
-    alert('❌ Convite não encontrado ou já utilizado.\n\nPeça um novo convite ao administrador.');
+    await (typeof BFModal !== 'undefined'
+      ? BFModal.alert({
+          title: 'Convite não encontrado',
+          icon: '❌',
+          variant: 'danger',
+          message: 'Este convite não foi encontrado ou já foi utilizado.\n\nPeça um novo convite ao administrador da família.',
+        })
+      : Promise.resolve(alert('Convite não encontrado.')));
     // Limpar URL
     try { window.history.replaceState({}, document.title, window.location.pathname); } catch {}
     return true;
   }
 
   if (convite.status !== 'pendente') {
-    alert('❌ Este convite já foi usado.');
+    await (typeof BFModal !== 'undefined'
+      ? BFModal.alert({
+          title: 'Convite já utilizado',
+          icon: '✓',
+          variant: 'info',
+          message: 'Este convite já foi aceito anteriormente.\n\nSe você não se lembra, entre em contato com o administrador da família.',
+        })
+      : Promise.resolve(alert('Convite já usado.')));
     try { window.history.replaceState({}, document.title, window.location.pathname); } catch {}
     return true;
   }
 
   if (convite.expiraEm && Date.now() > convite.expiraEm) {
-    alert('❌ Este convite expirou.\n\nPeça um novo convite ao administrador.');
+    await (typeof BFModal !== 'undefined'
+      ? BFModal.alert({
+          title: 'Convite expirado',
+          icon: '⏰',
+          variant: 'warn',
+          message: 'Este convite expirou (válido por 7 dias).\n\nPeça um novo convite ao administrador da família.',
+        })
+      : Promise.resolve(alert('Convite expirado.')));
     delete convites[token];
     _saveConvitesPendentes(convites);
     try { window.history.replaceState({}, document.title, window.location.pathname); } catch {}
@@ -7689,35 +7742,47 @@ async function salvarNovoGuardiao(){
   const nascimento=document.getElementById('novo-guardiao-nascimento').value;
   const parentescoEl=document.getElementById('novo-guardiao-parentesco');
   const parentesco=parentescoEl?parentescoEl.value:'';
+  const errEl = document.getElementById('ng-form-error');
+  const ngErr = (msg, focusId) => {
+    if (errEl) errEl.textContent = msg;
+    if (focusId) { const el = document.getElementById(focusId); if (el) el.focus(); }
+  };
+  if (errEl) errEl.textContent = '';
 
-  if(!nome){alert('⚠️ Digite o nome!');document.getElementById('novo-guardiao-nome').focus();return;}
-  if(!genero){alert('⚠️ Selecione o gênero!');document.getElementById('novo-guardiao-genero').focus();return;}
-  if(!email){alert('⚠️ Informe o e-mail!');document.getElementById('novo-guardiao-email').focus();return;}
-  if(!validarEmail(email)){alert('⚠️ E-mail inválido!');document.getElementById('novo-guardiao-email').focus();return;}
+  if(!nome){ngErr('⚠ Digite o nome','novo-guardiao-nome');return;}
+  if(!genero){ngErr('⚠ Selecione o gênero','novo-guardiao-genero');return;}
+  if(!email){ngErr('⚠ Informe o e-mail','novo-guardiao-email');return;}
+  if(!validarEmail(email)){ngErr('⚠ E-mail inválido — verifique a digitação','novo-guardiao-email');return;}
   // Validação SENHA (nova)
   if(!senha || senha.length < 8){
-    alert('⚠️ Senha deve ter pelo menos 8 caracteres!');
-    document.getElementById('novo-guardiao-senha')?.focus();
+    ngErr('⚠ A senha precisa ter pelo menos 8 caracteres','novo-guardiao-senha');
     return;
   }
   if(!/[a-zA-Z]/.test(senha) || !/\d/.test(senha)){
-    alert('⚠️ Senha deve conter letras E números!');
-    document.getElementById('novo-guardiao-senha')?.focus();
+    ngErr('⚠ A senha precisa ter letras E números','novo-guardiao-senha');
     return;
   }
   if(senha !== senha2){
-    alert('⚠️ As senhas não conferem!');
-    document.getElementById('novo-guardiao-senha2')?.focus();
+    ngErr('⚠ As senhas não conferem — digite igualmente nos dois campos','novo-guardiao-senha2');
     return;
   }
-  if(!nascimento){alert('⚠️ Informe a data de nascimento!');document.getElementById('novo-guardiao-nascimento').focus();return;}
-  if(!validarDataNascimento(nascimento)){alert('⚠️ Data de nascimento inválida (deve ser no passado e com idade plausível).');document.getElementById('novo-guardiao-nascimento').focus();return;}
-  if(!parentesco){alert('⚠️ Selecione o grau de parentesco com a criança!');parentescoEl&&parentescoEl.focus();return;}
+  if(!nascimento){ngErr('⚠ Informe sua data de nascimento','novo-guardiao-nascimento');return;}
+  if(!validarDataNascimento(nascimento)){ngErr('⚠ Data inválida — deve ser no passado com idade plausível','novo-guardiao-nascimento');return;}
+  if(!parentesco){ngErr('⚠ Selecione seu parentesco com a criança','novo-guardiao-parentesco');return;}
 
   // Verifica se email já está em uso
   const emailExistente = Object.values(GUARDIOES).find(g => String(g.email || '').toLowerCase() === email);
   if (emailExistente) {
-    alert('⚠️ Este e-mail já está cadastrado.\n\nSe for você, use a opção "Esqueci meu código" na tela de login.');
+    await (typeof BFModal !== 'undefined'
+      ? BFModal.alert({
+          title: 'E-mail já cadastrado',
+          icon: '📧',
+          variant: 'warn',
+          message: 'Este e-mail (' + email + ') já está vinculado a outro guardião.\n\nSe for você, volte à tela de login e use "Esqueci minha senha" para recuperar o acesso.',
+          okLabel: 'Entendi',
+        })
+      : Promise.resolve(alert('E-mail já cadastrado.')));
+    ngErr('⚠ E-mail já cadastrado — use outro','novo-guardiao-email');
     return;
   }
 
@@ -8124,18 +8189,53 @@ window._promoverParaAdmin = function(id) {
 };
 
 // Rebaixar admin (só funciona se sobrar pelo menos 1 admin)
-window._rebaixarAdmin = function(id) {
-  if (!window.ehAdmin()) { alert('⚠️ Apenas administradores podem rebaixar'); return; }
+window._rebaixarAdmin = async function(id) {
+  if (!window.ehAdmin()) {
+    await (typeof BFModal !== 'undefined'
+      ? BFModal.alert({
+          title: 'Permissão negada',
+          icon: '🔒',
+          variant: 'warn',
+          message: 'Apenas administradores podem rebaixar outros admins.',
+        })
+      : Promise.resolve(alert('Apenas admins.')));
+    return;
+  }
   if (!GUARDIOES[id] || !GUARDIOES[id].isAdmin) return;
   if (window.contarAdmins() <= 1) {
-    alert('⚠️ Não é possível remover o último administrador.\n\nPromova outro guardião a admin antes.');
+    await (typeof BFModal !== 'undefined'
+      ? BFModal.alert({
+          title: 'Último administrador',
+          icon: '👑',
+          variant: 'warn',
+          message: 'Não é possível remover o último administrador.\n\nPromova outro guardião a admin antes de rebaixar este.',
+        })
+      : Promise.resolve(alert('Último admin.')));
     return;
   }
   if (usuarioAtual === id) {
-    alert('⚠️ Você não pode remover seus próprios poderes de admin.\n\nOutro admin precisa fazer isso.');
+    await (typeof BFModal !== 'undefined'
+      ? BFModal.alert({
+          title: 'Não pode rebaixar a si mesmo',
+          icon: '🔒',
+          variant: 'warn',
+          message: 'Você não pode remover seus próprios poderes de admin.\n\nOutro administrador precisa fazer isso.',
+        })
+      : Promise.resolve(alert('Não pode rebaixar a si mesmo.')));
     return;
   }
-  if (!confirm(`Remover privilégios de administrador de ${GUARDIOES[id].nome}?\n\nEle continuará como guardião, mas não poderá mais gerenciar a família.`)) return;
+  const confirmado = await (typeof BFModal !== 'undefined'
+    ? BFModal.confirm({
+        title: 'Rebaixar ' + GUARDIOES[id].nome + '?',
+        icon: '⬇',
+        variant: 'warn',
+        message: GUARDIOES[id].nome + ' continuará como guardião, mas não poderá mais gerenciar a família (convidar, promover outros admins, etc).\n\nEsta ação pode ser revertida depois.',
+        okLabel: 'Sim, rebaixar',
+        cancelLabel: 'Cancelar',
+      })
+    : Promise.resolve(confirm('Rebaixar ' + GUARDIOES[id].nome + '?')));
+  if (!confirmado) return;
+
   GUARDIOES[id].isAdmin = false;
   GUARDIOES[id].papel = 'Guardião da Força';
   saveGuardioes(GUARDIOES);
@@ -9020,7 +9120,7 @@ window._focarMarcos = function() {
   if (alvo) setTimeout(() => alvo.scrollIntoView({ behavior:'smooth', block:'start' }), 100);
 };
 
-function showToast(msg){const t=document.createElement('div');t.textContent=msg;t.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#0056b3,#0099e6);color:white;padding:10px 20px;border-radius:20px;font-family:\'Orbitron\',monospace;font-size:0.75rem;box-shadow:0 4px 20px rgba(0,153,230,0.5);z-index:9999;animation:fadeIn 0.3s ease;white-space:nowrap;';document.body.appendChild(t);setTimeout(()=>t.remove(),2500);}
+function showToast(msg){const t=document.createElement('div');t.textContent=msg;t.setAttribute('role','status');t.setAttribute('aria-live','polite');t.setAttribute('aria-atomic','true');t.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#0056b3,#0099e6);color:white;padding:10px 20px;border-radius:20px;font-family:\'Orbitron\',monospace;font-size:0.75rem;box-shadow:0 4px 20px rgba(0,153,230,0.5);z-index:9999;animation:fadeIn 0.3s ease;white-space:nowrap;';document.body.appendChild(t);setTimeout(()=>t.remove(),2500);}
 
 // ── MAMADAS ──
 function initMamadaForm(){document.getElementById('m-data').value=todayISO();document.getElementById('m-hora').value=nowTime();}
@@ -11317,6 +11417,7 @@ function obProximo(fromStep, skip) {
   // Novo fluxo (Fase 1 — Administrador):
   //   Step 0 (welcome) → Step 1 (admin) → Step 2 (email verify) →
   //   Step 3 (bebê) → Step 4 (PIN) → Step 5 (emoji) → login
+  // fromStep negativo = voltar. -2 = step 2 → step 1, -3 = step 3 → step 2, etc.
   // ──────────────────────────────────────────────────────────
 
   // Step 0 → Step 1 (admin)
@@ -11329,10 +11430,19 @@ function obProximo(fromStep, skip) {
     return;
   }
 
+  // VOLTAR: step 1 → step 0 (welcome)
+  if (fromStep === -1) {
+    _obCurrentStep = 0;
+    document.getElementById('ob-step-1').classList.remove('active');
+    document.getElementById('ob-step-0').classList.add('active');
+    obAtualizarDots(0);
+    return;
+  }
+
   // Step 1 (admin) → valida e envia código (obEnviarCodigoVerificacao chama)
   // (A transição Step 1 → Step 2 acontece dentro de obEnviarCodigoVerificacao)
 
-  // fromStep === -2 é "voltar do step email para step admin"
+  // VOLTAR: step 2 (email) → step 1 (admin) — já existia
   if (fromStep === -2) {
     _obCurrentStep = 1;
     document.getElementById('ob-step-2-email').classList.remove('active');
@@ -11341,13 +11451,48 @@ function obProximo(fromStep, skip) {
     return;
   }
 
+  // VOLTAR: step 3 (bebê) → step 2 (email)
+  if (fromStep === -3) {
+    _obCurrentStep = 2;
+    document.getElementById('ob-step-3-bebe').classList.remove('active');
+    document.getElementById('ob-step-2-email').classList.add('active');
+    obAtualizarDots(2);
+    return;
+  }
+
+  // VOLTAR: step 4 (PIN) → step 3 (bebê)
+  if (fromStep === -4) {
+    _obCurrentStep = 3;
+    document.getElementById('ob-step-4-pin').classList.remove('active');
+    document.getElementById('ob-step-3-bebe').classList.add('active');
+    obAtualizarDots(3);
+    setTimeout(() => { const el = document.getElementById('ob-nome-bebe'); if (el) el.focus(); }, 300);
+    return;
+  }
+
+  // VOLTAR: step 5 (emoji) → step 4 (PIN)
+  if (fromStep === -5) {
+    _obCurrentStep = 4;
+    document.getElementById('ob-step-5-emoji').classList.remove('active');
+    document.getElementById('ob-step-4-pin').classList.add('active');
+    obAtualizarDots(4);
+    return;
+  }
+
   // Step 1 (legacy: avança do bebê — agora step 3)
   if (fromStep === 1) {
     const nome = document.getElementById('ob-nome-bebe').value.trim();
     const nasc = document.getElementById('ob-nasc-bebe').value;
-    if (!nome) { alert('⚠️ Informe o nome do bebê!'); return; }
-    if (!nasc) { alert('⚠️ Informe a data de nascimento!'); return; }
-    if (!_obGeneroBebe) { alert('⚠️ Escolha o gênero do bebê!'); return; }
+    const errEl = document.getElementById('ob-step3-error');
+    const ob3Err = (msg, focusId) => {
+      if (errEl) errEl.textContent = msg;
+      else if (typeof showToast === 'function') showToast(msg);
+      if (focusId) { const el = document.getElementById(focusId); if (el) el.focus(); }
+    };
+    if (errEl) errEl.textContent = '';
+    if (!nome) { ob3Err('⚠ Informe o nome do bebê', 'ob-nome-bebe'); return; }
+    if (!nasc) { ob3Err('⚠ Informe a data de nascimento', 'ob-nasc-bebe'); return; }
+    if (!_obGeneroBebe) { ob3Err('⚠ Escolha o gênero do bebê'); return; }
     // Salva no baby config
     const babyCfg = { name: nome, birthDate: nasc, photo: _obFotoPendente, genero: _obGeneroBebe };
     if (_obGeneroBebe === 'M' || _obGeneroBebe === 'F') babyCfg.sexo = _obGeneroBebe;
@@ -11569,19 +11714,27 @@ function cfgSelecionarGeneroBebe(g, btn) {
   });
 }
 
-function salvarConfiguracaoBebe(){
+async function salvarConfiguracaoBebe(){
   const nome=document.getElementById('cfg-nome-bebe')?.value.trim();
   const nasc=document.getElementById('cfg-nasc-bebe')?.value;
   const newPin=document.getElementById('cfg-novo-pin')?.value||'';
   const confirmPin=document.getElementById('cfg-confirmar-pin')?.value||'';
-  if(!nome){alert('⚠️ Informe o nome!');return;}
-  if(!nasc){alert('⚠️ Informe a data!');return;}
-  if(!_cfgGeneroBebe){alert('⚠️ Escolha o gênero do bebê!');return;}
+  const errEl = document.getElementById('cfg-form-error');
+  const cfgErr = (msg, focusId) => {
+    if (errEl) errEl.textContent = msg;
+    else if (typeof showToast === 'function') showToast(msg); // fallback: toast
+    if (focusId) { const el = document.getElementById(focusId); if (el) el.focus(); }
+  };
+  if (errEl) errEl.textContent = '';
+
+  if(!nome){cfgErr('⚠ Informe o nome do bebê','cfg-nome-bebe');return;}
+  if(!nasc){cfgErr('⚠ Informe a data de nascimento','cfg-nasc-bebe');return;}
+  if(!_cfgGeneroBebe){cfgErr('⚠ Escolha o gênero do bebê');return;}
   if(newPin&&newPin.length===6){
-    if(newPin!==confirmPin){alert('⚠️ PINs não coincidem!');return;}
+    if(newPin!==confirmPin){cfgErr('⚠ Os PINs não coincidem','cfg-confirmar-pin');return;}
     const appCfg=getAppConfig();saveAppConfig({...appCfg,pin:newPin});showToast('🔐 PIN alterado!');
   } else if(newPin&&newPin.length>0&&newPin.length<6){
-    alert('⚠️ O PIN deve ter exatamente 6 dígitos!');return;
+    cfgErr('⚠ O PIN deve ter exatamente 6 dígitos','cfg-novo-pin');return;
   }
   const babyCfg=getBabyConfig();
   const patch={...babyCfg,name:nome,birthDate:nasc,photo:cfgFotoPendente||babyCfg.photo,genero:_cfgGeneroBebe};
@@ -21589,17 +21742,37 @@ window._lerArquivoBackup = function(inputEl) {
   reader.readAsText(arq);
 };
 
-window._importarBackup = function(modo) {
-  if (!window._backupPendente) return alert('Selecione um arquivo primeiro');
-  const msg = modo === 'sobrescrever'
-    ? 'SOBRESCREVER TODOS os dados atuais?\n\nEsta ação apaga o que está salvo e substitui pelo backup. Não pode ser desfeita.\n\nContinuar?'
-    : 'MESCLAR o backup com os dados atuais?\n\nRegistros do backup serão adicionados onde não existirem. Registros atuais não são apagados.\n\nContinuar?';
-  if (!confirm(msg)) return;
+window._importarBackup = async function(modo) {
+  if (!window._backupPendente) {
+    return (typeof BFModal !== 'undefined'
+      ? BFModal.alert({
+          title: 'Nenhum arquivo selecionado',
+          icon: '📂',
+          variant: 'warn',
+          message: 'Selecione um arquivo de backup primeiro antes de importar.',
+        })
+      : Promise.resolve(alert('Selecione um arquivo primeiro')));
+  }
+
+  const ehSobrescrever = modo === 'sobrescrever';
+  const confirmado = await (typeof BFModal !== 'undefined'
+    ? BFModal.confirm({
+        title: ehSobrescrever ? 'Sobrescrever todos os dados?' : 'Mesclar com dados atuais?',
+        icon: ehSobrescrever ? '⚠️' : '🔀',
+        variant: ehSobrescrever ? 'danger' : 'info',
+        message: ehSobrescrever
+          ? 'Esta ação apaga TUDO o que está salvo atualmente e substitui pelo conteúdo do backup.\n\n⚠️ Não pode ser desfeita.\n\nSe não tiver certeza, escolha "Mesclar" em vez de "Sobrescrever".'
+          : 'Registros do backup serão adicionados onde ainda não existem.\n\n✓ Seus registros atuais NÃO serão apagados.\n✓ Apenas o que faltar será preenchido.',
+        okLabel: ehSobrescrever ? 'Sim, sobrescrever' : 'Mesclar',
+        cancelLabel: 'Cancelar',
+      })
+    : Promise.resolve(confirm(ehSobrescrever ? 'Sobrescrever?' : 'Mesclar?')));
+  if (!confirmado) return;
 
   const hideLoading = (typeof window.bfLoading !== 'undefined')
-    ? window.bfLoading.show(modo === 'sobrescrever' ? 'Restaurando backup…' : 'Mesclando backup…') : null;
+    ? window.bfLoading.show(ehSobrescrever ? 'Restaurando backup…' : 'Mesclando backup…') : null;
   // setTimeout para garantir que o overlay aparece antes do trabalho pesado
-  setTimeout(() => {
+  setTimeout(async () => {
     try {
     const dados = window._backupPendente.dados || {};
     let importadas = 0;
@@ -21642,11 +21815,25 @@ window._importarBackup = function(modo) {
     }
     if (typeof BFAudit !== 'undefined') BFAudit.log('backup_importado', { modo, chaves: importadas });
     if (hideLoading) hideLoading();
-    alert(`✓ Backup importado com sucesso!\n\n${importadas} chaves ${modo === 'sobrescrever' ? 'restauradas' : 'mescladas'}.\n\nO app será recarregado para aplicar as mudanças.`);
+    await (typeof BFModal !== 'undefined'
+      ? BFModal.alert({
+          title: 'Backup importado',
+          icon: '✓',
+          variant: 'success',
+          message: importadas + ' chaves ' + (modo === 'sobrescrever' ? 'restauradas' : 'mescladas') + ' com sucesso.\n\nO app será recarregado para aplicar as mudanças.',
+        })
+      : Promise.resolve(alert('Importado.')));
     setTimeout(() => window.location.reload(), 300);
   } catch (e) {
     if (hideLoading) hideLoading();
-    alert('Erro ao importar: ' + e.message);
+    await (typeof BFModal !== 'undefined'
+      ? BFModal.alert({
+          title: 'Erro ao importar',
+          icon: '✗',
+          variant: 'danger',
+          message: 'Ocorreu um erro ao importar o backup:\n\n' + (e.message || 'desconhecido') + '\n\nTente novamente com outro arquivo ou contate o suporte.',
+        })
+      : Promise.resolve(alert('Erro: ' + e.message)));
     console.error('[backup import]', e);
   }
   }, 50);
@@ -24313,21 +24500,37 @@ function fecharEdicaoGuardiao() {
   setTimeout(() => { modal.style.display = 'none'; }, 220);
 }
 
-function salvarEdicaoGuardiao() {
+async function salvarEdicaoGuardiao() {
   const nome = document.getElementById('edit-g-nome').value.trim();
   const genero = document.getElementById('edit-g-genero').value;
   const email = document.getElementById('edit-g-email').value.trim();
   const nascimento = document.getElementById('edit-g-nascimento').value;
+  const errEl = document.getElementById('edit-g-form-error');
+  const egErr = (msg, focusId) => {
+    if (errEl) errEl.textContent = msg;
+    if (focusId) { const el = document.getElementById(focusId); if (el) el.focus(); }
+  };
+  if (errEl) errEl.textContent = '';
 
-  if (!nome) { alert('⚠️ Informe o nome!'); document.getElementById('edit-g-nome').focus(); return; }
-  if (!genero) { alert('⚠️ Selecione o gênero!'); document.getElementById('edit-g-genero').focus(); return; }
-  if (!email) { alert('⚠️ Informe o e-mail!'); document.getElementById('edit-g-email').focus(); return; }
-  if (!validarEmail(email)) { alert('⚠️ E-mail inválido!'); document.getElementById('edit-g-email').focus(); return; }
-  if (!nascimento) { alert('⚠️ Informe a data de nascimento!'); document.getElementById('edit-g-nascimento').focus(); return; }
-  if (!validarDataNascimento(nascimento)) { alert('⚠️ Data de nascimento inválida.'); document.getElementById('edit-g-nascimento').focus(); return; }
+  if (!nome) return egErr('⚠ Informe o nome', 'edit-g-nome');
+  if (!genero) return egErr('⚠ Selecione o gênero', 'edit-g-genero');
+  if (!email) return egErr('⚠ Informe o e-mail', 'edit-g-email');
+  if (!validarEmail(email)) return egErr('⚠ E-mail inválido — verifique a digitação', 'edit-g-email');
+  if (!nascimento) return egErr('⚠ Informe sua data de nascimento', 'edit-g-nascimento');
+  if (!validarDataNascimento(nascimento)) return egErr('⚠ Data inválida — deve ser no passado com idade plausível', 'edit-g-nascimento');
 
   const id = window._completarPerfilId || usuarioAtual;
-  if (!id || !GUARDIOES[id]) { alert('Erro: guardião não identificado.'); return; }
+  if (!id || !GUARDIOES[id]) {
+    await (typeof BFModal !== 'undefined'
+      ? BFModal.alert({
+          title: 'Sessão não encontrada',
+          icon: '⚠️',
+          variant: 'warn',
+          message: 'Não foi possível identificar seu cadastro. Tente fazer login novamente.',
+        })
+      : Promise.resolve(alert('Sessão não encontrada')));
+    return;
+  }
 
   GUARDIOES[id] = { ...GUARDIOES[id], nome, genero, email, nascimento };
   saveGuardioes(GUARDIOES);
@@ -24454,6 +24657,7 @@ function salvarEdicaoGuardiao() {
       <label class="mg-label">DATA DE NASCIMENTO *</label>
       <input class="mg-input" type="date" id="edit-g-nascimento" autocomplete="bday">
     </div>
+    <div id="edit-g-form-error" role="alert" aria-live="polite" style="color:#ff8080;font-size:0.78rem;text-align:center;min-height:20px;margin-top:6px;margin-bottom:4px;line-height:1.4"></div>
     <div class="mg-actions">
       <button class="mg-btn mg-btn-cancel" id="edit-g-cancelar" onclick="fecharEdicaoGuardiao()">Cancelar</button>
       <button class="mg-btn mg-btn-save" onclick="salvarEdicaoGuardiao()">⚡ Salvar</button>
@@ -26033,6 +26237,8 @@ if (document.readyState === 'loading') {
       </div>
     </div>
 
+    <div id="cri-form-error" role="alert" aria-live="polite" style="color:#ff8080;font-size:0.78rem;text-align:center;min-height:20px;margin-bottom:8px;line-height:1.4"></div>
+
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
       <button class="btn" onclick="fecharCadastroCrianca()" style="background:rgba(0,30,70,0.6);border:1px solid rgba(0,180,255,0.25);color:var(--text-dim);padding:11px;border-radius:9px;font-family:'Orbitron',monospace;font-size:0.66rem;letter-spacing:0.05em">Cancelar</button>
       <button id="cri-form-salvar" class="btn btn-primary" onclick="salvarCriancaForm()" style="padding:11px;border-radius:9px;font-family:'Orbitron',monospace;font-size:0.68rem;letter-spacing:0.06em">💾 Salvar</button>
@@ -26667,19 +26873,25 @@ window.salvarCriancaForm = function() {
   const nome = document.getElementById('cri-nome').value.trim();
   const nasc = document.getElementById('cri-nasc').value;
   const genero = _criGeneroSelecionado;
+  const errEl = document.getElementById('cri-form-error');
+  const criErr = (msg, focusId) => {
+    if (errEl) errEl.textContent = msg;
+    if (focusId) { const el = document.getElementById(focusId); if (el) el.focus(); }
+  };
+  if (errEl) errEl.textContent = '';
 
-  if (!nome) { alert('⚠️ Digite o nome da criança'); document.getElementById('cri-nome').focus(); return; }
-  if (!nasc) { alert('⚠️ Informe a data de nascimento'); document.getElementById('cri-nasc').focus(); return; }
-  if (!genero) { alert('⚠️ Selecione o gênero'); return; }
+  if (!nome) { criErr('⚠ Digite o nome da criança', 'cri-nome'); return; }
+  if (!nasc) { criErr('⚠ Informe a data de nascimento', 'cri-nasc'); return; }
+  if (!genero) { criErr('⚠ Selecione o gênero'); return; }
 
   // Validação básica de data
   try {
     const d = new Date(nasc + 'T00:00:00');
     if (isNaN(d.getTime()) || d > new Date()) {
-      alert('⚠️ Data de nascimento inválida');
+      criErr('⚠ Data inválida — deve ser no passado', 'cri-nasc');
       return;
     }
-  } catch { alert('⚠️ Data de nascimento inválida'); return; }
+  } catch { criErr('⚠ Data de nascimento inválida', 'cri-nasc'); return; }
 
   const lista = getBabies();
 
@@ -27975,10 +28187,17 @@ window.escolherCrianca = function(babyId) {
 };
 
 // Cadastro direto a partir do step-4 (reusa modal-crianca-form já existente)
-window.abrirCadastroCriancaFromLogin = function() {
+window.abrirCadastroCriancaFromLogin = async function() {
   const lista = (typeof getBabies === 'function') ? getBabies() : [];
   if (lista.length >= LIMITE_CRIANCAS) {
-    alert(`⚠️ Limite atingido: máximo de ${LIMITE_CRIANCAS} crianças por conta.\n\nPara cadastrar outra, remova um perfil existente em "Crianças cadastradas" dentro do app.`);
+    await (typeof BFModal !== 'undefined'
+      ? BFModal.alert({
+          title: 'Limite atingido',
+          icon: '👶',
+          variant: 'warn',
+          message: `Máximo de ${LIMITE_CRIANCAS} crianças por conta.\n\nPara cadastrar outra, remova um perfil existente em "Crianças cadastradas" dentro do app.`,
+        })
+      : Promise.resolve(alert('Limite atingido.')));
     return;
   }
   if (typeof abrirCadastroCrianca === 'function') {
@@ -29049,29 +29268,64 @@ window._verificarIntegridadeAudit = async function() {
 };
 
 window._confirmarDeletarTudo = async function() {
-  const c1 = confirm(
-    'APAGAR DEFINITIVAMENTE?\n\n' +
-    'Isso irá remover:\n' +
-    '• Todos os registros deste aparelho\n' +
-    '• Backup na nuvem (se existir)\n' +
-    '• Sua conta e consentimentos\n' +
-    '• Histórico de auditoria\n\n' +
-    'NÃO há como recuperar depois. Tem certeza?'
-  );
+  const c1 = await (typeof BFModal !== 'undefined'
+    ? BFModal.confirm({
+        title: 'APAGAR DEFINITIVAMENTE?',
+        icon: '⚠️',
+        variant: 'danger',
+        message: 'Isso irá remover:\n\n• Todos os registros deste aparelho\n• Backup na nuvem (se existir)\n• Sua conta e consentimentos\n• Histórico de auditoria\n\n⚠️ NÃO há como recuperar depois.\n\nTem certeza absoluta?',
+        okLabel: 'Sim, continuar',
+        cancelLabel: 'Cancelar',
+      })
+    : Promise.resolve(confirm('APAGAR DEFINITIVAMENTE? Sem volta.')));
   if (!c1) return;
 
-  const palavra = prompt('Para confirmar, digite exatamente: APAGAR TUDO');
+  const palavra = await (typeof BFModal !== 'undefined'
+    ? BFModal.prompt({
+        title: 'Confirmação final',
+        icon: '🔒',
+        variant: 'danger',
+        message: 'Para confirmar a exclusão total, digite exatamente:\n\nAPAGAR TUDO\n\n(em maiúsculas, com o espaço)',
+        placeholder: 'APAGAR TUDO',
+        okLabel: 'Confirmar exclusão',
+        cancelLabel: 'Cancelar',
+      })
+    : Promise.resolve(prompt('Digite: APAGAR TUDO')));
+
   if (palavra !== 'APAGAR TUDO') {
-    alert('Cancelado. Nada foi apagado.');
+    if (palavra !== null) {
+      await (typeof BFModal !== 'undefined'
+        ? BFModal.alert({
+            title: 'Exclusão cancelada',
+            icon: 'ℹ️',
+            variant: 'info',
+            message: 'A palavra digitada não corresponde. Nada foi apagado.',
+          })
+        : Promise.resolve(alert('Cancelado.')));
+    }
     return;
   }
 
   try {
     await BFPrivacy.deletarTudoDefinitivamente();
-    alert('Dados apagados com sucesso.\n\nO app será recarregado.');
+    await (typeof BFModal !== 'undefined'
+      ? BFModal.alert({
+          title: 'Dados apagados',
+          icon: '✓',
+          variant: 'success',
+          message: 'Todos os dados foram apagados com sucesso.\n\nO app será recarregado agora.',
+        })
+      : Promise.resolve(alert('Apagado.')));
     setTimeout(() => location.reload(), 500);
   } catch (e) {
-    alert('Erro ao apagar: ' + e.message + '\n\nTente novamente ou contate suporte.');
+    await (typeof BFModal !== 'undefined'
+      ? BFModal.alert({
+          title: 'Erro ao apagar',
+          icon: '✗',
+          variant: 'danger',
+          message: 'Ocorreu um erro ao apagar os dados:\n\n' + (e.message || 'desconhecido') + '\n\nTente novamente ou contate o suporte.',
+        })
+      : Promise.resolve(alert('Erro: ' + e.message)));
   }
 };
 
