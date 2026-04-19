@@ -4050,6 +4050,78 @@ function _gerarTokenConvite() {
   return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
+// ═══════════════════════════════════════════════════════════════
+// [FIX CRÍTICO A+B] — Convite autocontido no link (cross-device)
+//
+// Problema: convites ficavam em localStorage SÓ do admin.
+// Quando o convidado clicava no link em outro dispositivo,
+// _getConvitesPendentes() retornava vazio e o convite falhava.
+//
+// Solução A: o link carrega o payload do convite em base64url.
+// Assim o convidado consegue aceitar em qualquer dispositivo,
+// sem depender de sincronização.
+//
+// Solução B (separada): sincronização via Firestore também será
+// implementada, com o link A como fallback offline.
+// ═══════════════════════════════════════════════════════════════
+
+// Codifica objeto em base64url (URL-safe, sem padding)
+function _conviteEncodarPayload(convite) {
+  try {
+    const json = JSON.stringify({
+      t: convite.token,
+      n: convite.nome,
+      e: convite.email,
+      p: convite.parentesco || '',
+      a: !!convite.comoAdmin,
+      cp: convite.convidadoPor || '',
+      ce: convite.convidadoEm || Date.now(),
+      ex: convite.expiraEm || (Date.now() + 7*24*60*60*1000),
+      v: 1, // versão do schema (pra migração futura)
+    });
+    // btoa trabalha com Latin1 — cuidado com UTF-8 (nomes acentuados)
+    const utf8 = new TextEncoder().encode(json);
+    let bin = '';
+    utf8.forEach(b => bin += String.fromCharCode(b));
+    // Base64 padrão → base64url (sem +/= )
+    return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  } catch (e) {
+    console.warn('[convite encode]', e);
+    return null;
+  }
+}
+
+// Decodifica payload base64url de volta pro objeto convite
+function _conviteDecodarPayload(b64url) {
+  try {
+    // Base64url → base64 padrão
+    let b64 = b64url.replace(/-/g, '+').replace(/_/g, '/');
+    // Preencher padding
+    while (b64.length % 4) b64 += '=';
+    const bin = atob(b64);
+    const bytes = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    const json = new TextDecoder().decode(bytes);
+    const obj = JSON.parse(json);
+    // Reconstrói o shape original do convite
+    return {
+      token: obj.t,
+      nome: obj.n,
+      email: obj.e,
+      parentesco: obj.p || '',
+      comoAdmin: !!obj.a,
+      convidadoPor: obj.cp || '',
+      convidadoEm: obj.ce || Date.now(),
+      expiraEm: obj.ex || (Date.now() + 7*24*60*60*1000),
+      status: 'pendente',
+      _fromLink: true, // marca que veio do link (não do localStorage)
+    };
+  } catch (e) {
+    console.warn('[convite decode]', e);
+    return null;
+  }
+}
+
 /**
  * Envia convite real: grava convite pendente + dispara magic link via Firebase
  */
@@ -4144,8 +4216,14 @@ window._confirmarConvite = async function() {
       err.code = 'bf/offline';
       throw err;
     }
+    // [FIX CRÍTICO A] Link autocontido: carrega payload do convite (base64url)
+    // para que funcione cross-device, sem depender do localStorage do convidado
+    const payload = _conviteEncodarPayload(convite);
+    const acceptParam = payload
+      ? '?acceptInviteData=' + payload
+      : '?acceptInvite=' + encodeURIComponent(token);  // fallback legacy (não deveria cair aqui)
     const actionCodeSettings = {
-      url: window.location.origin + window.location.pathname + '?acceptInvite=' + encodeURIComponent(token),
+      url: window.location.origin + window.location.pathname + acceptParam,
       handleCodeInApp: true,
     };
     await firebase.auth().sendSignInLinkToEmail(email, actionCodeSettings);
@@ -4183,8 +4261,11 @@ window._confirmarConvite = async function() {
     // Sem mostrar o erro técnico "cru" no modal; mostra UI amigável
     if (errEl) errEl.textContent = '⚠ ' + diagnostico.resumo;
 
-    // Oferece link manual via BFModal
-    const linkManual = window.location.origin + window.location.pathname + '?acceptInvite=' + encodeURIComponent(token);
+    // Oferece link manual via BFModal (autocontido A — funciona cross-device)
+    const _payloadFallback = _conviteEncodarPayload(convite);
+    const linkManual = window.location.origin + window.location.pathname
+      + (_payloadFallback ? '?acceptInviteData=' + _payloadFallback
+                          : '?acceptInvite=' + encodeURIComponent(token));
     setTimeout(async () => {
       const copiar = await (typeof BFModal !== 'undefined'
         ? BFModal.confirm({
@@ -4315,30 +4396,57 @@ function _traduzirErroConvite(codigo, msgOriginal) {
 // ACEITAR CONVITE — quando convidado clica no link do email
 // ═══════════════════════════════════════════════════════════════
 window._detectarLinkConvite = async function() {
-  // Verifica se a URL tem ?acceptInvite=TOKEN
+  // Verifica se a URL tem payload autocontido (novo, cross-device) OU token legacy
   const params = new URLSearchParams(window.location.search);
-  const token = params.get('acceptInvite');
-  if (!token) return false;
+  const payloadData = params.get('acceptInviteData');
+  const tokenLegacy = params.get('acceptInvite');
+  if (!payloadData && !tokenLegacy) return false;
 
-  // Busca convite pelo token
-  const convites = _getConvitesPendentes();
-  const convite = convites[token];
+  let convite = null;
+  let token = null;
+  let origem = 'localStorage'; // ou 'payload'
+
+  // Prioridade 1: payload autocontido no link (funciona em qualquer dispositivo)
+  if (payloadData) {
+    const decodado = _conviteDecodarPayload(payloadData);
+    if (decodado) {
+      convite = decodado;
+      token = decodado.token;
+      origem = 'payload';
+      // Salva no localStorage local para que o dispositivo do convidado tenha
+      // o registro (útil para UI de "convites pendentes" caso ele volte depois)
+      try {
+        const convitesLocais = _getConvitesPendentes();
+        if (!convitesLocais[token]) {
+          convitesLocais[token] = { ...convite };
+          _saveConvitesPendentes(convitesLocais);
+        }
+      } catch (e) { console.warn('[convite] salvar local falhou:', e); }
+    }
+  }
+
+  // Prioridade 2: token legacy no localStorage (dispositivo do admin)
+  if (!convite && tokenLegacy) {
+    token = tokenLegacy;
+    const convites = _getConvitesPendentes();
+    convite = convites[token];
+  }
 
   if (!convite) {
     await (typeof BFModal !== 'undefined'
       ? BFModal.alert({
-          title: 'Convite não encontrado',
+          title: 'Convite inválido',
           icon: '❌',
           variant: 'danger',
-          message: 'Este convite não foi encontrado ou já foi utilizado.\n\nPeça um novo convite ao administrador da família.',
+          message: 'Este link de convite não pôde ser lido.\n\nPode ter sido corrompido durante o envio, ou este é um link antigo (pré-versão cross-device).\n\nPeça ao administrador para enviar um novo convite.',
         })
-      : Promise.resolve(alert('Convite não encontrado.')));
-    // Limpar URL
+      : Promise.resolve(alert('Convite inválido.')));
     try { window.history.replaceState({}, document.title, window.location.pathname); } catch {}
     return true;
   }
 
-  if (convite.status !== 'pendente') {
+  // Status: só checa quando veio do localStorage (payload sempre assume "pendente" porque é snapshot)
+  if (origem === 'localStorage' && convite.status && convite.status !== 'pendente') {
     await (typeof BFModal !== 'undefined'
       ? BFModal.alert({
           title: 'Convite já utilizado',
@@ -4351,6 +4459,7 @@ window._detectarLinkConvite = async function() {
     return true;
   }
 
+  // Expiração: verifica em ambos os caminhos
   if (convite.expiraEm && Date.now() > convite.expiraEm) {
     await (typeof BFModal !== 'undefined'
       ? BFModal.alert({
@@ -4360,11 +4469,38 @@ window._detectarLinkConvite = async function() {
           message: 'Este convite expirou (válido por 7 dias).\n\nPeça um novo convite ao administrador da família.',
         })
       : Promise.resolve(alert('Convite expirado.')));
-    delete convites[token];
-    _saveConvitesPendentes(convites);
+    if (origem === 'localStorage') {
+      const convites = _getConvitesPendentes();
+      delete convites[token];
+      _saveConvitesPendentes(convites);
+    }
     try { window.history.replaceState({}, document.title, window.location.pathname); } catch {}
     return true;
   }
+
+  // Proteção: se este dispositivo já tem um guardião com o mesmo email, detecta duplicata
+  try {
+    const jaCadastrado = Object.values(GUARDIOES).find(g => g && g.email &&
+      String(g.email).toLowerCase() === String(convite.email).toLowerCase());
+    if (jaCadastrado) {
+      await (typeof BFModal !== 'undefined'
+        ? BFModal.alert({
+            title: 'Você já está cadastrado',
+            icon: '✓',
+            variant: 'info',
+            message: `Já existe um cadastro para ${convite.email} neste dispositivo.\n\nVá até a tela de login e entre com sua senha ou PIN.`,
+          })
+        : Promise.resolve(alert('Já cadastrado.')));
+      try { window.history.replaceState({}, document.title, window.location.pathname); } catch {}
+      // Leva para tela de login
+      const telaLogin = document.getElementById('tela-login');
+      const telaOnb = document.getElementById('tela-onboarding');
+      if (telaOnb) telaOnb.style.display = 'none';
+      if (telaLogin) telaLogin.style.display = 'flex';
+      if (typeof renderListaGuardioes === 'function') renderListaGuardioes();
+      return true;
+    }
+  } catch (e) { console.warn('[convite duplicata check]', e); }
 
   // Validar via Firebase (se disponível)
   let verificadoFirebase = false;
@@ -4479,9 +4615,27 @@ function _mostrarModalAceitarConvite(convite, verificadoFirebase) {
 
 window._finalizarAceitarConvite = async function(token, verificadoFirebase) {
   const errEl = document.getElementById('ac-error');
-  const convites = _getConvitesPendentes();
-  const convite = convites[token];
-  if (!convite) { if (errEl) errEl.textContent = 'Convite expirado ou inválido'; return; }
+
+  // [FIX A] Busca convite em 2 fontes:
+  //  1. localStorage local (dispositivo do admin OU já foi persistido pelo detector)
+  //  2. URL params (caso de dispositivo novo que só tem payload do link)
+  let convite = null;
+  const convitesLocais = _getConvitesPendentes();
+  if (convitesLocais[token]) {
+    convite = convitesLocais[token];
+  } else {
+    // Tenta ler do link atual
+    const params = new URLSearchParams(window.location.search);
+    const payloadData = params.get('acceptInviteData');
+    if (payloadData) {
+      convite = _conviteDecodarPayload(payloadData);
+    }
+  }
+
+  if (!convite || convite.token !== token) {
+    if (errEl) errEl.textContent = 'Convite expirado ou inválido';
+    return;
+  }
 
   const nome = (document.getElementById('ac-nome')?.value || '').trim();
   const senha = document.getElementById('ac-senha')?.value || '';
@@ -4495,6 +4649,14 @@ window._finalizarAceitarConvite = async function(token, verificadoFirebase) {
   if (!/[a-zA-Z]/.test(senha) || !/[0-9]/.test(senha)) { if (errEl) errEl.textContent = 'Senha deve conter letras E números'; return; }
   if (senha !== senha2) { if (errEl) errEl.textContent = 'As senhas não conferem'; return; }
   if (nascimento && !validarDataNascimento(nascimento)) { if (errEl) errEl.textContent = 'Data de nascimento inválida'; return; }
+
+  // Proteção: dispositivo já tem guardião com esse email?
+  const jaExiste = Object.values(GUARDIOES).find(g => g && g.email &&
+    String(g.email).toLowerCase() === String(convite.email).toLowerCase());
+  if (jaExiste) {
+    if (errEl) errEl.textContent = 'Já existe um cadastro com este e-mail neste dispositivo. Vá para login.';
+    return;
+  }
 
   // Gera hash da senha
   if (errEl) errEl.textContent = '⏳ Processando...';
@@ -4530,13 +4692,40 @@ window._finalizarAceitarConvite = async function(token, verificadoFirebase) {
     senhaHash,
     senhaSalt,
     convidadoPor: convite.convidadoPor,
+    conviteToken: token,  // mantém referência pro Firestore sync (B)
     criadoEm: new Date().toISOString(),
   };
   saveGuardioes(GUARDIOES);
 
-  // Remove o convite (já foi aceito)
-  delete convites[token];
-  _saveConvitesPendentes(convites);
+  // Remove o convite local (já foi aceito)
+  if (convitesLocais[token]) {
+    delete convitesLocais[token];
+    _saveConvitesPendentes(convitesLocais);
+  }
+
+  // [FIX B] Se Firebase disponível, registra aceite no Firestore
+  // para que o admin (noutro dispositivo) saiba que foi aceito
+  try {
+    if (typeof firebase !== 'undefined' && firebase.firestore && navigator.onLine !== false) {
+      if (typeof initFirebaseRefs === 'function') initFirebaseRefs();
+      const db = firebase.firestore();
+      // Grava um documento de aceite (outros dispositivos do admin podem ler depois)
+      await db.collection('babyforce_convites_aceitos').doc(token).set({
+        token,
+        email: convite.email,
+        nome,
+        guardiaoId: id,
+        isAdmin: !!convite.comoAdmin,
+        convidadoPor: convite.convidadoPor,
+        aceitoEm: Date.now(),
+        verificadoFirebase: !!verificadoFirebase,
+      });
+      if (typeof BFAudit !== 'undefined') BFAudit.log('convite_aceite_sync_firestore', { id });
+    }
+  } catch (e) {
+    console.warn('[convite aceite firestore]', e);
+    // Não-bloqueante: fluxo segue mesmo sem sync
+  }
 
   if (typeof BFAudit !== 'undefined') BFAudit.log('convite_aceito', { id, comoAdmin: convite.comoAdmin, verificadoFirebase });
 
@@ -4544,14 +4733,23 @@ window._finalizarAceitarConvite = async function(token, verificadoFirebase) {
   try { window.history.replaceState({}, document.title, window.location.pathname); } catch {}
 
   // Fecha modal
-  const m = document.getElementById('modal-aceitar-convite');
-  if (m) m.remove();
+  const mdl = document.getElementById('modal-aceitar-convite');
+  if (mdl) mdl.remove();
 
-  // Mostra confirmação e leva para login
-  alert(`✓ Bem-vindo(a) ao BabyForce, ${nome}!\n\nSua conta foi criada com sucesso.\n\nAgora você pode entrar com:\n• Seu nome na tela de login\n• O PIN compartilhado com o administrador\nOU\n• Sua senha pessoal (botão "Entrar com senha")`);
+  // Mostra confirmação temática
+  await (typeof BFModal !== 'undefined'
+    ? BFModal.alert({
+        title: 'Bem-vindo(a) ao BabyForce!',
+        icon: '🎉',
+        variant: 'success',
+        message: `Sua conta foi criada com sucesso, ${nome}!\n\nAgora você pode entrar com:\n• Seu nome na tela de login + PIN da família (pedir ao administrador)\n• OU sua senha pessoal (botão "Entrar com senha")`,
+      })
+    : Promise.resolve(alert(`Bem-vindo, ${nome}!`)));
 
   // Mostra tela de login
   const telaLogin = document.getElementById('tela-login');
+  const telaOnb = document.getElementById('tela-onboarding');
+  if (telaOnb) telaOnb.style.display = 'none';
   if (telaLogin) telaLogin.style.display = 'flex';
   if (typeof renderListaGuardioes === 'function') renderListaGuardioes();
 };
@@ -4574,7 +4772,8 @@ window._recusarConvite = function(token) {
 // Auto-detecção no DOMContentLoaded
 document.addEventListener('DOMContentLoaded', () => {
   setTimeout(() => {
-    if (location.search.includes('acceptInvite=')) {
+    const s = location.search || '';
+    if (s.includes('acceptInviteData=') || s.includes('acceptInvite=')) {
       if (typeof window._detectarLinkConvite === 'function') window._detectarLinkConvite();
     }
   }, 1500);
@@ -4583,11 +4782,13 @@ document.addEventListener('DOMContentLoaded', () => {
 // ═══════════════════════════════════════════════════════════════
 // VISUALIZAÇÃO DE CONVITES PENDENTES (admin)
 // ═══════════════════════════════════════════════════════════════
-window.abrirConvitesPendentes = function() {
+window.abrirConvitesPendentes = async function() {
   if (!usuarioAtual || !GUARDIOES[usuarioAtual] || !GUARDIOES[usuarioAtual].isAdmin) {
     alert('⚠️ Apenas administradores podem ver convites.');
     return;
   }
+  // [FIX B] Sincroniza aceites remotos ANTES de renderizar lista
+  try { await window._sincronizarConvitesAceitos(true); } catch {}
   const convites = _getConvitesPendentes();
   const lista = Object.values(convites);
 
@@ -4640,12 +4841,188 @@ window.abrirConvitesPendentes = function() {
     <div style="max-width:560px;width:100%;background:linear-gradient(135deg,#031027,#0a1a3d);border:1px solid rgba(199,125,255,0.4);border-radius:14px;padding:22px;color:#fff;font-family:'Exo 2',sans-serif;margin:auto" onclick="event.stopPropagation()">
       <div style="text-align:center;font-size:2.2rem;margin-bottom:6px">📨</div>
       <div style="text-align:center;font-family:'Orbitron',monospace;font-size:0.82rem;color:var(--purple-neon);letter-spacing:0.08em;font-weight:700;margin-bottom:6px">CONVITES PENDENTES</div>
-      <div style="text-align:center;font-size:0.72rem;color:var(--text-dim);margin-bottom:16px">${lista.length} convite${lista.length !== 1 ? 's' : ''}</div>
+      <div style="text-align:center;font-size:0.72rem;color:var(--text-dim);margin-bottom:12px">${lista.length} convite${lista.length !== 1 ? 's' : ''}</div>
+      <button onclick="window._btnAtualizarConvites(this)" style="width:100%;padding:9px;background:rgba(120,255,153,0.1);border:1px solid rgba(120,255,153,0.35);border-radius:8px;color:#78ff99;font-family:'Orbitron',monospace;font-size:0.64rem;letter-spacing:0.06em;cursor:pointer;margin-bottom:12px">🔄 Verificar aceites</button>
       <div>${html}</div>
       <button onclick="document.getElementById('modal-convites-pendentes').remove()" style="width:100%;padding:10px;background:rgba(0,60,120,0.5);border:1px solid rgba(0,180,255,0.3);border-radius:8px;color:var(--blue-neon);font-family:'Orbitron',monospace;font-size:0.66rem;letter-spacing:0.06em;cursor:pointer;margin-top:8px">Fechar</button>
     </div>
   `;
   document.body.appendChild(modal);
+};
+
+// Handler do botão "🔄 Verificar aceites" na lista de convites pendentes
+window._btnAtualizarConvites = async function(btn) {
+  if (!btn) return;
+  const originalText = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '⏳ Verificando...';
+  try {
+    const resultado = await window._sincronizarConvitesAceitos(false);
+    if (!resultado || !resultado.ok) {
+      const motivo = resultado && resultado.motivo;
+      if (motivo === 'firebase-indisponivel' || motivo === 'offline') {
+        await (typeof BFModal !== 'undefined'
+          ? BFModal.alert({
+              title: 'Sincronização indisponível',
+              icon: '📡',
+              variant: 'warn',
+              message: 'Não foi possível verificar aceites remotos.\n\n' + (motivo === 'offline' ? 'Você parece estar offline. Verifique sua conexão.' : 'O Firebase não está disponível. Consulte o GUIA_FIREBASE.md para habilitar.'),
+            })
+          : Promise.resolve(alert('Sincronização indisponível.')));
+      } else if (motivo === 'erro') {
+        await (typeof BFModal !== 'undefined'
+          ? BFModal.alert({
+              title: 'Erro na sincronização',
+              icon: '⚠️',
+              variant: 'warn',
+              message: 'Erro ao buscar aceites no servidor:\n\n' + (resultado.erro || 'desconhecido') + '\n\nTente novamente em instantes.',
+            })
+          : Promise.resolve(alert('Erro: ' + resultado.erro)));
+      }
+      btn.innerHTML = originalText;
+      btn.disabled = false;
+      return;
+    }
+    // Sucesso
+    if (resultado.novos > 0) {
+      // Reabre modal para refletir mudanças
+      document.getElementById('modal-convites-pendentes')?.remove();
+      setTimeout(() => window.abrirConvitesPendentes(), 300);
+      await (typeof BFModal !== 'undefined'
+        ? BFModal.alert({
+            title: resultado.novos + ' novo(s) guardião(ões)',
+            icon: '✨',
+            variant: 'success',
+            message: `${resultado.novos} pessoa${resultado.novos > 1 ? 's' : ''} aceitaram o convite!\n\n${resultado.removidos || 0} convite${(resultado.removidos || 0) !== 1 ? 's' : ''} pendente${(resultado.removidos || 0) !== 1 ? 's' : ''} movido${(resultado.removidos || 0) !== 1 ? 's' : ''} para a lista de guardiões.`,
+          })
+        : Promise.resolve(alert(resultado.novos + ' novos aceites!')));
+    } else {
+      btn.innerHTML = '✓ Nenhum aceite novo';
+      setTimeout(() => {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+      }, 1800);
+    }
+  } catch (e) {
+    console.warn('[btn atualizar convites]', e);
+    btn.innerHTML = originalText;
+    btn.disabled = false;
+  }
+};
+
+// ═══════════════════════════════════════════════════════════════
+// [FIX CRÍTICO B] — Sincroniza guardiões que aceitaram convites via Firestore
+//
+// Quando um convidado aceita em outro dispositivo, ele grava um documento
+// em `babyforce_convites_aceitos` no Firestore. Esta função lê esses aceites,
+// remove o convite pendente local e adiciona o guardião aceito no GUARDIOES
+// do admin.
+//
+// Chamada:
+//  1. Ao entrar no app (entrarSessao hook)
+//  2. Ao abrir a lista de convites pendentes
+//  3. Manualmente via botão "🔄 Atualizar" na lista
+// ═══════════════════════════════════════════════════════════════
+window._sincronizarConvitesAceitos = async function(silencioso) {
+  silencioso = silencioso !== false; // default: silencioso
+  try {
+    // Pré-checagens
+    if (typeof firebase === 'undefined' || !firebase.firestore) {
+      if (!silencioso) console.warn('[sync convites] Firebase não disponível');
+      return { ok: false, motivo: 'firebase-indisponivel', novos: 0 };
+    }
+    if (navigator.onLine === false) {
+      if (!silencioso) console.warn('[sync convites] offline');
+      return { ok: false, motivo: 'offline', novos: 0 };
+    }
+    if (!usuarioAtual || !GUARDIOES[usuarioAtual]) {
+      return { ok: false, motivo: 'sem-usuario', novos: 0 };
+    }
+    if (typeof initFirebaseRefs === 'function') initFirebaseRefs();
+    const db = firebase.firestore();
+
+    // Lê aceites filtrados pelo admin atual (para não puxar de todas as famílias)
+    const snapshot = await db.collection('babyforce_convites_aceitos')
+      .where('convidadoPor', '==', usuarioAtual)
+      .get();
+
+    if (snapshot.empty) {
+      return { ok: true, motivo: 'sem-aceites', novos: 0 };
+    }
+
+    const convitesLocais = _getConvitesPendentes();
+    let novosGuardioes = 0;
+    let convitesRemovidos = 0;
+
+    snapshot.forEach(doc => {
+      const aceite = doc.data();
+      if (!aceite || !aceite.token || !aceite.email) return;
+
+      // Remove convite pendente local (se existir)
+      if (convitesLocais[aceite.token]) {
+        delete convitesLocais[aceite.token];
+        convitesRemovidos++;
+      }
+
+      // Se guardião com esse email já existe localmente, pular
+      const jaExiste = Object.values(GUARDIOES).find(g => g && g.email &&
+        String(g.email).toLowerCase() === String(aceite.email).toLowerCase());
+      if (jaExiste) {
+        // Garante flag de sync
+        if (!jaExiste.aceiteSincronizado) {
+          jaExiste.aceiteSincronizado = true;
+          jaExiste.aceitoEm = aceite.aceitoEm || Date.now();
+        }
+        return;
+      }
+
+      // Criar guardião localmente a partir do aceite remoto
+      // IMPORTANTE: não temos senhaHash aqui (ficou no dispositivo do convidado).
+      // O guardião aparece na lista mas neste dispositivo só consegue entrar
+      // via PIN da família. A senha só funciona no dispositivo onde ele cadastrou.
+      const id = 'g_' + (aceite.aceitoEm || Date.now()) + '_' + Math.random().toString(36).slice(2, 6);
+      GUARDIOES[id] = {
+        nome: aceite.nome || 'Guardião',
+        emoji: aceite.isAdmin ? '👑' : '👤',
+        papel: aceite.isAdmin ? 'Administrador' : 'Guardião',
+        email: aceite.email,
+        isAdmin: !!aceite.isAdmin,
+        emailVerificado: true,
+        verificadoRealmente: !!aceite.verificadoFirebase,
+        convidadoPor: aceite.convidadoPor,
+        conviteToken: aceite.token,
+        aceiteSincronizado: true,     // marca que veio do Firestore
+        precisaSenhaLocal: true,       // este dispositivo não tem a senha hash
+        criadoEm: new Date(aceite.aceitoEm || Date.now()).toISOString(),
+        aceitoEm: aceite.aceitoEm || Date.now(),
+      };
+      novosGuardioes++;
+    });
+
+    if (convitesRemovidos > 0) _saveConvitesPendentes(convitesLocais);
+    if (novosGuardioes > 0 || convitesRemovidos > 0) {
+      saveGuardioes(GUARDIOES);
+      if (typeof BFAudit !== 'undefined') BFAudit.log('convites_sincronizados', {
+        novos: novosGuardioes, removidos: convitesRemovidos
+      });
+    }
+
+    // Feedback visual opcional
+    if (novosGuardioes > 0 && typeof showToast === 'function') {
+      showToast(`✨ ${novosGuardioes} guardião${novosGuardioes > 1 ? 'ões' : ''} aceito${novosGuardioes > 1 ? 's' : ''}!`);
+    }
+
+    return {
+      ok: true,
+      motivo: 'sucesso',
+      novos: novosGuardioes,
+      removidos: convitesRemovidos,
+    };
+  } catch (e) {
+    console.warn('[sync convites]', e);
+    if (typeof BFAudit !== 'undefined') BFAudit.log('convites_sync_falha', { erro: e.code || 'unknown' });
+    return { ok: false, motivo: 'erro', erro: e.message, novos: 0 };
+  }
 };
 
 window._reenviarConvite = async function(token) {
@@ -4655,25 +5032,44 @@ window._reenviarConvite = async function(token) {
   try {
     if (typeof firebase === 'undefined' || !firebase.auth) throw new Error('Firebase não disponível');
     if (typeof initFirebaseRefs === 'function') initFirebaseRefs();
+    // Renovar validade ANTES de codificar (assim o novo link carrega validade renovada)
+    c.expiraEm = Date.now() + CONVITE_VALIDADE_DIAS * 24 * 60 * 60 * 1000;
+    c.reenviadoEm = Date.now();
+    // Link autocontido cross-device
+    const payload = _conviteEncodarPayload(c);
+    const acceptParam = payload
+      ? '?acceptInviteData=' + payload
+      : '?acceptInvite=' + encodeURIComponent(token);
     const actionCodeSettings = {
-      url: window.location.origin + window.location.pathname + '?acceptInvite=' + encodeURIComponent(token),
+      url: window.location.origin + window.location.pathname + acceptParam,
       handleCodeInApp: true,
     };
     await firebase.auth().sendSignInLinkToEmail(c.email, actionCodeSettings);
-    // Renovar validade
-    c.expiraEm = Date.now() + CONVITE_VALIDADE_DIAS * 24 * 60 * 60 * 1000;
-    c.reenviadoEm = Date.now();
     _saveConvitesPendentes(convites);
     if (typeof BFAudit !== 'undefined') BFAudit.log('convite_reenviado', { token: token.substring(0, 6) });
     if (typeof showToast === 'function') showToast(`🔄 Convite reenviado para ${c.email}`);
     setTimeout(() => window.abrirConvitesPendentes(), 200);
   } catch (e) {
-    alert('Erro ao reenviar: ' + (e.message || 'falha'));
+    await (typeof BFModal !== 'undefined'
+      ? BFModal.alert({
+          title: 'Erro ao reenviar',
+          icon: '✗',
+          variant: 'danger',
+          message: 'Não foi possível reenviar o convite.\n\nDetalhes: ' + (e.message || 'falha desconhecida') + '\n\nVocê pode copiar o link manualmente na lista de convites.',
+        })
+      : Promise.resolve(alert('Erro ao reenviar: ' + (e.message || 'falha'))));
   }
 };
 
 window._copiarLinkConvite = function(token) {
-  const link = window.location.origin + window.location.pathname + '?acceptInvite=' + encodeURIComponent(token);
+  const convites = _getConvitesPendentes();
+  const c = convites[token];
+  if (!c) return;
+  // Link autocontido cross-device
+  const payload = _conviteEncodarPayload(c);
+  const link = window.location.origin + window.location.pathname
+    + (payload ? '?acceptInviteData=' + payload
+               : '?acceptInvite=' + encodeURIComponent(token));
   try {
     navigator.clipboard.writeText(link);
     if (typeof showToast === 'function') showToast('🔗 Link copiado para a área de transferência');
@@ -24566,6 +24962,13 @@ async function salvarEdicaoGuardiao() {
     const g = GUARDIOES[id];
     if (g && !guardiaoEstaCompleto(g)) {
       setTimeout(() => abrirCompletarPerfilObrigatorio(id), 500);
+    }
+    // [FIX B] Sincroniza aceites de convite do Firestore em background
+    // Só para admins — não faz sentido para guardiões comuns
+    if (g && g.isAdmin && typeof window._sincronizarConvitesAceitos === 'function') {
+      setTimeout(() => {
+        try { window._sincronizarConvitesAceitos(true); } catch (e) { console.warn('[sync convites login]', e); }
+      }, 1500);
     }
     return r;
   };
