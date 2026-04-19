@@ -4396,10 +4396,39 @@ function _traduzirErroConvite(codigo, msgOriginal) {
 // ACEITAR CONVITE — quando convidado clica no link do email
 // ═══════════════════════════════════════════════════════════════
 window._detectarLinkConvite = async function() {
-  // Verifica se a URL tem payload autocontido (novo, cross-device) OU token legacy
-  const params = new URLSearchParams(window.location.search);
-  const payloadData = params.get('acceptInviteData');
-  const tokenLegacy = params.get('acceptInvite');
+  // [FIX] Verifica params em AMBOS search e hash
+  // (alguns clientes de email e o Firebase Email Link podem jogar params no hash)
+  const searchParams = new URLSearchParams(window.location.search);
+  const hashParams = new URLSearchParams((window.location.hash || '').replace(/^#/, ''));
+
+  // Também verificamos dentro do parâmetro "continueUrl" do Firebase Email Link:
+  // quando o link é gerado via sendSignInLinkToEmail, o Firebase pode envolver
+  // a URL original dentro de continueUrl. Normalmente o redirect já acontece
+  // antes de chegar aqui, mas vamos cobrir o caso.
+  const continueUrl = searchParams.get('continueUrl') || hashParams.get('continueUrl');
+  let continueParams = null;
+  if (continueUrl) {
+    try {
+      const u = new URL(continueUrl);
+      continueParams = new URLSearchParams(u.search);
+    } catch {}
+  }
+
+  const payloadData = searchParams.get('acceptInviteData')
+                    || hashParams.get('acceptInviteData')
+                    || (continueParams && continueParams.get('acceptInviteData'));
+  const tokenLegacy = searchParams.get('acceptInvite')
+                    || hashParams.get('acceptInvite')
+                    || (continueParams && continueParams.get('acceptInvite'));
+
+  // Log completo para diagnóstico (aparece no console do dispositivo do convidado)
+  console.log('[convite] Detector iniciado. URL:', window.location.href);
+  console.log('[convite] search:', window.location.search);
+  console.log('[convite] hash:', window.location.hash);
+  console.log('[convite] continueUrl:', continueUrl);
+  console.log('[convite] payloadData encontrado:', !!payloadData, payloadData ? '(len=' + payloadData.length + ')' : '');
+  console.log('[convite] tokenLegacy encontrado:', !!tokenLegacy);
+
   if (!payloadData && !tokenLegacy) return false;
 
   let convite = null;
@@ -4413,6 +4442,7 @@ window._detectarLinkConvite = async function() {
       convite = decodado;
       token = decodado.token;
       origem = 'payload';
+      console.log('[convite] Payload decodificado OK:', { token, email: convite.email, nome: convite.nome });
       // Salva no localStorage local para que o dispositivo do convidado tenha
       // o registro (útil para UI de "convites pendentes" caso ele volte depois)
       try {
@@ -4422,6 +4452,8 @@ window._detectarLinkConvite = async function() {
           _saveConvitesPendentes(convitesLocais);
         }
       } catch (e) { console.warn('[convite] salvar local falhou:', e); }
+    } else {
+      console.warn('[convite] DECODE FALHOU. Payload recebido:', payloadData.substring(0, 80) + '...');
     }
   }
 
@@ -4430,17 +4462,32 @@ window._detectarLinkConvite = async function() {
     token = tokenLegacy;
     const convites = _getConvitesPendentes();
     convite = convites[token];
+    console.log('[convite] Tentou buscar token legacy no localStorage:', { token, encontrado: !!convite });
   }
 
   if (!convite) {
+    // Mensagem com info de diagnóstico para facilitar suporte
+    const urlCurta = window.location.href.length > 120
+      ? window.location.href.substring(0, 120) + '...'
+      : window.location.href;
+    const diagMsg = 'Este link de convite não pôde ser lido.\n\n' +
+      (payloadData
+        ? 'O link tinha um payload, mas a decodificação falhou. Isso pode acontecer se:\n• O payload foi cortado durante o envio (link muito longo)\n• O email encurtou/reescreveu o link\n• Problema de encoding entre dispositivos'
+        : 'Nenhum parâmetro de convite foi encontrado na URL. Isso pode significar:\n• Link antigo (pré-versão cross-device)\n• O cliente de email removeu os parâmetros\n• Firebase Email Link fez redirect sem preservar os parâmetros'
+      ) +
+      '\n\n━━━ DEBUG (para o administrador) ━━━\n' +
+      'URL: ' + urlCurta +
+      '\npayload presente: ' + (!!payloadData) +
+      '\ntoken legacy: ' + (!!tokenLegacy) +
+      '\ncontinueUrl: ' + (!!continueUrl);
     await (typeof BFModal !== 'undefined'
       ? BFModal.alert({
           title: 'Convite inválido',
           icon: '❌',
           variant: 'danger',
-          message: 'Este link de convite não pôde ser lido.\n\nPode ter sido corrompido durante o envio, ou este é um link antigo (pré-versão cross-device).\n\nPeça ao administrador para enviar um novo convite.',
+          message: diagMsg,
         })
-      : Promise.resolve(alert('Convite inválido.')));
+      : Promise.resolve(alert('Convite inválido. URL: ' + urlCurta)));
     try { window.history.replaceState({}, document.title, window.location.pathname); } catch {}
     return true;
   }
@@ -4773,7 +4820,14 @@ window._recusarConvite = function(token) {
 document.addEventListener('DOMContentLoaded', () => {
   setTimeout(() => {
     const s = location.search || '';
-    if (s.includes('acceptInviteData=') || s.includes('acceptInvite=')) {
+    const h = location.hash || '';
+    // Dispara se search OU hash tem qualquer parâmetro de convite
+    // (Firebase Email Link pode jogar no hash dependendo do mode)
+    const temParamConvite = s.includes('acceptInviteData=') || s.includes('acceptInvite=')
+                         || h.includes('acceptInviteData=') || h.includes('acceptInvite=')
+                         || s.includes('continueUrl=') // Firebase wrapper — pode ter convite dentro
+                         || s.includes('mode=signIn'); // Firebase magic link
+    if (temParamConvite) {
       if (typeof window._detectarLinkConvite === 'function') window._detectarLinkConvite();
     }
   }, 1500);
