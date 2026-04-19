@@ -56,8 +56,11 @@ body{background:#020b18;margin:0;}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 html,body{scrollbar-gutter:auto;}
 body{background:var(--blue-deep);color:var(--white);font-family:'Exo 2',sans-serif;min-height:100vh;min-height:-webkit-fill-available;overflow-x:hidden;overflow-y:auto;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom);-webkit-overflow-scrolling:touch;overscroll-behavior-y:none;-webkit-user-select:none;user-select:none;}
-body::-webkit-scrollbar{width:0;background:transparent;}
-body{scrollbar-width:none;-ms-overflow-style:none;}
+body::-webkit-scrollbar{width:10px;background:transparent;}
+body::-webkit-scrollbar-track{background:rgba(0,15,35,0.5);}
+body::-webkit-scrollbar-thumb{background:linear-gradient(180deg,rgba(0,180,255,0.55),rgba(100,30,180,0.55));border-radius:5px;border:2px solid rgba(0,15,35,0.3);}
+body::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,rgba(0,212,255,0.75),rgba(150,60,220,0.75));}
+body{scrollbar-width:thin;scrollbar-color:rgba(0,180,255,0.5) rgba(0,15,35,0.5);}
 input,textarea,[contenteditable]{-webkit-user-select:text;user-select:text;font-size:16px!important;}
 select{font-size:16px!important;}
 html{height:-webkit-fill-available;overflow-x:hidden;}
@@ -299,6 +302,12 @@ textarea{resize:none;min-height:80px;}
 .emoji-grid::-webkit-scrollbar{width:6px;}
 .emoji-grid::-webkit-scrollbar-thumb{background:rgba(0,180,255,0.4);border-radius:3px;}
 .emoji-btn{font-size:1.4rem;padding:6px;border-radius:8px;border:2px solid transparent;background:rgba(0,20,50,0.6);cursor:pointer;transition:all 0.15s;text-align:center;line-height:1;-webkit-tap-highlight-color:transparent;min-width:40px;min-height:40px;}
+.emoji-btn:hover{background:rgba(0,40,90,0.8);border-color:rgba(0,180,255,0.3);}
+.emoji-btn.sel{background:linear-gradient(135deg,rgba(0,100,190,0.5),rgba(100,30,180,0.4));border-color:var(--blue-neon);box-shadow:0 0 8px rgba(0,212,255,0.3);}
+/* Emblemas autorais BabyForce — destaque dourado sutil */
+.emoji-btn.emoji-autoral{background:linear-gradient(135deg,rgba(60,40,10,0.6),rgba(30,20,5,0.6));border:2px solid rgba(255,224,102,0.3);position:relative;}
+.emoji-btn.emoji-autoral:hover{border-color:var(--gold);background:linear-gradient(135deg,rgba(80,55,15,0.8),rgba(40,25,7,0.8));}
+.emoji-btn.emoji-autoral.sel{background:linear-gradient(135deg,rgba(200,150,40,0.4),rgba(150,80,20,0.4));border-color:var(--gold);box-shadow:0 0 10px rgba(255,224,102,0.45);}
 .emoji-btn.sel{border-color:var(--blue-neon);background:rgba(0,100,200,0.3);box-shadow:0 0 8px rgba(0,180,255,0.3);}
 .btn-novo-guardiao{width:100%;padding:11px;background:transparent;border:1px dashed rgba(0,180,255,0.3);border-radius:10px;color:var(--text-dim);font-family:'Orbitron',monospace;font-size:0.65rem;letter-spacing:0.08em;cursor:pointer;transition:all 0.2s;}
 
@@ -727,7 +736,7 @@ html.bf-tema-claro [style*="color: var(--white)"] { color: var(--white) !importa
       <button class="ob-btn ob-btn-primary" id="ob-btn-enviar-codigo" onclick="obEnviarCodigoVerificacao()">📧 Enviar código de verificação</button>
     </div>
 
-    <!-- Step 2: Validação de email (NOVO) -->
+    <!-- Step 2: Validação de email (refinado C1) -->
     <div class="ob-step" id="ob-step-2-email">
       <div class="ob-icon-wrap">📧</div>
       <div class="ob-title">VERIFICAR E-MAIL</div>
@@ -735,16 +744,25 @@ html.bf-tema-claro [style*="color: var(--white)"] { color: var(--white) !importa
         Enviamos um link de verificação para:<br>
         <strong style="color:var(--blue-neon)" id="ob-email-display">seu@email.com</strong>
       </div>
-      <div style="background:rgba(0,180,255,0.08);border-left:3px solid var(--blue-neon);padding:12px 14px;border-radius:8px;margin-bottom:14px;text-align:left;font-size:0.76rem;color:var(--white);line-height:1.55">
-        📬 <strong>Confira seu e-mail.</strong><br>
-        Clique no link enviado para verificar sua conta. Depois, volte a esta tela e clique em <strong>"Já verifiquei"</strong>.
+
+      <!-- Status bar dinâmico -->
+      <div class="verify-status-bar waiting" id="ob-verify-status-bar" role="status" aria-live="polite">
+        <span class="verify-spinner" aria-hidden="true"></span>
+        <div style="flex:1">
+          <div style="color:var(--white);font-weight:600">Aguardando você clicar no link</div>
+          <div style="font-size:0.68rem;color:var(--text-dim);margin-top:2px">O app detecta automaticamente quando você volta</div>
+        </div>
       </div>
+
       <div style="background:rgba(250,199,117,0.08);border-left:3px solid var(--gold);padding:10px 12px;border-radius:8px;margin-bottom:14px;text-align:left;font-size:0.7rem;color:var(--text-dim);line-height:1.5">
-        💡 <strong style="color:var(--gold)">Dica:</strong> verifique a caixa de spam/lixo eletrônico se não receber em 1 minuto.
+        💡 <strong style="color:var(--gold)">Dica:</strong> confira spam/lixo eletrônico se não receber em 1 minuto.
       </div>
-      <div class="ob-pin-status" id="ob-verify-status"></div>
+
+      <!-- Mantido por compatibilidade (ob-verify-status ainda é referenciado pelas funções antigas) -->
+      <div class="ob-pin-status" id="ob-verify-status" style="display:none"></div>
+
       <button class="ob-btn ob-btn-primary" id="ob-btn-verificar" onclick="obVerificarEmailClicado()">✓ Já verifiquei — continuar</button>
-      <button class="ob-btn ob-btn-secondary" onclick="obReenviarCodigo()">🔄 Reenviar link</button>
+      <button class="ob-btn ob-btn-secondary" id="ob-btn-reenviar" onclick="obReenviarCodigo()">🔄 Reenviar link<span class="countdown-timer" id="ob-reenviar-countdown"></span></button>
       <button class="ob-btn ob-btn-secondary" onclick="obProximo(-2)" style="font-size:0.7rem;margin-top:8px">← Voltar e corrigir e-mail</button>
     </div>
 
@@ -999,7 +1017,7 @@ html.bf-tema-claro [style*="color: var(--white)"] { color: var(--white) !importa
   <div style="position:absolute;right:12px;top:140px;background:linear-gradient(135deg,rgba(0,30,70,0.97),rgba(0,15,40,0.99));border:1px solid rgba(0,180,255,0.3);border-radius:12px;padding:6px;min-width:210px;box-shadow:0 8px 30px rgba(0,0,0,0.6)" onclick="event.stopPropagation()">
     <button onclick="abrirTrocaEmoji()" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:none;border:none;color:var(--white);cursor:pointer;border-radius:8px;font-family:'Exo 2',sans-serif;font-size:0.88rem">🔲 Trocar emblema</button>
     <button onclick="abrirTrocaFotoGuardiao()" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:none;border:none;color:var(--white);cursor:pointer;border-radius:8px;font-family:'Exo 2',sans-serif;font-size:0.88rem">📷 Trocar foto</button>
-    <button onclick="abrirEdicaoGuardiao()" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:none;border:none;color:var(--white);cursor:pointer;border-radius:8px;font-family:'Exo 2',sans-serif;font-size:0.88rem">👤 Editar meus dados</button>
+    <button onclick="abrirMinhaConta()" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:none;border:none;color:var(--white);cursor:pointer;border-radius:8px;font-family:'Exo 2',sans-serif;font-size:0.88rem">👤 Minha conta</button>
     <button onclick="abrirGestaoFamilia()" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:none;border:none;color:var(--gold);cursor:pointer;border-radius:8px;font-family:'Exo 2',sans-serif;font-size:0.88rem">👨‍👩‍👧‍👦 Gerenciar família</button>
     <button onclick="abrirGlossario()" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:none;border:none;color:var(--white);cursor:pointer;border-radius:8px;font-family:'Exo 2',sans-serif;font-size:0.88rem">📖 Glossário Galáctico</button>
     <button onclick="abrirMigracao()" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:none;border:none;color:rgba(57,255,20,0.8);cursor:pointer;border-radius:8px;font-family:'Exo 2',sans-serif;font-size:0.88rem">☁️ Sincronizar dados</button>
@@ -2427,22 +2445,46 @@ function getBirthISO(){return getBabyConfig().birthDate||null;}
 function getAppPIN(){return getAppConfig().pin||'000000';}
 
 // ── GUARDIÕES ──
-const // Lista expandida (80+ emblemas) atendendo a todos os públicos:
-// família, profissões, sci-fi, fantasia, animais, abstratos, natureza
+const // Lista expandida (100+ emblemas) atendendo a todos os públicos:
+// BabyForce autorais, família, profissões, sci-fi, fantasia, animais, abstratos, natureza
+// Para manter compatibilidade: os "autorais" são strings de emojis que o app renderiza
+// em grids e pode vir a ter versões SVG no futuro.
 EMOJIS_DISPONIVEIS=[
+  // BabyForce autorais — combinações temáticas exclusivas (use BF: como prefixo visual)
+  '🌌','🛸','🌠','✨','☄️','🌟','💫','🪐','🌙','🌞',
   // Família clássica
   '👩','👨','🧔','👱','🧕','👴','👵','🧑','👩‍🦱','👨‍🦱','👩‍🦳','👨‍🦳','👩‍🦰','👨‍🦰','🧒','👦','👧',
-  // Profissões
+  // Profissões (serve para diversos papéis familiares)
   '🧑‍⚕️','👩‍⚕️','👨‍⚕️','🧑‍🏫','👩‍🏫','👨‍🏫','🧑‍💻','🧑‍🍳','🧑‍🌾','🧑‍🎨','🧑‍🚀','🧑‍🔬','🧑‍✈️','🧑‍⚖️','🧑‍🚒',
   // Sci-fi / fantasia
-  '🦸','🦸‍♀️','🦸‍♂️','🧙','🧙‍♀️','🧙‍♂️','🧝','🧝‍♀️','🧚','🧞','🤖','👽','👾','🛸','⚔️','🌌','🌠','💫','⭐','🌟',
+  '🦸','🦸‍♀️','🦸‍♂️','🧙','🧙‍♀️','🧙‍♂️','🧝','🧝‍♀️','🧚','🧞','🤖','👽','👾','⚔️',
   // Animais (favoritos de bebês/crianças)
   '🦁','🐯','🐻','🐼','🐨','🦊','🐶','🐱','🐰','🦄','🐝','🦋','🐙','🐳','🦖','🐢','🦉','🦔',
   // Natureza & abstratos
-  '🌸','🌻','🌈','☀️','🌙','🌊','🔥','❄️','💎','🎨','🎵','📚','⚽','🎮','🚀','🎪','🎭',
+  '🌸','🌻','🌈','☀️','🌊','🔥','❄️','💎','🎨','🎵','📚','⚽','🎮','🚀','🎪','🎭',
   // Corações/símbolos afetivos
   '💖','💗','💙','💜','💚','🧡','💛','🫶','👑'
 ];
+
+// BUG 1: Emblemas autorais BabyForce — designs exclusivos (metadata para filtro e categoria)
+// Estes mesmos emojis aparecem no grid, mas sinalizam "autorais" para futura substituição por SVG/imagem própria
+window.BABYFORCE_AUTORAIS = {
+  categoria: 'BabyForce — Autorais',
+  // Índices de EMOJIS_DISPONIVEIS que são autorais (primeiros 10)
+  indices: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+  nomes: {
+    '🌌': 'Nebula Baby',
+    '🛸': 'Guardião Estelar',
+    '🌠': 'Estrela Cadente',
+    '✨': 'Partícula Force',
+    '☄️': 'Cometa do Amor',
+    '🌟': 'Guia Galáctico',
+    '💫': 'Órbita Família',
+    '🪐': 'Planeta Bebê',
+    '🌙': 'Lua Maternal',
+    '🌞': 'Sol da Manhã',
+  }
+};
 
 // ═══════════════════════════════════════════════════════════════
 // FASE 2 — Migração suave + autenticação por senha
@@ -2584,6 +2626,8 @@ window.abrirLoginComSenha = function(guardiaoId) {
 
       <button onclick="window._confirmarLoginSenha('${guardiaoId}')" style="width:100%;padding:13px;background:linear-gradient(135deg,#00d4ff,#c77dff);border:none;border-radius:10px;color:#fff;font-family:'Orbitron',monospace;font-size:0.74rem;letter-spacing:0.08em;cursor:pointer;font-weight:700;margin-bottom:10px">✓ ENTRAR</button>
 
+      <button onclick="document.getElementById('modal-login-senha').remove(); window.abrirRecuperarSenha('${guardiaoId}')" style="width:100%;padding:10px;background:transparent;border:1px dashed rgba(199,125,255,0.4);border-radius:8px;color:var(--purple-neon);font-family:'Orbitron',monospace;font-size:0.64rem;letter-spacing:0.06em;cursor:pointer;margin-bottom:8px">🔓 Esqueci minha senha</button>
+
       <button onclick="document.getElementById('modal-login-senha').remove()" style="width:100%;padding:10px;background:rgba(0,60,120,0.5);border:1px solid rgba(0,180,255,0.3);border-radius:8px;color:var(--blue-neon);font-family:'Orbitron',monospace;font-size:0.66rem;letter-spacing:0.06em;cursor:pointer">Cancelar</button>
     </div>
   `;
@@ -2624,6 +2668,1099 @@ window._confirmarLoginSenha = async function(guardiaoId) {
     senhaEl.focus();
   }
 };
+
+// ═══════════════════════════════════════════════════════════════
+// C2 — RECUPERAÇÃO DE SENHA (esqueci minha senha)
+// ═══════════════════════════════════════════════════════════════
+// Fluxo: abrirRecuperarSenha(id) → envia magic link → usuário clica →
+// abre modal de nova senha → _definirNovaSenhaPorToken → atualiza GUARDIOES
+//
+// Chaves:
+//   babyforce_recuperar_senha_v1 — dados pendentes (id, email, token, enviadoEm)
+//   URL param: ?recoverPassword=1 — sinaliza retorno do magic link
+// ═══════════════════════════════════════════════════════════════
+const RECUPERAR_SENHA_KEY = 'babyforce_recuperar_senha_v1';
+
+// Helper: gera token aleatório (mesma lógica dos convites)
+function _gerarTokenRecuperacao() {
+  try {
+    const bytes = crypto.getRandomValues(new Uint8Array(16));
+    return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
+  } catch {
+    return Date.now().toString(36) + Math.random().toString(36).substring(2, 12);
+  }
+}
+
+// Abre modal "Esqueci minha senha" — escolhe entre magic link OU pergunta de segurança
+window.abrirRecuperarSenha = function(guardiaoId) {
+  const g = GUARDIOES[guardiaoId];
+  if (!g) return;
+
+  const existente = document.getElementById('modal-recuperar-senha');
+  if (existente) existente.remove();
+
+  const temEmail = g.email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(g.email);
+  const emailMasked = temEmail ? g.email.replace(/^(.{2}).+(@.+)$/, '$1***$2') : '(sem e-mail)';
+
+  const modal = document.createElement('div');
+  modal.id = 'modal-recuperar-senha';
+  modal.setAttribute('role', 'dialog');
+  modal.setAttribute('aria-modal', 'true');
+  modal.setAttribute('aria-labelledby', 'rs-title');
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,10,30,0.94);z-index:99998;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(10px);';
+  modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
+
+  modal.innerHTML = `
+    <div style="max-width:420px;width:100%;background:linear-gradient(135deg,#031027,#0a1a3d);border:1px solid rgba(199,125,255,0.5);border-radius:14px;padding:24px;color:#fff;font-family:'Exo 2',sans-serif;max-height:92vh;overflow-y:auto" onclick="event.stopPropagation()">
+      <div style="text-align:center;font-size:2.4rem;margin-bottom:8px" aria-hidden="true">🔓</div>
+      <div id="rs-title" style="text-align:center;font-family:'Orbitron',monospace;font-size:0.82rem;color:var(--purple-neon);letter-spacing:0.08em;font-weight:700;margin-bottom:6px">RECUPERAR SENHA</div>
+      <div style="text-align:center;font-size:0.74rem;color:var(--text-dim);margin-bottom:16px">
+        ${g.emoji || '👤'} ${_rcEsc(g.nome)}
+      </div>
+
+      ${temEmail ? `
+        <div style="background:rgba(0,180,255,0.08);border-left:3px solid var(--blue-neon);padding:12px 14px;border-radius:8px;margin-bottom:16px;text-align:left;font-size:0.76rem;line-height:1.55">
+          📧 Enviaremos um link para:<br>
+          <strong style="color:var(--blue-neon)">${_rcEsc(emailMasked)}</strong><br>
+          <span style="color:var(--text-dim);font-size:0.7rem">Clique no link e defina uma nova senha.</span>
+        </div>
+        <button id="rs-btn-enviar" onclick="window._enviarMagicLinkRecuperarSenha('${guardiaoId}')" style="width:100%;padding:13px;background:linear-gradient(135deg,#00d4ff,#c77dff);border:none;border-radius:10px;color:#fff;font-family:'Orbitron',monospace;font-size:0.74rem;letter-spacing:0.08em;cursor:pointer;font-weight:700;margin-bottom:10px">📧 ENVIAR LINK POR E-MAIL</button>
+      ` : `
+        <div style="background:rgba(255,128,128,0.1);border:1px solid rgba(255,128,128,0.3);border-radius:8px;padding:12px;font-size:0.76rem;color:#ff8080;line-height:1.5;margin-bottom:14px;text-align:center">
+          ⚠ Este guardião não tem e-mail cadastrado.<br>
+          <span style="color:var(--text-dim);font-size:0.7rem">Use a recuperação offline abaixo.</span>
+        </div>
+      `}
+
+      <div style="border-top:1px dashed rgba(0,180,255,0.2);margin:14px 0;padding-top:14px">
+        <div style="font-family:'Orbitron',monospace;font-size:0.6rem;color:var(--gold);letter-spacing:0.08em;margin-bottom:10px;text-align:center">OU — RECUPERAÇÃO OFFLINE</div>
+        <div style="font-size:0.72rem;color:var(--text-dim);line-height:1.55;margin-bottom:12px;text-align:center">
+          Responda a pergunta de segurança para redefinir offline.
+        </div>
+        <button onclick="window._iniciarRecuperacaoOffline('${guardiaoId}')" style="width:100%;padding:11px;background:rgba(250,199,117,0.15);border:1px solid rgba(250,199,117,0.4);border-radius:8px;color:var(--gold);font-family:'Orbitron',monospace;font-size:0.66rem;letter-spacing:0.06em;cursor:pointer;font-weight:700;margin-bottom:10px">🔑 RECUPERAÇÃO OFFLINE</button>
+      </div>
+
+      <div id="rs-status" style="font-size:0.72rem;text-align:center;min-height:20px;margin:8px 0"></div>
+
+      <button onclick="document.getElementById('modal-recuperar-senha').remove()" style="width:100%;padding:10px;background:rgba(0,60,120,0.5);border:1px solid rgba(0,180,255,0.3);border-radius:8px;color:var(--blue-neon);font-family:'Orbitron',monospace;font-size:0.66rem;letter-spacing:0.06em;cursor:pointer">Cancelar</button>
+    </div>
+  `;
+  document.body.appendChild(modal);
+
+  if (typeof BFAudit !== 'undefined') BFAudit.log('recuperar_senha_aberto', { id: guardiaoId });
+};
+
+// Envia magic link para email do guardião (mesma infra de recuperação de PIN)
+window._enviarMagicLinkRecuperarSenha = async function(guardiaoId) {
+  const g = GUARDIOES[guardiaoId];
+  if (!g || !g.email) return;
+
+  const statusEl = document.getElementById('rs-status');
+  const btnEl = document.getElementById('rs-btn-enviar');
+  if (statusEl) statusEl.innerHTML = '<span style="color:var(--blue-neon)">⏳ Enviando...</span>';
+  if (btnEl) btnEl.disabled = true;
+
+  // Rate limit: 3 tentativas/hora via BFRateLimit
+  if (typeof BFRateLimit !== 'undefined' && BFRateLimit.podeTemtarLogin) {
+    const r = BFRateLimit.podeTemtarLogin('recuperar_senha_' + guardiaoId);
+    if (!r.permitido) {
+      const restante = Math.ceil(r.esperarMs / 1000);
+      if (statusEl) statusEl.innerHTML = `<span style="color:#ff8080">🔒 Aguarde ${restante}s para reenviar</span>`;
+      if (btnEl) btnEl.disabled = false;
+      return;
+    }
+  }
+
+  // Gera token e grava estado pendente
+  const token = _gerarTokenRecuperacao();
+  const pendente = {
+    guardiaoId,
+    email: g.email,
+    token,
+    enviadoEm: Date.now(),
+  };
+  try { localStorage.setItem(RECUPERAR_SENHA_KEY, JSON.stringify(pendente)); } catch {}
+
+  // Envia magic link
+  try {
+    if (typeof firebase === 'undefined' || !firebase.auth) {
+      throw new Error('Firebase indisponível — use recuperação offline');
+    }
+    if (typeof initFirebaseRefs === 'function') initFirebaseRefs();
+    const actionCodeSettings = {
+      url: window.location.origin + window.location.pathname + '?recoverPassword=1',
+      handleCodeInApp: true,
+    };
+    await firebase.auth().sendSignInLinkToEmail(g.email, actionCodeSettings);
+    if (typeof BFRateLimit !== 'undefined' && BFRateLimit.registrarFalha) BFRateLimit.registrarFalha('recuperar_senha_' + guardiaoId);
+    if (typeof BFAudit !== 'undefined') BFAudit.log('recuperar_senha_link_enviado', { id: guardiaoId });
+    if (statusEl) statusEl.innerHTML = '<span style="color:#78ff99">✓ Link enviado! Confira seu e-mail.</span>';
+
+    // Aguarda 2s e troca para estado de "aguardando"
+    setTimeout(() => {
+      if (statusEl) statusEl.innerHTML = '<span style="color:var(--blue-neon)">📧 Aguardando clique no link...</span>';
+    }, 2000);
+  } catch (e) {
+    console.warn('[recuperar senha]', e);
+    if (statusEl) statusEl.innerHTML = `<span style="color:#ff8080">✗ ${_rcEsc(e.message || 'Erro ao enviar')}</span>`;
+    if (btnEl) btnEl.disabled = false;
+    if (typeof BFAudit !== 'undefined') BFAudit.log('recuperar_senha_falha', { erro: e.code || 'unknown' });
+  }
+};
+
+// Recuperação offline: pergunta + nova senha
+window._iniciarRecuperacaoOffline = async function(guardiaoId) {
+  const g = GUARDIOES[guardiaoId];
+  if (!g) return;
+
+  // Busca primeira criança cadastrada como pergunta de segurança
+  let criancas = [];
+  try {
+    if (typeof getBabies === 'function') criancas = getBabies() || [];
+  } catch {}
+
+  if (!criancas.length) {
+    await (typeof BFModal !== 'undefined'
+      ? BFModal.alert({
+          title: 'Recuperação offline indisponível',
+          icon: '⚠️',
+          variant: 'warn',
+          message: 'Não há crianças cadastradas para usar como pergunta de segurança.\n\nUse a recuperação por e-mail.',
+        })
+      : Promise.resolve(alert('Sem crianças para pergunta.')));
+    return;
+  }
+
+  // Rate limit
+  if (typeof BFRateLimit !== 'undefined' && BFRateLimit.podeTemtarLogin) {
+    const r = BFRateLimit.podeTemtarLogin('recuperar_offline_' + guardiaoId);
+    if (!r.permitido) {
+      const restante = Math.ceil(r.esperarMs / 1000);
+      await (typeof BFModal !== 'undefined'
+        ? BFModal.alert({
+            title: 'Muitas tentativas',
+            icon: '🔒',
+            variant: 'danger',
+            message: `Aguarde ${restante}s antes de tentar novamente.\n\nIsto é uma proteção contra tentativas maliciosas de adivinhação.`,
+          })
+        : Promise.resolve(alert('Aguarde.')));
+      return;
+    }
+  }
+
+  // Pede nome da primeira criança + data
+  document.getElementById('modal-recuperar-senha').remove();
+
+  const nome = await (typeof BFModal !== 'undefined'
+    ? BFModal.prompt({
+        title: 'Pergunta de segurança',
+        icon: '🔐',
+        variant: 'info',
+        message: 'Qual o nome da PRIMEIRA criança cadastrada neste app?\n\n(apenas primeiro nome, sem maiúsculas/minúsculas)',
+        placeholder: 'primeiro nome',
+        okLabel: 'Verificar',
+      })
+    : Promise.resolve(prompt('Nome da 1ª criança?')));
+
+  if (nome === null || !nome.trim()) return;
+
+  const nomeEsperado = (criancas[0].nome || '').split(/\s+/)[0].trim().toLowerCase();
+  const nomeDigitado = nome.trim().toLowerCase();
+
+  if (nomeEsperado !== nomeDigitado) {
+    if (typeof BFRateLimit !== 'undefined' && BFRateLimit.registrarFalha) BFRateLimit.registrarFalha('recuperar_offline_' + guardiaoId);
+    if (typeof BFAudit !== 'undefined') BFAudit.log('recuperar_senha_offline_falha', { id: guardiaoId });
+    await (typeof BFModal !== 'undefined'
+      ? BFModal.alert({
+          title: 'Resposta incorreta',
+          icon: '✗',
+          variant: 'danger',
+          message: 'O nome informado não corresponde.\n\nPor segurança, após 5 tentativas erradas a recuperação fica bloqueada por 1 hora.',
+        })
+      : Promise.resolve(alert('Incorreto.')));
+    return;
+  }
+
+  // Pede data de nascimento
+  const dataNasc = await (typeof BFModal !== 'undefined'
+    ? BFModal.prompt({
+        title: 'Confirmação adicional',
+        icon: '📅',
+        variant: 'info',
+        message: `Qual a data de nascimento de ${criancas[0].nome.split(/\s+/)[0]}?\n\n(formato: AAAA-MM-DD)`,
+        placeholder: '2024-01-15',
+        type: 'date',
+        defaultValue: '',
+        okLabel: 'Verificar',
+      })
+    : Promise.resolve(prompt('Data (AAAA-MM-DD):')));
+
+  if (dataNasc === null || !dataNasc) return;
+
+  const dataEsperada = criancas[0].nasc || '';
+  if (dataEsperada !== dataNasc) {
+    if (typeof BFRateLimit !== 'undefined' && BFRateLimit.registrarFalha) BFRateLimit.registrarFalha('recuperar_offline_' + guardiaoId);
+    if (typeof BFAudit !== 'undefined') BFAudit.log('recuperar_senha_offline_falha', { id: guardiaoId });
+    await BFModal.alert({
+      title: 'Data incorreta',
+      icon: '✗',
+      variant: 'danger',
+      message: 'A data não corresponde ao que está cadastrado.\n\nVerifique e tente novamente.',
+    });
+    return;
+  }
+
+  // ✓ Identidade confirmada — abre modal para definir nova senha
+  if (typeof BFAudit !== 'undefined') BFAudit.log('recuperar_senha_offline_sucesso', { id: guardiaoId });
+  window._abrirModalNovaSenha(guardiaoId, 'offline');
+};
+
+// Modal para definir nova senha (chamado após validação por email OU offline)
+window._abrirModalNovaSenha = function(guardiaoId, origem) {
+  const g = GUARDIOES[guardiaoId];
+  if (!g) return;
+
+  const existente = document.getElementById('modal-nova-senha');
+  if (existente) existente.remove();
+
+  const modal = document.createElement('div');
+  modal.id = 'modal-nova-senha';
+  modal.setAttribute('role', 'dialog');
+  modal.setAttribute('aria-modal', 'true');
+  modal.setAttribute('aria-labelledby', 'ns-title');
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,10,30,0.95);z-index:99999;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(10px);';
+  modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
+
+  modal.innerHTML = `
+    <div style="max-width:400px;width:100%;background:linear-gradient(135deg,#031027,#0a1a3d);border:1px solid rgba(120,255,153,0.5);border-radius:14px;padding:24px;color:#fff;font-family:'Exo 2',sans-serif" onclick="event.stopPropagation()">
+      <div style="text-align:center;font-size:2.4rem;margin-bottom:8px" aria-hidden="true">🔑</div>
+      <div id="ns-title" style="text-align:center;font-family:'Orbitron',monospace;font-size:0.82rem;color:#78ff99;letter-spacing:0.08em;font-weight:700;margin-bottom:6px">DEFINIR NOVA SENHA</div>
+      <div style="text-align:center;font-size:0.74rem;color:var(--text-dim);margin-bottom:18px">
+        ${g.emoji || '👤'} ${_rcEsc(g.nome)}
+      </div>
+
+      <div style="background:rgba(120,255,153,0.08);border-left:3px solid #78ff99;padding:10px 12px;border-radius:6px;margin-bottom:14px;font-size:0.74rem;color:#78ff99;line-height:1.5">
+        ✓ Identidade confirmada via ${origem === 'offline' ? 'pergunta de segurança' : 'e-mail'}
+      </div>
+
+      <div class="ng-field">
+        <label class="ng-label">Nova senha</label>
+        <input type="password" id="ns-senha" class="ng-input" placeholder="mínimo 8 caracteres" autocomplete="new-password" minlength="8">
+        <div style="font-size:0.62rem;color:var(--text-dim);margin-top:4px;line-height:1.4">Use 8+ caracteres, com letras e números.</div>
+      </div>
+
+      <div class="ng-field">
+        <label class="ng-label">Confirmar nova senha</label>
+        <input type="password" id="ns-senha-confirm" class="ng-input" placeholder="digite novamente" autocomplete="new-password" minlength="8">
+      </div>
+
+      <div id="ns-error" style="color:#ff8080;font-size:0.72rem;text-align:center;min-height:18px;margin-bottom:10px"></div>
+
+      <button onclick="window._confirmarNovaSenha('${guardiaoId}', '${origem}')" style="width:100%;padding:13px;background:linear-gradient(135deg,#78ff99,#00d4ff);border:none;border-radius:10px;color:#031027;font-family:'Orbitron',monospace;font-size:0.74rem;letter-spacing:0.08em;cursor:pointer;font-weight:700;margin-bottom:10px">✓ SALVAR NOVA SENHA</button>
+
+      <button onclick="document.getElementById('modal-nova-senha').remove()" style="width:100%;padding:10px;background:rgba(0,60,120,0.5);border:1px solid rgba(0,180,255,0.3);border-radius:8px;color:var(--blue-neon);font-family:'Orbitron',monospace;font-size:0.66rem;letter-spacing:0.06em;cursor:pointer">Cancelar</button>
+    </div>
+  `;
+  document.body.appendChild(modal);
+  setTimeout(() => { const i = document.getElementById('ns-senha'); if (i) i.focus(); }, 100);
+};
+
+// Valida e salva nova senha
+window._confirmarNovaSenha = async function(guardiaoId, origem) {
+  const g = GUARDIOES[guardiaoId];
+  if (!g) return;
+
+  const senhaEl = document.getElementById('ns-senha');
+  const confirmEl = document.getElementById('ns-senha-confirm');
+  const errEl = document.getElementById('ns-error');
+  const senha = senhaEl?.value || '';
+  const confirm = confirmEl?.value || '';
+
+  // Validações
+  if (senha.length < 8) {
+    errEl.textContent = '⚠ Mínimo 8 caracteres';
+    return;
+  }
+  if (!/[a-zA-Z]/.test(senha) || !/[0-9]/.test(senha)) {
+    errEl.textContent = '⚠ Use letras E números';
+    return;
+  }
+  if (senha !== confirm) {
+    errEl.textContent = '⚠ Senhas não conferem';
+    return;
+  }
+
+  // Gera novo hash + salt
+  try {
+    const saltBytes = crypto.getRandomValues(new Uint8Array(16));
+    const salt = btoa(String.fromCharCode(...saltBytes));
+    let hash;
+    if (typeof BFSec !== 'undefined' && BFSec.sha256) {
+      hash = await BFSec.sha256(senha + salt);
+    } else {
+      const data = new TextEncoder().encode(senha + salt);
+      const buf = await crypto.subtle.digest('SHA-256', data);
+      hash = Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    // Atualiza guardião
+    GUARDIOES[guardiaoId].senhaHash = hash;
+    GUARDIOES[guardiaoId].senhaSalt = salt;
+    GUARDIOES[guardiaoId].senhaRedefinidaEm = new Date().toISOString();
+    delete GUARDIOES[guardiaoId].precisaMigrarSenha; // se tinha flag de migração
+    saveGuardioes(GUARDIOES);
+
+    // Limpa dados pendentes
+    try { localStorage.removeItem(RECUPERAR_SENHA_KEY); } catch {}
+    try { window.history.replaceState({}, document.title, window.location.pathname); } catch {}
+
+    if (typeof BFAudit !== 'undefined') {
+      BFAudit.log('senha_redefinida', { id: guardiaoId, origem });
+    }
+
+    document.getElementById('modal-nova-senha').remove();
+
+    // Feedback de sucesso
+    await (typeof BFModal !== 'undefined'
+      ? BFModal.alert({
+          title: 'Senha redefinida',
+          icon: '✓',
+          variant: 'success',
+          message: `Sua nova senha foi salva com sucesso, ${g.nome.split(/\s+/)[0]}!\n\nAgora você pode fazer login normalmente.`,
+        })
+      : Promise.resolve(alert('Senha redefinida!')));
+
+    // Sugere reabrir login por senha
+    if (typeof window.abrirLoginComSenha === 'function') {
+      setTimeout(() => window.abrirLoginComSenha(guardiaoId), 300);
+    }
+  } catch (e) {
+    console.warn('[nova senha]', e);
+    errEl.textContent = '✗ Erro ao salvar. Tente novamente.';
+    if (typeof BFAudit !== 'undefined') BFAudit.log('senha_redefinir_falha', { id: guardiaoId, erro: e.message });
+  }
+};
+
+// Detecta retorno do magic link de recuperação de senha
+(function() {
+  document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(async () => {
+      if (!location.search.includes('recoverPassword=1')) return;
+      try {
+        const raw = localStorage.getItem(RECUPERAR_SENHA_KEY);
+        if (!raw) return;
+        const pendente = JSON.parse(raw);
+        if (!pendente || !pendente.guardiaoId) return;
+
+        // Valida via Firebase
+        let validado = false;
+        try {
+          if (typeof firebase !== 'undefined' && firebase.auth
+              && firebase.auth().isSignInWithEmailLink(window.location.href)) {
+            await firebase.auth().signInWithEmailLink(pendente.email, window.location.href);
+            try { await firebase.auth().signOut(); } catch {}
+            validado = true;
+          }
+        } catch (e) {
+          console.warn('[recover password validate]', e);
+        }
+
+        if (validado) {
+          if (typeof BFAudit !== 'undefined') BFAudit.log('recuperar_senha_link_validado', { id: pendente.guardiaoId });
+          // Abre modal nova senha
+          window._abrirModalNovaSenha(pendente.guardiaoId, 'email');
+        } else {
+          // Oferece tentativa manual
+          const tentar = await (typeof BFModal !== 'undefined'
+            ? BFModal.confirm({
+                title: 'Link não validado',
+                icon: '⚠️',
+                variant: 'warn',
+                message: 'Não conseguimos confirmar o link de recuperação automaticamente.\n\nDeseja abrir o modal de nova senha mesmo assim? (modo offline)',
+                okLabel: 'Abrir (offline)',
+                cancelLabel: 'Cancelar',
+              })
+            : Promise.resolve(confirm('Abrir em modo offline?')));
+          if (tentar) window._abrirModalNovaSenha(pendente.guardiaoId, 'email-offline');
+        }
+      } catch (e) {
+        console.warn('[recoverPassword handler]', e);
+      }
+    }, 1800);
+  });
+})();
+
+// ═══════════════════════════════════════════════════════════════
+// C3 — TELA "MINHA CONTA"
+// ═══════════════════════════════════════════════════════════════
+// Permite editar: nome, email, foto, nascimento, gênero
+// Trocar senha (com senha atual + nova)
+// Reverificar email se mudou
+// Excluir conta (com transferência de admin)
+// Ver papel + histórico de acessos (últimos 10 do BFAudit)
+// ═══════════════════════════════════════════════════════════════
+
+window.abrirMinhaConta = function() {
+  if (typeof fecharMenuGuardiaoQuietly === 'function') fecharMenuGuardiaoQuietly();
+  else if (typeof fecharMenuGuardiao === 'function') fecharMenuGuardiao();
+
+  const g = GUARDIOES[usuarioAtual];
+  if (!g) {
+    BFModal.alert({
+      title: 'Sessão não encontrada',
+      icon: '⚠️',
+      variant: 'warn',
+      message: 'Faça login primeiro para acessar sua conta.',
+    });
+    return;
+  }
+
+  const existente = document.getElementById('modal-minha-conta');
+  if (existente) existente.remove();
+
+  const modal = document.createElement('div');
+  modal.id = 'modal-minha-conta';
+  modal.setAttribute('role', 'dialog');
+  modal.setAttribute('aria-modal', 'true');
+  modal.setAttribute('aria-labelledby', 'mc-title');
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,10,30,0.94);z-index:99998;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(10px);';
+  modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
+
+  const papel = g.isAdmin ? '👑 Administrador' : '🧑 Guardião';
+  const verifiedBadge = g.verificadoRealmente
+    ? '<span style="color:#78ff99;font-size:0.68rem;margin-left:4px">✓ verificado</span>'
+    : (g.emailVerificado
+       ? '<span style="color:#FAC775;font-size:0.68rem;margin-left:4px">⚠ não confirmado</span>'
+       : '<span style="color:#ff8080;font-size:0.68rem;margin-left:4px">✗ sem verificação</span>');
+
+  modal.innerHTML = `
+    <div style="max-width:480px;width:100%;background:linear-gradient(135deg,#031027,#0a1a3d);border:1px solid rgba(0,180,255,0.4);border-radius:14px;padding:24px;color:#fff;font-family:'Exo 2',sans-serif;max-height:92vh;overflow-y:auto" onclick="event.stopPropagation()">
+      <div style="text-align:center;font-size:2.4rem;margin-bottom:8px">${g.emoji || '👤'}</div>
+      <div id="mc-title" style="text-align:center;font-family:'Orbitron',monospace;font-size:0.82rem;color:var(--blue-neon);letter-spacing:0.08em;font-weight:700;margin-bottom:6px">MINHA CONTA</div>
+      <div style="text-align:center;font-size:0.72rem;color:var(--text-dim);margin-bottom:6px">
+        ${papel}
+      </div>
+      <div style="text-align:center;font-size:0.68rem;color:var(--text-dim);margin-bottom:18px;font-style:italic">
+        Criado em ${g.criadoEm ? new Date(g.criadoEm).toLocaleDateString('pt-BR') : 'data desconhecida'}
+      </div>
+
+      <!-- Abas -->
+      <div style="display:flex;gap:4px;margin-bottom:16px;background:rgba(0,20,50,0.6);border-radius:10px;padding:4px" role="tablist">
+        <button role="tab" id="mc-tab-dados" onclick="window._mcMostrarAba('dados')" aria-selected="true" style="flex:1;padding:8px 6px;background:rgba(0,180,255,0.2);border:1px solid rgba(0,180,255,0.4);border-radius:7px;color:var(--blue-neon);font-family:'Orbitron',monospace;font-size:0.58rem;letter-spacing:0.05em;cursor:pointer;font-weight:700">📝 DADOS</button>
+        <button role="tab" id="mc-tab-senha" onclick="window._mcMostrarAba('senha')" aria-selected="false" style="flex:1;padding:8px 6px;background:transparent;border:1px solid rgba(0,180,255,0.2);border-radius:7px;color:var(--text-dim);font-family:'Orbitron',monospace;font-size:0.58rem;letter-spacing:0.05em;cursor:pointer">🔒 SENHA</button>
+        <button role="tab" id="mc-tab-atividade" onclick="window._mcMostrarAba('atividade')" aria-selected="false" style="flex:1;padding:8px 6px;background:transparent;border:1px solid rgba(0,180,255,0.2);border-radius:7px;color:var(--text-dim);font-family:'Orbitron',monospace;font-size:0.58rem;letter-spacing:0.05em;cursor:pointer">📊 ATIVIDADE</button>
+      </div>
+
+      <!-- ABA DADOS -->
+      <div id="mc-panel-dados" role="tabpanel">
+        <div class="ng-field">
+          <label class="ng-label">Nome completo</label>
+          <input type="text" id="mc-nome" class="ng-input" value="${_rcEsc(g.nome || '')}" maxlength="80" autocomplete="name">
+        </div>
+
+        <div class="ng-field">
+          <label class="ng-label">E-mail ${verifiedBadge}</label>
+          <input type="email" id="mc-email" class="ng-input" value="${_rcEsc(g.email || '')}" autocomplete="email" inputmode="email">
+          <div style="font-size:0.6rem;color:var(--text-dim);margin-top:4px;line-height:1.4">Se alterar, precisará reverificar o e-mail.</div>
+        </div>
+
+        <div class="ng-field">
+          <label class="ng-label">Data de nascimento</label>
+          <input type="date" id="mc-nascimento" class="ng-input" value="${g.nascimento || ''}" autocomplete="bday">
+        </div>
+
+        <div class="ng-field">
+          <label class="ng-label">Gênero</label>
+          <select id="mc-genero" class="ng-input" style="appearance:auto">
+            <option value="">— não informar —</option>
+            <option value="feminino" ${g.genero === 'feminino' ? 'selected' : ''}>👩 Feminino</option>
+            <option value="masculino" ${g.genero === 'masculino' ? 'selected' : ''}>🧔 Masculino</option>
+            <option value="nao-binario" ${g.genero === 'nao-binario' ? 'selected' : ''}>🧑 Não-binário</option>
+            <option value="prefere-nao-dizer" ${g.genero === 'prefere-nao-dizer' ? 'selected' : ''}>Prefiro não dizer</option>
+          </select>
+        </div>
+
+        <div class="ng-field">
+          <label class="ng-label">Emblema</label>
+          <button onclick="window._mcAbrirTrocaEmoji()" style="width:100%;padding:12px;background:rgba(0,30,70,0.6);border:1px solid rgba(0,180,255,0.3);border-radius:10px;color:#fff;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px">
+            <span style="font-size:1.5rem">${g.emoji || '👤'}</span>
+            <span style="font-size:0.72rem;color:var(--blue-neon);font-family:'Orbitron',monospace;letter-spacing:0.05em">Trocar emblema</span>
+          </button>
+        </div>
+
+        <div id="mc-dados-error" style="color:#ff8080;font-size:0.72rem;text-align:center;min-height:18px;margin-bottom:10px"></div>
+
+        <button onclick="window._mcSalvarDados()" style="width:100%;padding:13px;background:linear-gradient(135deg,#00d4ff,#c77dff);border:none;border-radius:10px;color:#fff;font-family:'Orbitron',monospace;font-size:0.74rem;letter-spacing:0.08em;cursor:pointer;font-weight:700;margin-bottom:10px">✓ SALVAR ALTERAÇÕES</button>
+      </div>
+
+      <!-- ABA SENHA -->
+      <div id="mc-panel-senha" role="tabpanel" style="display:none">
+        ${g.senhaHash ? `
+          <div style="background:rgba(0,180,255,0.08);border-left:3px solid var(--blue-neon);padding:10px 12px;border-radius:6px;margin-bottom:14px;font-size:0.74rem;color:var(--white);line-height:1.5">
+            🔒 Para trocar sua senha, confirme a senha atual e escolha uma nova.
+          </div>
+
+          <div class="ng-field">
+            <label class="ng-label">Senha atual</label>
+            <input type="password" id="mc-senha-atual" class="ng-input" placeholder="digite sua senha atual" autocomplete="current-password">
+          </div>
+
+          <div class="ng-field">
+            <label class="ng-label">Nova senha</label>
+            <input type="password" id="mc-senha-nova" class="ng-input" placeholder="mínimo 8 caracteres" autocomplete="new-password" minlength="8">
+            <div style="font-size:0.6rem;color:var(--text-dim);margin-top:4px;line-height:1.4">Use 8+ caracteres, com letras e números.</div>
+          </div>
+
+          <div class="ng-field">
+            <label class="ng-label">Confirmar nova senha</label>
+            <input type="password" id="mc-senha-confirm" class="ng-input" placeholder="digite novamente" autocomplete="new-password" minlength="8">
+          </div>
+
+          <div id="mc-senha-error" style="color:#ff8080;font-size:0.72rem;text-align:center;min-height:18px;margin-bottom:10px"></div>
+
+          <button onclick="window._mcTrocarSenha()" style="width:100%;padding:13px;background:linear-gradient(135deg,#00d4ff,#c77dff);border:none;border-radius:10px;color:#fff;font-family:'Orbitron',monospace;font-size:0.74rem;letter-spacing:0.08em;cursor:pointer;font-weight:700;margin-bottom:10px">🔐 TROCAR SENHA</button>
+        ` : `
+          <div style="background:rgba(250,199,117,0.1);border:1px solid rgba(250,199,117,0.3);border-radius:10px;padding:14px;font-size:0.78rem;color:var(--gold);line-height:1.55;margin-bottom:14px">
+            ⚠️ <strong>Você ainda não tem senha cadastrada.</strong><br>
+            <span style="color:var(--text-dim);font-size:0.72rem;display:inline-block;margin-top:6px">Defina uma senha para poder recuperar o acesso caso esqueça o PIN.</span>
+          </div>
+
+          <div class="ng-field">
+            <label class="ng-label">Nova senha</label>
+            <input type="password" id="mc-senha-nova" class="ng-input" placeholder="mínimo 8 caracteres" autocomplete="new-password" minlength="8">
+          </div>
+
+          <div class="ng-field">
+            <label class="ng-label">Confirmar senha</label>
+            <input type="password" id="mc-senha-confirm" class="ng-input" placeholder="digite novamente" autocomplete="new-password" minlength="8">
+          </div>
+
+          <div id="mc-senha-error" style="color:#ff8080;font-size:0.72rem;text-align:center;min-height:18px;margin-bottom:10px"></div>
+
+          <button onclick="window._mcDefinirSenha()" style="width:100%;padding:13px;background:linear-gradient(135deg,#78ff99,#00d4ff);border:none;border-radius:10px;color:#031027;font-family:'Orbitron',monospace;font-size:0.74rem;letter-spacing:0.08em;cursor:pointer;font-weight:700;margin-bottom:10px">🔑 DEFINIR SENHA</button>
+        `}
+
+        <div style="border-top:1px dashed rgba(255,128,128,0.3);margin:18px 0;padding-top:14px">
+          <div style="font-family:'Orbitron',monospace;font-size:0.6rem;color:#ff8080;letter-spacing:0.08em;margin-bottom:10px;text-align:center">⚠ ZONA DE PERIGO</div>
+          <button onclick="window._mcExcluirConta()" style="width:100%;padding:11px;background:rgba(255,128,128,0.12);border:1px solid rgba(255,128,128,0.4);border-radius:8px;color:#ff8080;font-family:'Orbitron',monospace;font-size:0.64rem;letter-spacing:0.06em;cursor:pointer">🗑 EXCLUIR MINHA CONTA</button>
+        </div>
+      </div>
+
+      <!-- ABA ATIVIDADE -->
+      <div id="mc-panel-atividade" role="tabpanel" style="display:none">
+        <div style="background:rgba(0,180,255,0.08);border-left:3px solid var(--blue-neon);padding:10px 12px;border-radius:6px;margin-bottom:14px;font-size:0.72rem;color:var(--text-dim);line-height:1.5">
+          📊 Últimas atividades registradas nesta conta.
+        </div>
+        <div id="mc-atividade-lista" style="max-height:50vh;overflow-y:auto;padding-right:4px"></div>
+      </div>
+
+      <button onclick="document.getElementById('modal-minha-conta').remove()" style="width:100%;padding:11px;margin-top:14px;background:rgba(0,60,120,0.5);border:1px solid rgba(0,180,255,0.3);border-radius:8px;color:var(--blue-neon);font-family:'Orbitron',monospace;font-size:0.66rem;letter-spacing:0.06em;cursor:pointer">Fechar</button>
+    </div>
+  `;
+  document.body.appendChild(modal);
+
+  if (typeof BFAudit !== 'undefined') BFAudit.log('minha_conta_aberto', { id: usuarioAtual });
+};
+
+// Troca de aba
+window._mcMostrarAba = function(aba) {
+  const abas = ['dados', 'senha', 'atividade'];
+  abas.forEach(a => {
+    const btn = document.getElementById(`mc-tab-${a}`);
+    const pan = document.getElementById(`mc-panel-${a}`);
+    const ativo = a === aba;
+    if (btn) {
+      btn.setAttribute('aria-selected', ativo ? 'true' : 'false');
+      btn.style.background = ativo ? 'rgba(0,180,255,0.2)' : 'transparent';
+      btn.style.borderColor = ativo ? 'rgba(0,180,255,0.4)' : 'rgba(0,180,255,0.2)';
+      btn.style.color = ativo ? 'var(--blue-neon)' : 'var(--text-dim)';
+      btn.style.fontWeight = ativo ? '700' : '400';
+    }
+    if (pan) pan.style.display = ativo ? 'block' : 'none';
+  });
+  if (aba === 'atividade') window._mcRenderAtividade();
+};
+
+// Trocar emblema (chama obRenderEmojiGrid reaproveitando)
+window._mcAbrirTrocaEmoji = function() {
+  const g = GUARDIOES[usuarioAtual];
+  if (!g) return;
+
+  const existente = document.getElementById('modal-troca-emoji-mc');
+  if (existente) existente.remove();
+
+  const modal = document.createElement('div');
+  modal.id = 'modal-troca-emoji-mc';
+  modal.setAttribute('role', 'dialog');
+  modal.setAttribute('aria-modal', 'true');
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,10,30,0.95);z-index:99999;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(10px);';
+  modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
+
+  // Reusa EMOJIS_DISPONIVEIS + categorias autorais
+  const autoraisIndices = window.BABYFORCE_AUTORAIS?.indices || [];
+  const autoraisNomes = window.BABYFORCE_AUTORAIS?.nomes || {};
+  let gridHtml = '';
+  gridHtml += `<div style="grid-column:1/-1;font-family:'Orbitron',monospace;font-size:0.55rem;color:var(--gold);letter-spacing:0.1em;padding:6px 4px 2px;opacity:0.85">✨ BABYFORCE — AUTORAIS</div>`;
+  autoraisIndices.forEach(i => {
+    const e = EMOJIS_DISPONIVEIS[i];
+    if (!e) return;
+    const nome = autoraisNomes[e] || '';
+    const sel = e === g.emoji ? 'sel' : '';
+    gridHtml += `<button class="emoji-btn emoji-autoral ${sel}" onclick="window._mcSelecionarEmoji('${e}')" title="${nome}" aria-label="${nome || 'Emblema'}">${e}</button>`;
+  });
+  gridHtml += `<div style="grid-column:1/-1;font-family:'Orbitron',monospace;font-size:0.55rem;color:var(--blue-neon);letter-spacing:0.1em;padding:10px 4px 2px;opacity:0.75">👥 DEMAIS EMBLEMAS</div>`;
+  for (let i = 0; i < EMOJIS_DISPONIVEIS.length; i++) {
+    if (autoraisIndices.includes(i)) continue;
+    const e = EMOJIS_DISPONIVEIS[i];
+    const sel = e === g.emoji ? 'sel' : '';
+    gridHtml += `<button class="emoji-btn ${sel}" onclick="window._mcSelecionarEmoji('${e}')" aria-label="Emblema">${e}</button>`;
+  }
+
+  modal.innerHTML = `
+    <div style="max-width:400px;width:100%;background:linear-gradient(135deg,#031027,#0a1a3d);border:1px solid rgba(255,224,102,0.4);border-radius:14px;padding:20px;color:#fff;font-family:'Exo 2',sans-serif;max-height:80vh;display:flex;flex-direction:column" onclick="event.stopPropagation()">
+      <div style="text-align:center;font-size:1.8rem;margin-bottom:4px">${g.emoji || '👤'}</div>
+      <div style="text-align:center;font-family:'Orbitron',monospace;font-size:0.74rem;color:var(--gold);letter-spacing:0.08em;font-weight:700;margin-bottom:14px">TROCAR EMBLEMA</div>
+      <div class="emoji-grid" style="overflow-y:auto">${gridHtml}</div>
+      <button onclick="document.getElementById('modal-troca-emoji-mc').remove()" style="margin-top:12px;width:100%;padding:10px;background:rgba(0,60,120,0.5);border:1px solid rgba(0,180,255,0.3);border-radius:8px;color:var(--blue-neon);font-family:'Orbitron',monospace;font-size:0.64rem;letter-spacing:0.06em;cursor:pointer">Fechar</button>
+    </div>
+  `;
+  document.body.appendChild(modal);
+};
+
+// Seleciona emblema e atualiza preview (não salva até apertar Salvar)
+window._mcSelecionarEmoji = function(emoji) {
+  // Salva provisoriamente no GUARDIOES em memória (não persiste ainda)
+  // Na verdade, aqui é mais simples: salva imediatamente
+  if (!usuarioAtual || !GUARDIOES[usuarioAtual]) return;
+  GUARDIOES[usuarioAtual].emoji = emoji;
+  saveGuardioes(GUARDIOES);
+
+  // Fecha modal
+  const modal = document.getElementById('modal-troca-emoji-mc');
+  if (modal) modal.remove();
+
+  // Reabrir Minha Conta para refletir o novo emoji
+  window.abrirMinhaConta();
+
+  if (typeof BFAudit !== 'undefined') BFAudit.log('emblema_alterado', { id: usuarioAtual, emoji });
+  if (typeof showToast === 'function') showToast('✓ Emblema atualizado!');
+  if (typeof renderListaGuardioes === 'function') renderListaGuardioes();
+  if (typeof atualizarUserBadge === 'function') atualizarUserBadge();
+};
+
+// Salva alterações da aba DADOS
+window._mcSalvarDados = async function() {
+  const g = GUARDIOES[usuarioAtual];
+  if (!g) return;
+
+  const nome = (document.getElementById('mc-nome')?.value || '').trim();
+  const email = (document.getElementById('mc-email')?.value || '').trim().toLowerCase();
+  const nascimento = document.getElementById('mc-nascimento')?.value || '';
+  const genero = document.getElementById('mc-genero')?.value || '';
+  const errEl = document.getElementById('mc-dados-error');
+
+  // Validações
+  if (!nome || nome.length < 3) { errEl.textContent = '⚠ Nome deve ter ao menos 3 caracteres'; return; }
+  if (email && !validarEmail(email)) { errEl.textContent = '⚠ E-mail inválido'; return; }
+  if (nascimento && typeof validarDataNascimento === 'function' && !validarDataNascimento(nascimento)) {
+    errEl.textContent = '⚠ Data de nascimento inválida';
+    return;
+  }
+
+  // Detecta mudança de email (pra marcar como não verificado e oferecer reverificação)
+  const emailMudou = email !== (g.email || '').toLowerCase();
+
+  // Atualiza
+  GUARDIOES[usuarioAtual].nome = nome;
+  GUARDIOES[usuarioAtual].email = email;
+  GUARDIOES[usuarioAtual].nascimento = nascimento;
+  GUARDIOES[usuarioAtual].genero = genero;
+  if (emailMudou) {
+    GUARDIOES[usuarioAtual].emailVerificado = false;
+    GUARDIOES[usuarioAtual].verificadoRealmente = false;
+  }
+  saveGuardioes(GUARDIOES);
+
+  if (typeof BFAudit !== 'undefined') {
+    BFAudit.log('minha_conta_dados_salvos', {
+      id: usuarioAtual,
+      emailMudou,
+    });
+  }
+
+  document.getElementById('modal-minha-conta').remove();
+
+  if (emailMudou && email) {
+    const reverificar = await BFModal.confirm({
+      title: 'E-mail alterado',
+      icon: '📧',
+      variant: 'warn',
+      message: `Seu novo e-mail (${email}) ainda não foi verificado.\n\nDeseja enviar um link de verificação agora?`,
+      okLabel: 'Enviar link',
+      cancelLabel: 'Depois',
+    });
+    if (reverificar) {
+      await window._mcEnviarReverificacao();
+    }
+  } else {
+    await BFModal.alert({
+      title: 'Dados atualizados',
+      icon: '✓',
+      variant: 'success',
+      message: 'Suas informações foram salvas com sucesso!',
+    });
+  }
+
+  if (typeof renderListaGuardioes === 'function') renderListaGuardioes();
+  if (typeof atualizarUserBadge === 'function') atualizarUserBadge();
+};
+
+// Envia link de reverificação do email (se usuário alterou)
+window._mcEnviarReverificacao = async function() {
+  const g = GUARDIOES[usuarioAtual];
+  if (!g || !g.email) return;
+
+  try {
+    if (typeof firebase === 'undefined' || !firebase.auth) {
+      await BFModal.alert({
+        title: 'Firebase indisponível',
+        icon: '⚠️',
+        variant: 'warn',
+        message: 'Não foi possível enviar o link agora (modo offline).\n\nVocê pode tentar novamente depois em Minha Conta.',
+      });
+      return;
+    }
+    if (typeof initFirebaseRefs === 'function') initFirebaseRefs();
+    const actionCodeSettings = {
+      url: window.location.origin + window.location.pathname + '?reverifyEmail=1',
+      handleCodeInApp: true,
+    };
+    await firebase.auth().sendSignInLinkToEmail(g.email, actionCodeSettings);
+
+    try { localStorage.setItem('babyforce_reverify_email_v1', JSON.stringify({
+      guardiaoId: usuarioAtual,
+      email: g.email,
+      enviadoEm: Date.now(),
+    })); } catch {}
+
+    if (typeof BFAudit !== 'undefined') BFAudit.log('reverify_email_enviado', { id: usuarioAtual });
+    await BFModal.alert({
+      title: 'Link enviado',
+      icon: '✓',
+      variant: 'success',
+      message: `Enviamos um link de verificação para ${g.email}.\n\nConfira sua caixa de entrada (e o spam).`,
+    });
+  } catch (e) {
+    if (typeof BFAudit !== 'undefined') BFAudit.log('reverify_email_falha', { erro: e.code || 'unknown' });
+    await BFModal.alert({
+      title: 'Erro ao enviar',
+      icon: '✗',
+      variant: 'danger',
+      message: 'Não foi possível enviar o link agora.\n\n' + (e.message || 'Erro desconhecido'),
+    });
+  }
+};
+
+// Troca senha (requer senha atual)
+window._mcTrocarSenha = async function() {
+  const g = GUARDIOES[usuarioAtual];
+  if (!g) return;
+
+  const senhaAtual = document.getElementById('mc-senha-atual')?.value || '';
+  const nova = document.getElementById('mc-senha-nova')?.value || '';
+  const confirm = document.getElementById('mc-senha-confirm')?.value || '';
+  const errEl = document.getElementById('mc-senha-error');
+
+  if (!senhaAtual) { errEl.textContent = '⚠ Informe sua senha atual'; return; }
+  if (nova.length < 8) { errEl.textContent = '⚠ Nova senha precisa ter 8+ caracteres'; return; }
+  if (!/[a-zA-Z]/.test(nova) || !/[0-9]/.test(nova)) { errEl.textContent = '⚠ Nova senha: letras E números'; return; }
+  if (nova !== confirm) { errEl.textContent = '⚠ Nova senha e confirmação não conferem'; return; }
+  if (nova === senhaAtual) { errEl.textContent = '⚠ Nova senha deve ser diferente da atual'; return; }
+
+  // Verifica senha atual
+  try {
+    const atualOk = await _verificarSenhaGuardiao(usuarioAtual, senhaAtual);
+    if (!atualOk) {
+      errEl.textContent = '⚠ Senha atual incorreta';
+      if (typeof BFAudit !== 'undefined') BFAudit.log('mc_troca_senha_falha_atual', { id: usuarioAtual });
+      return;
+    }
+
+    // Gera novo hash
+    const saltBytes = crypto.getRandomValues(new Uint8Array(16));
+    const salt = btoa(String.fromCharCode(...saltBytes));
+    let hash;
+    if (typeof BFSec !== 'undefined' && BFSec.sha256) {
+      hash = await BFSec.sha256(nova + salt);
+    } else {
+      const data = new TextEncoder().encode(nova + salt);
+      const buf = await crypto.subtle.digest('SHA-256', data);
+      hash = Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    GUARDIOES[usuarioAtual].senhaHash = hash;
+    GUARDIOES[usuarioAtual].senhaSalt = salt;
+    GUARDIOES[usuarioAtual].senhaRedefinidaEm = new Date().toISOString();
+    saveGuardioes(GUARDIOES);
+
+    if (typeof BFAudit !== 'undefined') BFAudit.log('mc_senha_trocada', { id: usuarioAtual });
+
+    document.getElementById('modal-minha-conta').remove();
+    await BFModal.alert({
+      title: 'Senha atualizada',
+      icon: '✓',
+      variant: 'success',
+      message: 'Sua senha foi trocada com sucesso!\n\nUse a nova senha no próximo login.',
+    });
+  } catch (e) {
+    errEl.textContent = '✗ Erro ao trocar senha';
+    if (typeof BFAudit !== 'undefined') BFAudit.log('mc_troca_senha_erro', { erro: String(e.message || e) });
+  }
+};
+
+// Define senha (se não tinha ainda)
+window._mcDefinirSenha = async function() {
+  const g = GUARDIOES[usuarioAtual];
+  if (!g) return;
+
+  const nova = document.getElementById('mc-senha-nova')?.value || '';
+  const confirm = document.getElementById('mc-senha-confirm')?.value || '';
+  const errEl = document.getElementById('mc-senha-error');
+
+  if (nova.length < 8) { errEl.textContent = '⚠ Senha precisa ter 8+ caracteres'; return; }
+  if (!/[a-zA-Z]/.test(nova) || !/[0-9]/.test(nova)) { errEl.textContent = '⚠ Use letras E números'; return; }
+  if (nova !== confirm) { errEl.textContent = '⚠ Senhas não conferem'; return; }
+
+  try {
+    const saltBytes = crypto.getRandomValues(new Uint8Array(16));
+    const salt = btoa(String.fromCharCode(...saltBytes));
+    let hash;
+    if (typeof BFSec !== 'undefined' && BFSec.sha256) {
+      hash = await BFSec.sha256(nova + salt);
+    } else {
+      const data = new TextEncoder().encode(nova + salt);
+      const buf = await crypto.subtle.digest('SHA-256', data);
+      hash = Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    GUARDIOES[usuarioAtual].senhaHash = hash;
+    GUARDIOES[usuarioAtual].senhaSalt = salt;
+    GUARDIOES[usuarioAtual].senhaRedefinidaEm = new Date().toISOString();
+    delete GUARDIOES[usuarioAtual].precisaMigrarSenha;
+    saveGuardioes(GUARDIOES);
+
+    if (typeof BFAudit !== 'undefined') BFAudit.log('mc_senha_definida', { id: usuarioAtual });
+
+    document.getElementById('modal-minha-conta').remove();
+    await BFModal.alert({
+      title: 'Senha criada',
+      icon: '🔑',
+      variant: 'success',
+      message: 'Sua senha foi definida com sucesso!\n\nAgora você pode recuperar o acesso caso esqueça o PIN.',
+    });
+  } catch (e) {
+    errEl.textContent = '✗ Erro ao definir senha';
+  }
+};
+
+// Excluir conta (com confirmação dupla + transferência de admin se necessário)
+window._mcExcluirConta = async function() {
+  const g = GUARDIOES[usuarioAtual];
+  if (!g) return;
+
+  // Primeira confirmação
+  const c1 = await BFModal.confirm({
+    title: 'Excluir minha conta',
+    icon: '⚠️',
+    variant: 'danger',
+    message: `Tem certeza que deseja excluir sua conta de guardião?\n\n• Seus registros de bebê NÃO serão apagados (ficam no app)\n• Você não conseguirá mais entrar com esta identidade\n• Esta ação é IRREVERSÍVEL`,
+    okLabel: 'Continuar',
+    cancelLabel: 'Cancelar',
+  });
+  if (!c1) return;
+
+  // Se é admin único, precisa transferir antes
+  const outrosAdmins = Object.keys(GUARDIOES).filter(id => id !== usuarioAtual && GUARDIOES[id].isAdmin);
+  const outrosNaoAdmins = Object.keys(GUARDIOES).filter(id => id !== usuarioAtual && !GUARDIOES[id].isAdmin);
+
+  if (g.isAdmin && outrosAdmins.length === 0 && outrosNaoAdmins.length > 0) {
+    await BFModal.alert({
+      title: 'Transferência obrigatória',
+      icon: '👑',
+      variant: 'warn',
+      message: `Você é o ÚNICO administrador.\n\nAntes de excluir sua conta, é necessário promover outro guardião a administrador.\n\nVá em "Gerenciar família" e promova alguém.`,
+    });
+    return;
+  }
+
+  // Segunda confirmação — pede senha ou palavra-chave
+  const palavra = await BFModal.prompt({
+    title: 'Confirmação final',
+    icon: '🔒',
+    variant: 'danger',
+    message: `Para confirmar, digite a palavra: EXCLUIR\n\n(em maiúsculas)`,
+    placeholder: 'EXCLUIR',
+    okLabel: 'Confirmar exclusão',
+    cancelLabel: 'Cancelar',
+  });
+
+  if (palavra !== 'EXCLUIR') {
+    if (palavra !== null) {
+      await BFModal.alert({
+        title: 'Exclusão cancelada',
+        icon: 'ℹ️',
+        variant: 'info',
+        message: 'A palavra digitada não bate. Sua conta NÃO foi excluída.',
+      });
+    }
+    return;
+  }
+
+  // Executa exclusão
+  if (typeof BFAudit !== 'undefined') BFAudit.log('conta_excluida', { id: usuarioAtual, nome: g.nome, eraAdmin: g.isAdmin });
+
+  delete GUARDIOES[usuarioAtual];
+  saveGuardioes(GUARDIOES);
+
+  // Limpa sessão
+  try { sessionStorage.removeItem(SESSION_KEY); } catch {}
+  try { localStorage.removeItem(AUTOLOGIN_KEY); } catch {}
+  try { localStorage.removeItem(LEMBRAR_KEY); } catch {}
+
+  document.getElementById('modal-minha-conta').remove();
+
+  await BFModal.alert({
+    title: 'Conta excluída',
+    icon: '✓',
+    variant: 'info',
+    message: `Sua conta de guardião foi excluída com sucesso.\n\nO app vai recarregar agora.`,
+  });
+
+  setTimeout(() => location.reload(), 500);
+};
+
+// Renderiza histórico de atividades (últimos 30 registros do usuário)
+window._mcRenderAtividade = function() {
+  const lista = document.getElementById('mc-atividade-lista');
+  if (!lista) return;
+
+  let eventos = [];
+  try {
+    if (typeof BFAudit !== 'undefined' && BFAudit.listar) {
+      const todos = BFAudit.listar() || [];
+      // Filtra por eventos que referenciam o usuário atual (ou de interesse geral)
+      eventos = todos
+        .filter(ev => !ev.meta || !ev.meta.id || ev.meta.id === usuarioAtual || ev.evento.startsWith('login'))
+        .slice(0, 30);
+    }
+  } catch (e) { console.warn('[mc atividade]', e); }
+
+  if (!eventos.length) {
+    lista.innerHTML = `<div style="text-align:center;color:var(--text-dim);font-size:0.76rem;padding:20px;font-style:italic">Sem atividades registradas ainda.</div>`;
+    return;
+  }
+
+  // Formatação de cada evento
+  const iconMap = {
+    'login_sucesso': '🔓', 'login_senha_sucesso': '🔓',
+    'login_falha': '⛔', 'login_senha_falha': '⛔',
+    'logout': '👋',
+    'admin_criado': '👑', 'admin_promovido': '👑', 'admin_revogado': '🎖',
+    'guardiao_removido': '🗑',
+    'convite_enviado': '📨', 'convite_aceito': '✓',
+    'minha_conta_aberto': '👤', 'minha_conta_dados_salvos': '✏️',
+    'mc_senha_trocada': '🔐', 'mc_senha_definida': '🔑',
+    'senha_redefinida': '🔑',
+    'emblema_alterado': '🎭',
+    'recuperar_senha_aberto': '🔓', 'recuperar_senha_link_enviado': '📧',
+    'reverify_email_enviado': '📧',
+    'conta_excluida': '🗑',
+  };
+
+  const labelMap = {
+    'login_sucesso': 'Login com PIN',
+    'login_senha_sucesso': 'Login com senha',
+    'login_falha': 'Tentativa de login falha',
+    'login_senha_falha': 'Tentativa de login (senha) falha',
+    'admin_criado': 'Administrador criado',
+    'admin_promovido': 'Guardião promovido a admin',
+    'admin_revogado': 'Admin revogado',
+    'guardiao_removido': 'Guardião removido',
+    'convite_enviado': 'Convite enviado',
+    'convite_aceito': 'Convite aceito',
+    'minha_conta_aberto': 'Acesso à Minha Conta',
+    'minha_conta_dados_salvos': 'Dados da conta atualizados',
+    'mc_senha_trocada': 'Senha trocada',
+    'mc_senha_definida': 'Senha criada',
+    'senha_redefinida': 'Senha redefinida (recuperação)',
+    'emblema_alterado': 'Emblema trocado',
+    'recuperar_senha_aberto': 'Recuperação de senha iniciada',
+    'recuperar_senha_link_enviado': 'Link de recuperação enviado',
+    'reverify_email_enviado': 'Link de reverificação enviado',
+    'conta_excluida': 'Conta excluída',
+  };
+
+  const html = eventos.map(ev => {
+    const icon = iconMap[ev.evento] || '•';
+    const label = labelMap[ev.evento] || ev.evento.replace(/_/g, ' ');
+    const data = ev.ts ? new Date(ev.ts).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' }) : '—';
+    return `<div style="padding:10px 12px;background:rgba(0,30,70,0.35);border:1px solid rgba(0,180,255,0.15);border-radius:8px;margin-bottom:6px;display:flex;align-items:flex-start;gap:10px">
+      <span style="font-size:1rem;flex-shrink:0" aria-hidden="true">${icon}</span>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:0.76rem;color:var(--white);line-height:1.3">${_rcEsc(label)}</div>
+        <div style="font-size:0.64rem;color:var(--text-dim);margin-top:2px">${data}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  lista.innerHTML = html;
+};
+
+// Detecta retorno do magic link de reverificação de email
+(function() {
+  document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(async () => {
+      if (!location.search.includes('reverifyEmail=1')) return;
+      try {
+        const raw = localStorage.getItem('babyforce_reverify_email_v1');
+        if (!raw) return;
+        const pendente = JSON.parse(raw);
+        if (!pendente || !pendente.guardiaoId) return;
+
+        if (typeof firebase !== 'undefined' && firebase.auth
+            && firebase.auth().isSignInWithEmailLink(window.location.href)) {
+          try {
+            await firebase.auth().signInWithEmailLink(pendente.email, window.location.href);
+            try { await firebase.auth().signOut(); } catch {}
+
+            // Marca email como verificado
+            if (GUARDIOES[pendente.guardiaoId]) {
+              GUARDIOES[pendente.guardiaoId].emailVerificado = true;
+              GUARDIOES[pendente.guardiaoId].verificadoRealmente = true;
+              saveGuardioes(GUARDIOES);
+            }
+
+            try { localStorage.removeItem('babyforce_reverify_email_v1'); } catch {}
+            try { window.history.replaceState({}, document.title, window.location.pathname); } catch {}
+
+            if (typeof BFAudit !== 'undefined') BFAudit.log('reverify_email_validado', { id: pendente.guardiaoId });
+
+            if (typeof BFModal !== 'undefined') {
+              await BFModal.alert({
+                title: 'E-mail reverificado',
+                icon: '✓',
+                variant: 'success',
+                message: 'Seu e-mail foi confirmado com sucesso!',
+              });
+            }
+          } catch (e) {
+            console.warn('[reverify]', e);
+          }
+        }
+      } catch (e) { console.warn('[reverifyEmail handler]', e); }
+    }, 1800);
+  });
+})();
 
 // ═══════════════════════════════════════════════════════════════
 // FASE 3 — UI de Gestão de Administradores
@@ -9655,6 +10792,11 @@ async function obEnviarCodigoVerificacao() {
   document.getElementById('ob-step-2-email').classList.add('active');
   obAtualizarDots(2);
 
+  // C1 — feedback visual imediato: "enviando..."
+  if (typeof _obAtualizarVerifyStatusBar === 'function') {
+    _obAtualizarVerifyStatusBar('sending', 'Enviando link para seu e-mail...', 'Aguarde alguns segundos');
+  }
+
   // 6. Enviar magic link via Firebase
   try {
     if (typeof firebase === 'undefined' || !firebase.auth) {
@@ -9683,6 +10825,14 @@ async function obEnviarCodigoVerificacao() {
         ✓ <strong>Link enviado!</strong> Verifique sua caixa de entrada (e spam).
       </div>`;
     }
+    // C1 — feedback visual de sucesso + polling + countdown
+    if (typeof _obAtualizarVerifyStatusBar === 'function') {
+      _obAtualizarVerifyStatusBar('waiting',
+        'Link enviado! Aguardando você clicar no e-mail',
+        'O app detecta automaticamente quando você volta');
+    }
+    if (typeof _obIniciarPollingVerify === 'function') _obIniciarPollingVerify();
+    if (typeof _obIniciarCountdownReenviar === 'function') _obIniciarCountdownReenviar(60);
     _obReenviarTimestamp = Date.now();
   } catch (e) {
     console.warn('[obEnviar] Firebase falhou:', e);
@@ -9692,6 +10842,12 @@ async function obEnviarCodigoVerificacao() {
         Motivo: ${_rcEsc(e.message || 'conexão indisponível')}.<br>
         Clique em <strong>"Já verifiquei"</strong> para continuar (modo offline).
       </div>`;
+    }
+    // C1 — status bar de erro (modo offline)
+    if (typeof _obAtualizarVerifyStatusBar === 'function') {
+      _obAtualizarVerifyStatusBar('error',
+        'Não foi possível enviar o e-mail real',
+        'Modo offline ativado. Clique em "Já verifiquei" para continuar');
     }
     if (typeof BFAudit !== 'undefined') BFAudit.log('ob_magic_link_falha', { erro: e.code || 'unknown' });
   }
@@ -9703,6 +10859,7 @@ async function obEnviarCodigoVerificacao() {
  */
 async function obVerificarEmailClicado() {
   const statusEl = document.getElementById('ob-verify-status');
+  const btn = document.getElementById('ob-btn-verificar');
   if (!_obAdminDados) {
     // Tenta recuperar de localStorage (caso a página tenha sido recarregada após magic link)
     try {
@@ -9712,7 +10869,16 @@ async function obVerificarEmailClicado() {
   }
   if (!_obAdminDados) {
     if (statusEl) statusEl.innerHTML = '<span style="color:#ff8080">✗ Dados perdidos. Volte ao passo anterior.</span>';
+    if (typeof _obAtualizarVerifyStatusBar === 'function') {
+      _obAtualizarVerifyStatusBar('error', 'Dados perdidos', 'Volte ao passo anterior e refaça o cadastro');
+    }
     return;
+  }
+
+  // UX: desabilita botão e indica que está verificando
+  if (btn) btn.disabled = true;
+  if (typeof _obAtualizarVerifyStatusBar === 'function') {
+    _obAtualizarVerifyStatusBar('sending', 'Verificando...', 'Aguarde');
   }
 
   // Tentar validar via Firebase (se disponível)
@@ -9737,6 +10903,33 @@ async function obVerificarEmailClicado() {
     console.warn('[obVerificar]', e);
   }
 
+  // Se NÃO verificado de verdade, pergunta ao usuário se quer continuar em modo offline
+  if (!verificadoDeVerdade) {
+    // C1 — substituir confirm() feio por BFModal estético
+    const continuar = await (typeof BFModal !== 'undefined'
+      ? BFModal.confirm({
+          title: 'E-mail ainda não verificado',
+          icon: '⚠️',
+          variant: 'warn',
+          message: 'Não conseguimos confirmar que você clicou no link enviado.\n\n' +
+                   '• OK: continua sem verificação (modo offline — e-mail marcado como "não verificado")\n' +
+                   '• Cancelar: volta e você clica no link do e-mail primeiro',
+          okLabel: 'Continuar mesmo assim',
+          cancelLabel: 'Voltar e verificar',
+        })
+      : Promise.resolve(confirm('E-mail não foi verificado. Continuar mesmo assim?')));
+
+    if (!continuar) {
+      if (btn) btn.disabled = false;
+      if (typeof _obAtualizarVerifyStatusBar === 'function') {
+        _obAtualizarVerifyStatusBar('waiting',
+          'Aguardando você clicar no link do e-mail',
+          'Confira sua caixa de entrada e o spam');
+      }
+      return;
+    }
+  }
+
   // Marcar como verificado (de verdade OU em modo offline permissivo)
   _obAdminDados.emailVerificado = true;
   _obAdminDados.verificadoRealmente = verificadoDeVerdade;
@@ -9746,14 +10939,28 @@ async function obVerificarEmailClicado() {
     BFAudit.log('ob_email_verificado', { real: verificadoDeVerdade });
   }
 
-  // Avançar para step 3 (bebê)
-  _obCurrentStep = 3;
-  document.getElementById('ob-step-2-email').classList.remove('active');
-  document.getElementById('ob-step-3-bebe').classList.add('active');
-  obAtualizarDots(3);
-  const inp = document.getElementById('ob-nasc-bebe');
-  if (inp && !inp.value) inp.value = todayISO();
-  if (statusEl) statusEl.innerHTML = '';
+  // C1 — feedback de sucesso antes de avançar
+  if (typeof _obAtualizarVerifyStatusBar === 'function') {
+    _obAtualizarVerifyStatusBar('success',
+      verificadoDeVerdade ? 'E-mail verificado com sucesso!' : 'Continuando em modo offline',
+      'Avançando para o próximo passo...');
+  }
+
+  // Parar polling e countdown
+  if (_obPollingVerifyInterval) { clearInterval(_obPollingVerifyInterval); _obPollingVerifyInterval = null; }
+  if (_obReenviarCountdownInterval) { clearInterval(_obReenviarCountdownInterval); _obReenviarCountdownInterval = null; }
+
+  // Avançar para step 3 (bebê) após breve pausa (mostra sucesso)
+  setTimeout(() => {
+    _obCurrentStep = 3;
+    document.getElementById('ob-step-2-email').classList.remove('active');
+    document.getElementById('ob-step-3-bebe').classList.add('active');
+    obAtualizarDots(3);
+    const inp = document.getElementById('ob-nasc-bebe');
+    if (inp && !inp.value) inp.value = todayISO();
+    if (statusEl) statusEl.innerHTML = '';
+    if (btn) btn.disabled = false;
+  }, 1200);
 }
 
 /**
@@ -9762,7 +10969,9 @@ async function obVerificarEmailClicado() {
 async function obReenviarCodigo() {
   const statusEl = document.getElementById('ob-verify-status');
   if (!_obAdminDados || !_obAdminDados.email) {
-    if (statusEl) statusEl.innerHTML = '<span style="color:#ff8080">✗ Dados perdidos</span>';
+    if (typeof _obAtualizarVerifyStatusBar === 'function') {
+      _obAtualizarVerifyStatusBar('error', 'Dados perdidos', 'Volte e refaça o cadastro');
+    }
     return;
   }
   // Rate limit: 60s entre reenvios
@@ -9770,9 +10979,21 @@ async function obReenviarCodigo() {
   const elapsed = agora - _obReenviarTimestamp;
   if (elapsed < 60000) {
     const restante = Math.ceil((60000 - elapsed) / 1000);
-    if (statusEl) statusEl.innerHTML = `<span style="color:#FAC775">⏱ Aguarde ${restante}s antes de reenviar</span>`;
+    if (typeof _obAtualizarVerifyStatusBar === 'function') {
+      _obAtualizarVerifyStatusBar('error',
+        `Aguarde ${restante}s antes de reenviar`,
+        'Limite para evitar spam ao seu e-mail');
+    }
+    // Garante que countdown está visível
+    if (typeof _obIniciarCountdownReenviar === 'function') _obIniciarCountdownReenviar(restante);
     return;
   }
+
+  // UX: mostra estado "enviando"
+  if (typeof _obAtualizarVerifyStatusBar === 'function') {
+    _obAtualizarVerifyStatusBar('sending', 'Reenviando link...', 'Aguarde alguns segundos');
+  }
+
   try {
     if (typeof firebase === 'undefined' || !firebase.auth) throw new Error('Firebase não disponível');
     if (typeof initFirebaseRefs === 'function') initFirebaseRefs();
@@ -9782,10 +11003,30 @@ async function obReenviarCodigo() {
     };
     await firebase.auth().sendSignInLinkToEmail(_obAdminDados.email, actionCodeSettings);
     _obReenviarTimestamp = agora;
-    if (statusEl) statusEl.innerHTML = '<span style="color:#78ff99">✓ Link reenviado!</span>';
     if (typeof BFAudit !== 'undefined') BFAudit.log('ob_magic_link_reenviado');
+
+    // UX sucesso — volta para waiting + countdown
+    if (typeof _obAtualizarVerifyStatusBar === 'function') {
+      _obAtualizarVerifyStatusBar('success',
+        'Link reenviado com sucesso!',
+        'Confira seu e-mail (e o spam)');
+    }
+    if (typeof _obIniciarCountdownReenviar === 'function') _obIniciarCountdownReenviar(60);
+    // Depois de 2s volta ao estado waiting
+    setTimeout(() => {
+      if (typeof _obAtualizarVerifyStatusBar === 'function') {
+        _obAtualizarVerifyStatusBar('waiting',
+          'Aguardando você clicar no link',
+          'O app detecta automaticamente quando você volta');
+      }
+    }, 2500);
   } catch (e) {
-    if (statusEl) statusEl.innerHTML = `<span style="color:#ff8080">✗ Erro: ${_rcEsc(e.message || 'falha')}</span>`;
+    if (typeof _obAtualizarVerifyStatusBar === 'function') {
+      _obAtualizarVerifyStatusBar('error',
+        'Erro ao reenviar',
+        String(e.message || 'falha de conexão').substring(0, 80));
+    }
+    if (typeof BFAudit !== 'undefined') BFAudit.log('ob_magic_link_reenvio_falha', { erro: e.code || 'unknown' });
   }
 }
 
@@ -9811,10 +11052,134 @@ async function obReenviarCodigo() {
   });
 })();
 
+// ═══════════════════════════════════════════════════════════════
+// C1 — Helpers UX do step 2 (verify email)
+// ═══════════════════════════════════════════════════════════════
+
+// Atualiza o status bar visual (waiting / sending / success / error)
+window._obAtualizarVerifyStatusBar = function(estado, msg, sub) {
+  const bar = document.getElementById('ob-verify-status-bar');
+  if (!bar) return;
+  bar.className = 'verify-status-bar ' + (estado || 'waiting');
+  const icons = {
+    waiting: '<span class="verify-spinner" aria-hidden="true"></span>',
+    sending: '<span class="verify-spinner" aria-hidden="true"></span>',
+    success: '<span style="font-size:1.2rem" aria-hidden="true">✅</span>',
+    error:   '<span style="font-size:1.2rem" aria-hidden="true">⚠️</span>',
+  };
+  const corTitulo = {
+    waiting: 'var(--white)',
+    sending: 'var(--gold)',
+    success: '#78ff99',
+    error:   '#ff8080',
+  };
+  bar.innerHTML = `${icons[estado] || icons.waiting}
+    <div style="flex:1">
+      <div style="color:${corTitulo[estado] || 'var(--white)'};font-weight:600">${msg || ''}</div>
+      ${sub ? `<div style="font-size:0.68rem;color:var(--text-dim);margin-top:2px">${sub}</div>` : ''}
+    </div>`;
+};
+
+// Countdown regressivo no botão Reenviar (60s após envio)
+let _obReenviarCountdownInterval = null;
+window._obIniciarCountdownReenviar = function(segundos) {
+  const btn = document.getElementById('ob-btn-reenviar');
+  const spanTimer = document.getElementById('ob-reenviar-countdown');
+  if (!btn || !spanTimer) return;
+
+  if (_obReenviarCountdownInterval) clearInterval(_obReenviarCountdownInterval);
+
+  let restante = segundos;
+  const atualizar = () => {
+    if (restante <= 0) {
+      btn.classList.remove('btn-disabled-countdown');
+      spanTimer.textContent = '';
+      clearInterval(_obReenviarCountdownInterval);
+      _obReenviarCountdownInterval = null;
+      return;
+    }
+    btn.classList.add('btn-disabled-countdown');
+    spanTimer.textContent = ` (${restante}s)`;
+    restante--;
+  };
+  atualizar();
+  _obReenviarCountdownInterval = setInterval(atualizar, 1000);
+};
+
+// Polling: verifica automaticamente a cada 3s se o usuário voltou da URL do magic link
+// Para quando sai do step 2 ou depois de 5 minutos
+let _obPollingVerifyInterval = null;
+window._obIniciarPollingVerify = function() {
+  if (_obPollingVerifyInterval) clearInterval(_obPollingVerifyInterval);
+  let tentativas = 0;
+  const MAX_TENTATIVAS = 100; // 100 × 3s = 5 minutos
+
+  _obPollingVerifyInterval = setInterval(() => {
+    tentativas++;
+    const step2 = document.getElementById('ob-step-2-email');
+    if (!step2 || !step2.classList.contains('active')) {
+      clearInterval(_obPollingVerifyInterval);
+      _obPollingVerifyInterval = null;
+      return;
+    }
+    if (tentativas >= MAX_TENTATIVAS) {
+      clearInterval(_obPollingVerifyInterval);
+      _obPollingVerifyInterval = null;
+      return;
+    }
+    // Verifica se a URL atual tem o magic link
+    try {
+      if (typeof firebase !== 'undefined' && firebase.auth
+          && firebase.auth().isSignInWithEmailLink
+          && firebase.auth().isSignInWithEmailLink(window.location.href)) {
+        clearInterval(_obPollingVerifyInterval);
+        _obPollingVerifyInterval = null;
+        // Dispara verificação automática
+        obVerificarEmailClicado();
+      }
+    } catch {}
+  }, 3000);
+};
+
+// Detecção de retorno de foco (usuário saiu pra email client e voltou)
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) {
+    const step2 = document.getElementById('ob-step-2-email');
+    if (step2 && step2.classList.contains('active') && _obAdminDados) {
+      // Usuário voltou — atualiza status dizendo "voltou!"
+      if (typeof _obAtualizarVerifyStatusBar === 'function') {
+        _obAtualizarVerifyStatusBar('waiting', 'Você voltou! Clique em "Já verifiquei" para continuar', 'Ou clique no link do e-mail para confirmar automaticamente');
+      }
+    }
+  }
+});
+
 function obRenderEmojiGrid(){
   const grid=document.getElementById('ob-emoji-grid');
   if(!grid)return;
-  grid.innerHTML=EMOJIS_DISPONIVEIS.map(e=>`<button class="emoji-btn ${e===_obEmojiGuardiao?'sel':''}" onclick="obSelecionarEmoji('${e}',this)">${e}</button>`).join('');
+  // Bug 1: agrupar visualmente — autorais primeiro com destaque
+  const autoraisIndices = window.BABYFORCE_AUTORAIS?.indices || [];
+  const autoraisNomes = window.BABYFORCE_AUTORAIS?.nomes || {};
+  const total = EMOJIS_DISPONIVEIS.length;
+  let html = '';
+  // Categoria 1: Autorais BabyForce
+  html += `<div style="grid-column:1/-1;font-family:'Orbitron',monospace;font-size:0.55rem;color:var(--gold);letter-spacing:0.1em;padding:6px 4px 2px;opacity:0.85">✨ BABYFORCE — AUTORAIS</div>`;
+  autoraisIndices.forEach(i => {
+    const e = EMOJIS_DISPONIVEIS[i];
+    if (!e) return;
+    const nomeAutoral = autoraisNomes[e] || '';
+    const sel = e === _obEmojiGuardiao ? 'sel' : '';
+    html += `<button class="emoji-btn emoji-autoral ${sel}" onclick="obSelecionarEmoji('${e}',this)" title="${nomeAutoral}" aria-label="${nomeAutoral || 'Emblema'}">${e}</button>`;
+  });
+  // Categoria 2: Demais (todos os outros)
+  html += `<div style="grid-column:1/-1;font-family:'Orbitron',monospace;font-size:0.55rem;color:var(--blue-neon);letter-spacing:0.1em;padding:10px 4px 2px;opacity:0.75">👥 DEMAIS EMBLEMAS</div>`;
+  for (let i = 0; i < total; i++) {
+    if (autoraisIndices.includes(i)) continue;
+    const e = EMOJIS_DISPONIVEIS[i];
+    const sel = e === _obEmojiGuardiao ? 'sel' : '';
+    html += `<button class="emoji-btn ${sel}" onclick="obSelecionarEmoji('${e}',this)" aria-label="Emblema">${e}</button>`;
+  }
+  grid.innerHTML = html;
 }
 function obSelecionarEmoji(emoji,btn){
   _obEmojiGuardiao=emoji;
@@ -10950,45 +12315,73 @@ function oraculoHandleKey(ev) {
 }
 
 // ── Configurar chave API ──
-function oraculoConfigKey() {
+async function oraculoConfigKey() {
   // Fecha menu guardião se estiver aberto (UX melhorada)
   if (typeof fecharMenuGuardiao === 'function') fecharMenuGuardiao();
   const existing = localStorage.getItem(ORACULO_KEY_STORAGE) || '';
   const current = existing ? existing.slice(0, 12) + '...' + existing.slice(-4) : '(nenhuma)';
   const hasDefault = BABYFORCE_DEFAULT_API_KEY && BABYFORCE_DEFAULT_API_KEY.startsWith('sk-ant-');
-  const statusDefault = hasDefault
-    ? '✓ BabyForce tem uma chave DEFAULT embutida. O Oráculo já funciona sem você configurar nada.\n'
-    : '⚠ BabyForce NÃO tem chave default embutida. Você precisa configurar uma chave sua para usar o Oráculo.\n';
-  const help = `🔮 Configurar Oráculo (AI)\n\n` +
-    statusDefault + '\n' +
-    `Se quiser usar SUA PRÓPRIA chave (por exemplo, para separar custos):\n` +
-    `A chave é salva LOCALMENTE (nada vai para servidores nossos).\n\n` +
-    `Chave atual do usuário: ${current}\n\n` +
-    `Como obter uma chave:\n` +
-    `1. Acesse: https://console.anthropic.com/\n` +
-    `2. Crie uma conta (aceita email pessoal)\n` +
-    `3. Adicione créditos (US$ 5 dura MUITO tempo)\n` +
-    `4. Settings → API Keys → Create Key\n` +
-    `5. Cole aqui embaixo (começa com "sk-ant-...")\n\n` +
-    `Depois de configurada, a AI fica disponível em:\n` +
-    `• Oráculo (Hub Apoio)\n` +
-    `• Sleep AI (Hub Cuidado)\n` +
-    `• Crescimento AI (Hub Saúde)\n` +
-    `• Relatórios Clínicos com análise AI\n\n` +
-    `Deixe em branco para REMOVER sua chave (volta a usar a default). Cancelar para fechar.`;
-  const novaKey = prompt(help, existing);
+
+  // Mensagem em HTML (BFModal aceita HTML dentro de <pre-wrap>)
+  const statusBlock = hasDefault
+    ? '<div style="background:rgba(120,255,153,0.1);border-left:3px solid #78ff99;padding:10px 12px;border-radius:6px;margin-bottom:12px;font-size:0.78rem;line-height:1.5;color:#78ff99"><strong>✓ Chave BabyForce ativa</strong><br><span style="color:var(--text-dim);font-size:0.7rem">O Oráculo já funciona sem você configurar nada.</span></div>'
+    : '<div style="background:rgba(250,199,117,0.1);border-left:3px solid #FAC775;padding:10px 12px;border-radius:6px;margin-bottom:12px;font-size:0.78rem;line-height:1.5;color:#FAC775"><strong>⚠ Sem chave default</strong><br><span style="color:var(--text-dim);font-size:0.7rem">Você precisa configurar sua chave para usar a AI.</span></div>';
+
+  const msgHTML = statusBlock +
+    '<div style="font-size:0.78rem;line-height:1.6">Para usar <strong>SUA PRÓPRIA chave</strong> (ex: separar custos):</div>' +
+    '<div style="font-size:0.7rem;color:var(--text-dim);margin:8px 0;line-height:1.5">A chave fica SÓ no seu dispositivo (nada vai para nossos servidores).</div>' +
+    `<div style="font-size:0.72rem;margin:10px 0;padding:8px 10px;background:rgba(0,180,255,0.08);border-radius:6px"><strong>Sua chave atual:</strong> <code style="color:var(--gold);font-size:0.7rem">${current}</code></div>` +
+    '<div style="font-size:0.7rem;color:var(--text-dim);line-height:1.6"><strong style="color:var(--white)">Como obter uma chave:</strong><br>1. Acesse <span style="color:var(--blue-neon)">console.anthropic.com</span><br>2. Crie conta e adicione créditos (US$ 5 dura muito tempo)<br>3. Settings → API Keys → Create Key<br>4. Cole abaixo (começa com "sk-ant-...")</div>' +
+    '<div style="font-size:0.7rem;color:var(--text-dim);margin-top:10px;font-style:italic">Deixe em branco para REMOVER sua chave.</div>';
+
+  const novaKey = await (typeof BFModal !== 'undefined'
+    ? BFModal.prompt({
+        title: 'Configurar Oráculo (AI)',
+        icon: '🔮',
+        variant: 'info',
+        message: msgHTML,
+        placeholder: 'sk-ant-api03-...',
+        defaultValue: existing,
+        type: 'text',
+        okLabel: 'Salvar',
+        cancelLabel: 'Cancelar',
+      })
+    : Promise.resolve(prompt('Cole sua chave sk-ant-...', existing)));
+
   if (novaKey === null) return; // cancelou
+
   if (!novaKey.trim()) {
     localStorage.removeItem(ORACULO_KEY_STORAGE);
-    alert(hasDefault
-      ? '✓ Sua chave foi removida. O Oráculo voltará a usar a chave DEFAULT do BabyForce.'
-      : '✓ Chave removida. O Oráculo ficará em modo demo (sem AI) até você configurar uma.');
+    await (typeof BFModal !== 'undefined'
+      ? BFModal.alert({
+          title: 'Chave removida',
+          icon: '✓',
+          variant: 'success',
+          message: hasDefault
+            ? 'Sua chave foi removida.\nO Oráculo voltará a usar a chave DEFAULT do BabyForce.'
+            : 'Chave removida.\nO Oráculo ficará em modo demo até você configurar uma nova.',
+        })
+      : Promise.resolve(alert('Chave removida.')));
   } else if (!/^sk-ant-/.test(novaKey.trim())) {
-    alert('⚠ Chave inválida — deve começar com "sk-ant-".\n\nPegue em: console.anthropic.com → Settings → API Keys');
+    await (typeof BFModal !== 'undefined'
+      ? BFModal.alert({
+          title: 'Chave inválida',
+          icon: '⚠️',
+          variant: 'warn',
+          message: 'A chave deve começar com "sk-ant-".\n\nPegue em:\nconsole.anthropic.com → Settings → API Keys',
+        })
+      : Promise.resolve(alert('Chave inválida.')));
     return;
   } else {
     localStorage.setItem(ORACULO_KEY_STORAGE, novaKey.trim());
-    alert('✓ Sua chave salva!\n\nEla fica SÓ no seu dispositivo (nunca sai daqui).\nEla sobrescreve a chave default do BabyForce.\n\nAgora você pode:\n• Perguntar ao Oráculo\n• Gerar Relatórios Clínicos com análise AI\n• Usar Sleep AI e Crescimento AI');
+    await (typeof BFModal !== 'undefined'
+      ? BFModal.alert({
+          title: 'Chave salva',
+          icon: '✓',
+          variant: 'success',
+          message: 'Sua chave salva com sucesso!\n\nEla fica SÓ no seu dispositivo (nunca sai daqui) e sobrescreve a chave default.\n\nAgora você pode usar:\n• Oráculo\n• Relatórios Clínicos com análise AI\n• Sleep AI e Crescimento AI',
+        })
+      : Promise.resolve(alert('Chave salva!')));
     if (typeof BFAudit !== 'undefined') BFAudit.log('oraculo_api_key_configurada');
   }
   if (typeof oraculoRenderSuggestions === 'function') oraculoRenderSuggestions();
@@ -19787,6 +21180,170 @@ window._toggleAcessibilidade = function(key, valor) {
 };
 
 // ═══════════════════════════════════════════════════════════════
+// C1 — BFModal: substituto temático de alert/confirm/prompt
+// API:
+//   BFModal.alert({title, message, icon, variant}) → Promise<void>
+//   BFModal.confirm({title, message, icon, okLabel, cancelLabel, variant}) → Promise<boolean>
+//   BFModal.prompt({title, message, placeholder, defaultValue, type, icon}) → Promise<string|null>
+// Variants: 'info' (azul) | 'success' (verde) | 'warn' (âmbar) | 'danger' (vermelho)
+// ═══════════════════════════════════════════════════════════════
+window.BFModal = (function() {
+  const VARIANTS = {
+    info:    { color: '#00d4ff', bg: 'rgba(0,180,255,0.12)', glow: 'rgba(0,212,255,0.3)' },
+    success: { color: '#78ff99', bg: 'rgba(120,255,153,0.12)', glow: 'rgba(120,255,153,0.3)' },
+    warn:    { color: '#FAC775', bg: 'rgba(250,199,117,0.14)', glow: 'rgba(250,199,117,0.3)' },
+    danger:  { color: '#ff8080', bg: 'rgba(255,128,128,0.14)', glow: 'rgba(255,128,128,0.3)' },
+  };
+
+  function _escape(s) {
+    return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  function _build({ title, message, icon = '', variant = 'info', buttons, inputField }) {
+    const v = VARIANTS[variant] || VARIANTS.info;
+    const modal = document.createElement('div');
+    modal.className = 'bfmodal-overlay';
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    modal.setAttribute('aria-labelledby', 'bfmodal-title');
+    modal.style.cssText = `position:fixed;inset:0;background:rgba(0,10,30,0.82);z-index:99998;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);animation:bfmodalFadeIn 0.2s ease-out;`;
+
+    const box = document.createElement('div');
+    box.className = 'bfmodal-box';
+    box.style.cssText = `max-width:420px;width:100%;background:linear-gradient(135deg,#031027,#0a1a3d);border:1px solid ${v.color};border-radius:14px;padding:22px;color:#fff;font-family:'Exo 2',sans-serif;max-height:92vh;overflow-y:auto;box-shadow:0 0 40px ${v.glow}, 0 8px 32px rgba(0,0,0,0.5);animation:bfmodalSlideUp 0.25s cubic-bezier(0.2,0.8,0.2,1);`;
+
+    let html = '';
+    if (icon) html += `<div style="text-align:center;font-size:2.4rem;margin-bottom:8px" aria-hidden="true">${icon}</div>`;
+    html += `<div id="bfmodal-title" style="text-align:center;font-family:'Orbitron',monospace;font-size:0.82rem;color:${v.color};letter-spacing:0.08em;font-weight:700;margin-bottom:10px">${_escape(title || '')}</div>`;
+    if (message) html += `<div style="font-size:0.82rem;color:#e8f4fd;line-height:1.55;margin-bottom:16px;text-align:left;white-space:pre-wrap">${message}</div>`;
+    if (inputField) {
+      html += `<div style="margin-bottom:14px">
+        <input type="${inputField.type || 'text'}" id="bfmodal-input" placeholder="${_escape(inputField.placeholder || '')}" value="${_escape(inputField.defaultValue || '')}" style="width:100%;padding:12px;background:rgba(0,20,50,0.8);border:1px solid rgba(0,180,255,0.4);border-radius:8px;color:#fff;font-family:'Exo 2',sans-serif;font-size:0.9rem;box-sizing:border-box" autocomplete="off">
+      </div>`;
+    }
+
+    // Botões
+    html += `<div class="bfmodal-buttons" style="display:flex;gap:8px;flex-direction:${buttons.length > 2 ? 'column' : 'row'}">`;
+    buttons.forEach((b, i) => {
+      const isPrimary = b.primary;
+      const bgStyle = isPrimary
+        ? `background:linear-gradient(135deg,${v.color},#0066aa);color:#fff;font-weight:700`
+        : `background:rgba(0,60,120,0.6);color:${v.color};border:1px solid ${v.color}40`;
+      html += `<button data-idx="${i}" class="bfmodal-btn" style="${bgStyle};flex:1;padding:12px;border:none;border-radius:10px;font-family:'Orbitron',monospace;font-size:0.72rem;letter-spacing:0.06em;cursor:pointer;transition:all 0.15s" aria-label="${_escape(b.label)}">${_escape(b.label)}</button>`;
+    });
+    html += `</div>`;
+    box.innerHTML = html;
+    modal.appendChild(box);
+
+    // Click outside fecha como cancel
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        const cancel = buttons.find(b => b.cancel);
+        if (cancel && cancel.onClick) cancel.onClick();
+        _close(modal);
+      }
+    });
+    // ESC fecha como cancel
+    const escHandler = (e) => {
+      if (e.key === 'Escape') {
+        const cancel = buttons.find(b => b.cancel);
+        if (cancel && cancel.onClick) cancel.onClick();
+        _close(modal);
+        document.removeEventListener('keydown', escHandler);
+      }
+    };
+    document.addEventListener('keydown', escHandler);
+
+    // Click em botões
+    box.querySelectorAll('.bfmodal-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx = parseInt(btn.getAttribute('data-idx'), 10);
+        const b = buttons[idx];
+        if (b && b.onClick) b.onClick();
+        _close(modal);
+        document.removeEventListener('keydown', escHandler);
+      });
+    });
+
+    document.body.appendChild(modal);
+    // Focus no primeiro botão primary ou no input
+    setTimeout(() => {
+      if (inputField) {
+        const inp = document.getElementById('bfmodal-input');
+        if (inp) { inp.focus(); inp.select(); }
+      } else {
+        const btnPrimary = box.querySelector('.bfmodal-btn[data-idx]');
+        if (btnPrimary) btnPrimary.focus();
+      }
+    }, 50);
+
+    return modal;
+  }
+
+  function _close(modal) {
+    modal.style.animation = 'bfmodalFadeOut 0.15s ease-in forwards';
+    setTimeout(() => modal.remove(), 160);
+  }
+
+  return {
+    alert(opts) {
+      return new Promise((resolve) => {
+        const { title = 'Aviso', message = '', icon = 'ℹ️', variant = 'info', okLabel = 'OK' } = opts || {};
+        _build({
+          title, message, icon, variant,
+          buttons: [{ label: okLabel, primary: true, onClick: () => resolve() }],
+        });
+      });
+    },
+    confirm(opts) {
+      return new Promise((resolve) => {
+        const { title = 'Confirmar', message = '', icon = '❓', variant = 'info',
+                okLabel = 'Confirmar', cancelLabel = 'Cancelar' } = opts || {};
+        _build({
+          title, message, icon, variant,
+          buttons: [
+            { label: cancelLabel, cancel: true, onClick: () => resolve(false) },
+            { label: okLabel, primary: true, onClick: () => resolve(true) },
+          ],
+        });
+      });
+    },
+    prompt(opts) {
+      return new Promise((resolve) => {
+        const { title = 'Entrada', message = '', placeholder = '', defaultValue = '',
+                type = 'text', icon = '✏️', variant = 'info',
+                okLabel = 'OK', cancelLabel = 'Cancelar' } = opts || {};
+        const modal = _build({
+          title, message, icon, variant,
+          inputField: { type, placeholder, defaultValue },
+          buttons: [
+            { label: cancelLabel, cancel: true, onClick: () => resolve(null) },
+            { label: okLabel, primary: true, onClick: () => {
+              const inp = document.getElementById('bfmodal-input');
+              resolve(inp ? inp.value : '');
+            }},
+          ],
+        });
+        // Enter no input = confirmar
+        setTimeout(() => {
+          const inp = document.getElementById('bfmodal-input');
+          if (inp) {
+            inp.addEventListener('keydown', (e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                const val = inp.value;
+                _close(modal);
+                resolve(val);
+              }
+            });
+          }
+        }, 60);
+      });
+    },
+  };
+})();
+
+// ═══════════════════════════════════════════════════════════════
 // SPRINT A — BACKUP E RESTAURAÇÃO (exportar + importar JSON)
 // ═══════════════════════════════════════════════════════════════
 window.abrirBackupRestore = function() {
@@ -24422,11 +25979,11 @@ body.modo-madrugada .hub-hoje-container {
   filter: brightness(0.95);
 }
 
-/* Indicador flutuante "🌙 Modo madrugada" */
+/* Indicador flutuante "🌙 Modo madrugada" — respeita safe-area (ilha/notch iPhone) */
 .madrugada-badge {
   position: fixed;
-  top: 12px;
-  right: 12px;
+  top: calc(12px + env(safe-area-inset-top, 0px));
+  right: calc(12px + env(safe-area-inset-right, 0px));
   background: linear-gradient(135deg, rgba(60,30,15,0.95), rgba(40,20,8,0.95));
   color: #ffcc88;
   padding: 6px 12px;
@@ -24440,6 +25997,7 @@ body.modo-madrugada .hub-hoje-container {
   box-shadow: 0 2px 12px rgba(0,0,0,0.4);
   display: none;
   transition: opacity 0.3s;
+  max-width: calc(100vw - 24px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px));
 }
 body.modo-madrugada .madrugada-badge {
   display: block;
@@ -24569,16 +26127,233 @@ html.bf-reduce-motion *::after {
   border: 0 !important;
 }
 
-/* Tema claro (experimental) */
+/* Bug 2: Checkbox customizado com check visível (override do accent-color) */
+/* Funciona mesmo se accent-color não for suportado ou se tema claro inverte cores */
+input[type="checkbox"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  border: 2px solid rgba(0, 180, 255, 0.5);
+  border-radius: 5px;
+  background: rgba(0, 30, 70, 0.6);
+  cursor: pointer;
+  position: relative;
+  flex-shrink: 0;
+  transition: all 0.15s;
+  vertical-align: middle;
+}
+input[type="checkbox"]:hover {
+  border-color: #00d4ff;
+  background: rgba(0, 40, 90, 0.8);
+}
+input[type="checkbox"]:checked {
+  background: linear-gradient(135deg, #00d4ff, #0066aa);
+  border-color: #00d4ff;
+  box-shadow: 0 0 10px rgba(0, 212, 255, 0.4);
+}
+input[type="checkbox"]:checked::after {
+  content: '';
+  position: absolute;
+  left: 6px;
+  top: 2px;
+  width: 6px;
+  height: 11px;
+  border: solid #fff;
+  border-width: 0 2.5px 2.5px 0;
+  transform: rotate(45deg);
+}
+input[type="checkbox"]:focus-visible {
+  outline: 3px solid #00d4ff !important;
+  outline-offset: 2px !important;
+}
+
+/* Tema claro — checkbox adaptado */
+html.bf-tema-claro input[type="checkbox"] {
+  border: 2px solid rgba(0, 102, 204, 0.5);
+  background: rgba(255, 255, 255, 0.9);
+}
+html.bf-tema-claro input[type="checkbox"]:checked {
+  background: linear-gradient(135deg, #0066cc, #7b2cbf);
+  border-color: #0066cc;
+}
+
+/* Tema claro — cores invertidas com contraste WCAG AA */
+html.bf-tema-claro {
+  --blue-deep: #f0f4f8 !important;
+  --blue-neon: #0066cc !important;
+  --purple-neon: #7b2cbf !important;
+  --white: #1a2a3d !important;
+  --text-dim: #4a5568 !important;
+  --gold: #b8860b !important;
+}
 html.bf-tema-claro body {
-  background: #f0f4f8 !important;
+  background: linear-gradient(180deg, #f0f4f8 0%, #dde8f2 100%) !important;
   color: #1a2a3d !important;
 }
+html.bf-tema-claro .nebula {
+  display: none !important;  /* nebulosa escura fica feia em tema claro */
+}
+html.bf-tema-claro .star {
+  display: none !important;  /* estrelas brancas somem no fundo branco */
+}
+html.bf-tema-claro nav {
+  background: rgba(255, 255, 255, 0.95) !important;
+  border-bottom-color: rgba(0, 102, 204, 0.2) !important;
+}
+html.bf-tema-claro nav button {
+  color: #4a5568 !important;
+}
+html.bf-tema-claro nav button.active {
+  color: #0066cc !important;
+  border-bottom-color: #0066cc !important;
+  background: rgba(0, 102, 204, 0.08) !important;
+}
+html.bf-tema-claro .hub-subnav {
+  background: rgba(255, 255, 255, 0.8) !important;
+}
+html.bf-tema-claro .hub-subchip {
+  background: rgba(200, 220, 240, 0.6) !important;
+  border-color: rgba(0, 102, 204, 0.25) !important;
+  color: #4a5568 !important;
+}
+html.bf-tema-claro .hub-subchip.active {
+  background: linear-gradient(135deg, #0066cc, #7b2cbf) !important;
+  color: #fff !important;
+}
 html.bf-tema-claro .ob-box,
-html.bf-tema-claro .login-box,
+html.bf-tema-claro .login-box {
+  background: #ffffff !important;
+  color: #1a2a3d !important;
+  border: 1px solid rgba(0, 102, 204, 0.25) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08) !important;
+}
+html.bf-tema-claro [role="dialog"] {
+  background: rgba(240, 244, 248, 0.95) !important;
+}
 html.bf-tema-claro [role="dialog"] > div {
   background: #ffffff !important;
   color: #1a2a3d !important;
+  border: 1px solid rgba(0, 102, 204, 0.2) !important;
+}
+html.bf-tema-claro .ob-label,
+html.bf-tema-claro .ng-label,
+html.bf-tema-claro .login-label,
+html.bf-tema-claro header,
+html.bf-tema-claro h1, 
+html.bf-tema-claro h2, 
+html.bf-tema-claro h3 {
+  color: #1a2a3d !important;
+}
+html.bf-tema-claro .ob-input,
+html.bf-tema-claro .ng-input,
+html.bf-tema-claro input,
+html.bf-tema-claro textarea,
+html.bf-tema-claro select {
+  background: #fff !important;
+  color: #1a2a3d !important;
+  border: 1px solid rgba(0, 102, 204, 0.3) !important;
+}
+html.bf-tema-claro .bf-blue { color: #0066cc !important; }
+html.bf-tema-claro .bf-purple { color: #7b2cbf !important; }
+html.bf-tema-claro button {
+  color: inherit;
+}
+html.bf-tema-claro .pin-dot {
+  background: rgba(0, 102, 204, 0.2) !important;
+  border-color: rgba(0, 102, 204, 0.4) !important;
+}
+html.bf-tema-claro .pin-dot.filled {
+  background: #0066cc !important;
+}
+html.bf-tema-claro .emoji-btn {
+  background: rgba(240, 244, 248, 0.8) !important;
+  border: 1px solid rgba(0, 102, 204, 0.2) !important;
+}
+html.bf-tema-claro .emoji-btn.sel {
+  background: rgba(0, 102, 204, 0.15) !important;
+  border-color: #0066cc !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════ */
+/* C1 — BFModal: animações temáticas                              */
+/* ═══════════════════════════════════════════════════════════════ */
+@keyframes bfmodalFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes bfmodalFadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+@keyframes bfmodalSlideUp {
+  from { opacity: 0; transform: translateY(20px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.bfmodal-btn:hover {
+  filter: brightness(1.15);
+  transform: translateY(-1px);
+}
+.bfmodal-btn:active {
+  transform: translateY(0);
+}
+
+/* C1 — Step 2 verify email: status animado + countdown */
+.verify-status-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: rgba(0, 30, 70, 0.5);
+  border: 1px solid rgba(0, 180, 255, 0.3);
+  border-radius: 10px;
+  margin-bottom: 12px;
+  font-size: 0.76rem;
+  line-height: 1.45;
+  transition: all 0.3s;
+  text-align: left;
+}
+.verify-status-bar.sending {
+  background: rgba(250, 199, 117, 0.1);
+  border-color: rgba(250, 199, 117, 0.4);
+}
+.verify-status-bar.success {
+  background: rgba(120, 255, 153, 0.12);
+  border-color: rgba(120, 255, 153, 0.5);
+  box-shadow: 0 0 14px rgba(120, 255, 153, 0.25);
+}
+.verify-status-bar.error {
+  background: rgba(255, 128, 128, 0.12);
+  border-color: rgba(255, 128, 128, 0.5);
+}
+.verify-status-bar.waiting {
+  background: rgba(0, 180, 255, 0.1);
+  border-color: rgba(0, 180, 255, 0.4);
+}
+.verify-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(0, 180, 255, 0.2);
+  border-top-color: #00d4ff;
+  border-radius: 50%;
+  animation: bfSpin 0.8s linear infinite;
+  flex-shrink: 0;
+}
+@keyframes bfSpin {
+  to { transform: rotate(360deg); }
+}
+.countdown-timer {
+  font-family: 'Orbitron', monospace;
+  font-size: 0.66rem;
+  color: var(--gold);
+  margin-left: 6px;
+  letter-spacing: 0.04em;
+  font-weight: 700;
+}
+.btn-disabled-countdown {
+  opacity: 0.5;
+  cursor: not-allowed !important;
+  pointer-events: none;
 }
 </style>
 
