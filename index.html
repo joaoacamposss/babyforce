@@ -269,6 +269,7 @@ textarea{resize:none;min-height:80px;}
 .foto-remove-btn{background:transparent;border:none;color:rgba(255,100,100,0.6);font-size:0.72rem;cursor:pointer;padding:4px;}
 #tela-login{position:fixed;inset:0;z-index:9000;display:flex;align-items:center;justify-content:center;background:var(--blue-deep);padding:20px;}
 .login-box{width:100%;max-width:320px;text-align:center;}
+.login-box.wide{max-width:420px;}
 .login-wordmark{font-family:'Orbitron',monospace;font-size:1.8rem;font-weight:900;letter-spacing:0.04em;color:var(--white);text-shadow:0 0 20px var(--blue-glow);margin-bottom:4px;}
 .login-wordmark .bf-blue{color:var(--blue-neon);}
 .login-wordmark .bf-purple{color:var(--purple-glow);}
@@ -297,6 +298,93 @@ textarea{resize:none;min-height:80px;}
 .emoji-btn{font-size:1.4rem;padding:6px;border-radius:8px;border:2px solid transparent;background:rgba(0,20,50,0.6);cursor:pointer;transition:all 0.15s;text-align:center;line-height:1;-webkit-tap-highlight-color:transparent;min-width:40px;min-height:40px;}
 .emoji-btn.sel{border-color:var(--blue-neon);background:rgba(0,100,200,0.3);box-shadow:0 0 8px rgba(0,180,255,0.3);}
 .btn-novo-guardiao{width:100%;padding:11px;background:transparent;border:1px dashed rgba(0,180,255,0.3);border-radius:10px;color:var(--text-dim);font-family:'Orbitron',monospace;font-size:0.65rem;letter-spacing:0.08em;cursor:pointer;transition:all 0.2s;}
+
+/* Novo Guardião — formulário moderno, legível */
+.ng-field{margin-bottom:14px;text-align:left;}
+.ng-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.ng-row .ng-field{margin-bottom:0;}
+.ng-label{font-family:'Exo 2',sans-serif;font-size:0.78rem;color:var(--white);font-weight:600;display:block;margin-bottom:6px;letter-spacing:0.01em;}
+.ng-input{width:100%;padding:12px 14px;background:rgba(0,20,50,0.7);color:var(--white);border:1px solid rgba(0,180,255,0.3);border-radius:10px;font-family:'Exo 2',sans-serif;font-size:16px;outline:none;transition:border-color 0.15s,box-shadow 0.15s;-webkit-appearance:none;appearance:none;min-height:46px;box-sizing:border-box;text-align:left;}
+.ng-input:focus{border-color:var(--blue-neon);box-shadow:0 0 0 3px rgba(0,180,255,0.18);}
+.ng-input::placeholder{color:rgba(158,176,200,0.6);font-family:'Exo 2',sans-serif;}
+select.ng-input{appearance:menulist;cursor:pointer;padding-right:32px;background-image:linear-gradient(45deg,transparent 50%,rgba(0,180,255,0.6) 50%),linear-gradient(135deg,rgba(0,180,255,0.6) 50%,transparent 50%);background-position:calc(100% - 16px) 50%,calc(100% - 11px) 50%;background-size:5px 5px,5px 5px;background-repeat:no-repeat;}
+.ng-hint{font-size:0.66rem;color:var(--text-dim);margin-top:5px;line-height:1.45;}
+.ng-btns{display:flex;gap:10px;flex-direction:column;margin-top:6px;}
+.ng-btn-primary{width:100%;padding:13px;font-family:'Orbitron',monospace;font-size:0.76rem;letter-spacing:0.08em;font-weight:700;}
+.ng-btn-secondary{width:100%;padding:11px;background:transparent;border:1px solid rgba(0,180,255,0.2);color:var(--text-dim);font-family:'Orbitron',monospace;font-size:0.68rem;letter-spacing:0.06em;border-radius:10px;cursor:pointer;}
+@media (max-width:380px){.ng-row{grid-template-columns:1fr;}}
+
+/* ═══ ACESSIBILIDADE (Sprint A) ═══ */
+/* Texto grande: +20% em todos os elementos */
+html.bf-text-large body { font-size: 18px !important; }
+html.bf-text-large .section-title { font-size: 1.08rem !important; }
+html.bf-text-large button:not(.emoji-btn):not(.pin-key) { font-size: 1.05em !important; min-height: 48px; }
+html.bf-text-large .nav-icon { font-size: 1.4rem !important; }
+html.bf-text-large nav button { font-size: 0.78rem !important; }
+html.bf-text-large input, html.bf-text-large select, html.bf-text-large textarea { font-size: 17px !important; min-height: 50px; }
+html.bf-text-large label, html.bf-text-large .ng-label { font-size: 1em !important; }
+html.bf-text-large .empty p, html.bf-text-large .card { font-size: 1em !important; line-height: 1.6 !important; }
+/* Elementos com font-size muito pequeno (0.5-0.6rem) ficam 0.75rem no modo texto grande */
+html.bf-text-large [style*="font-size:0.5"],
+html.bf-text-large [style*="font-size: 0.5"],
+html.bf-text-large [style*="font-size:0.6"],
+html.bf-text-large [style*="font-size: 0.6"] { font-size: 0.78rem !important; }
+
+/* Alto contraste: textos dim ficam mais luminosos */
+html.bf-high-contrast { --text-dim: #c4d6ee !important; }
+html.bf-high-contrast [style*="color:var(--text-dim)"],
+html.bf-high-contrast [style*="color: var(--text-dim)"] { color: #c4d6ee !important; }
+html.bf-high-contrast .empty p, html.bf-high-contrast .guardian-info-role { color: #c4d6ee !important; }
+
+/* Reduzir movimento */
+html.bf-reduce-motion *, html.bf-reduce-motion *::before, html.bf-reduce-motion *::after {
+  animation-duration: 0.001s !important; transition-duration: 0.001s !important;
+}
+
+/* Foco visível para navegação por teclado */
+button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, [tabindex]:focus-visible {
+  outline: 2px solid var(--blue-neon);
+  outline-offset: 2px;
+}
+
+/* Min-height 44px em botões principais (WCAG 2.1 AA SC 2.5.5) */
+.btn:not(.btn-sm) { min-height: 44px; }
+.filter-btn { min-height: 36px; }
+
+/* Link 'Esqueci meu PIN' */
+.btn-esqueci-pin { background: none; border: none; color: var(--text-dim); font-family: 'Orbitron', monospace; font-size: 0.62rem; letter-spacing: 0.08em; cursor: pointer; padding: 8px 12px; margin-top: 8px; opacity: 0.8; text-decoration: underline; }
+.btn-esqueci-pin:hover { color: var(--blue-neon); opacity: 1; }
+
+/* ═══ LOADING SPINNER (Sprint C) ═══ */
+@keyframes bf-spin { to { transform: rotate(360deg); } }
+.bf-spinner { display: inline-block; width: 18px; height: 18px; border: 2px solid rgba(0,180,255,0.2); border-top-color: var(--blue-neon); border-radius: 50%; animation: bf-spin 0.8s linear infinite; vertical-align: middle; }
+.bf-spinner-lg { width: 32px; height: 32px; border-width: 3px; }
+.bf-loading-overlay { position: fixed; inset: 0; background: rgba(2,11,24,0.8); z-index: 99997; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; backdrop-filter: blur(3px); }
+.bf-loading-text { font-family: 'Orbitron', monospace; font-size: 0.72rem; color: var(--blue-neon); letter-spacing: 0.08em; }
+html.bf-reduce-motion .bf-spinner { animation-duration: 0.001s !important; border-top-color: var(--text-dim); }
+
+/* ═══ TEMA CLARO (experimental, Sprint C) ═══ */
+html.bf-tema-claro {
+  --blue-deep: #f5f9ff;
+  --blue-dark: #eef4fc;
+  --blue-mid: #dce7f5;
+  --white: #0a2a4a;
+  --text-dim: #4a6a8a;
+}
+html.bf-tema-claro body { background: var(--blue-deep); color: var(--white); }
+html.bf-tema-claro .card { background: rgba(255,255,255,0.85); border-color: rgba(0,100,200,0.2); color: var(--white); }
+html.bf-tema-claro .empty, html.bf-tema-claro .empty p { color: var(--text-dim); }
+html.bf-tema-claro header { background: linear-gradient(180deg, rgba(240,248,255,0.95) 0%, transparent 100%); }
+html.bf-tema-claro nav { background: rgba(240,248,255,0.95); border-top: 1px solid rgba(0,100,200,0.15); }
+html.bf-tema-claro nav button { color: var(--text-dim); }
+html.bf-tema-claro nav button.active { color: var(--blue-bright); }
+html.bf-tema-claro .nebula { opacity: 0.2; }
+html.bf-tema-claro .star { background: rgba(100,100,140,0.3); }
+html.bf-tema-claro .btn-primary { background: linear-gradient(135deg, var(--blue-bright), #0052cc); color: #fff; }
+html.bf-tema-claro .login-box .login-wordmark { color: var(--blue-bright); }
+html.bf-tema-claro input, html.bf-tema-claro select, html.bf-tema-claro textarea { background: rgba(255,255,255,0.9); color: var(--white); border-color: rgba(0,100,200,0.25); }
+html.bf-tema-claro [style*="color:var(--white)"] { color: var(--white) !important; }
+html.bf-tema-claro [style*="color: var(--white)"] { color: var(--white) !important; }
 ::-webkit-scrollbar{width:0;height:0;background:transparent;}
 ::-webkit-scrollbar-track{background:transparent;}
 ::-webkit-scrollbar-thumb{background:transparent;border-radius:2px;}
@@ -718,13 +806,16 @@ textarea{resize:none;min-height:80px;}
         <button class="pin-key" onclick="pinDigito('1')">1</button><button class="pin-key" onclick="pinDigito('2')">2</button><button class="pin-key" onclick="pinDigito('3')">3</button>
         <button class="pin-key" onclick="pinDigito('4')">4</button><button class="pin-key" onclick="pinDigito('5')">5</button><button class="pin-key" onclick="pinDigito('6')">6</button>
         <button class="pin-key" onclick="pinDigito('7')">7</button><button class="pin-key" onclick="pinDigito('8')">8</button><button class="pin-key" onclick="pinDigito('9')">9</button>
-        <button class="pin-key pin-key-back" onclick="voltarLogin()">↩</button>
+        <button class="pin-key pin-key-back" onclick="voltarLogin()" aria-label="Voltar">↩</button>
         <button class="pin-key" onclick="pinDigito('0')">0</button>
-        <button class="pin-key pin-key-del" onclick="pinApagar()">⌫</button>
+        <button class="pin-key pin-key-del" onclick="pinApagar()" aria-label="Apagar dígito">⌫</button>
       </div>
       <div class="lembrar-wrap" onclick="toggleLembrarDispositivo()" id="lembrar-wrap">
         <div class="lembrar-toggle" id="lembrar-toggle"></div>
         <span class="lembrar-label">LEMBRAR ESTE DISPOSITIVO</span>
+      </div>
+      <div style="text-align:center;margin-top:14px">
+        <button type="button" class="btn-esqueci-pin" onclick="window.abrirRecuperacaoPin()" aria-label="Esqueci meu PIN">🔓 Esqueci meu código</button>
       </div>
     </div>
     <div id="login-step-4" style="display:none">
@@ -742,31 +833,41 @@ textarea{resize:none;min-height:80px;}
     </div>
     <div id="login-step-3" style="display:none">
       <div class="login-label">Novo Guardião da Força</div>
-      <div style="margin-bottom:12px">
-        <label style="font-family:'Orbitron',monospace;font-size:0.6rem;color:var(--text-dim);letter-spacing:0.08em;display:block;margin-bottom:6px">NOME *</label>
-        <input type="text" id="novo-guardiao-nome" maxlength="40" placeholder="ex: Ana, Pedro..." autocomplete="name" style="width:100%;text-align:center;font-family:'Orbitron',monospace;font-size:1rem;">
+      <div style="font-size:0.7rem;color:var(--text-dim);margin-bottom:18px;line-height:1.5;text-align:center">
+        Preencha seus dados para criar acesso seguro à Ordem.
       </div>
-      <div style="margin-bottom:12px">
-        <label style="font-family:'Orbitron',monospace;font-size:0.6rem;color:var(--text-dim);letter-spacing:0.08em;display:block;margin-bottom:6px">GÊNERO *</label>
-        <select id="novo-guardiao-genero" style="width:100%;padding:10px;background:rgba(0,20,50,0.5);color:var(--white);border:1px solid rgba(0,180,255,0.25);border-radius:8px;font-family:'Orbitron',monospace;font-size:0.82rem;appearance:auto">
-          <option value="">— selecione —</option>
-          <option value="feminino">👩 Feminino</option>
-          <option value="masculino">🧔 Masculino</option>
-          <option value="nao-binario">🧑 Não-binário</option>
-          <option value="prefere-nao-dizer">Prefiro não dizer</option>
-        </select>
+
+      <div class="ng-field">
+        <label class="ng-label">Nome *</label>
+        <input type="text" id="novo-guardiao-nome" class="ng-input" maxlength="40" placeholder="Ex: Ana Silva" autocomplete="name">
       </div>
-      <div style="margin-bottom:12px">
-        <label style="font-family:'Orbitron',monospace;font-size:0.6rem;color:var(--text-dim);letter-spacing:0.08em;display:block;margin-bottom:6px">E-MAIL *</label>
-        <input type="email" id="novo-guardiao-email" placeholder="seu@email.com" autocomplete="email" inputmode="email" style="width:100%;text-align:center;padding:10px;background:rgba(0,20,50,0.5);color:var(--white);border:1px solid rgba(0,180,255,0.25);border-radius:8px;font-family:'Orbitron',monospace;font-size:0.82rem">
+
+      <div class="ng-field">
+        <label class="ng-label">E-mail *</label>
+        <input type="email" id="novo-guardiao-email" class="ng-input" placeholder="seu@email.com" autocomplete="email" inputmode="email" autocapitalize="off" spellcheck="false">
+        <div class="ng-hint">Usado para recuperação de acesso</div>
       </div>
-      <div style="margin-bottom:12px">
-        <label style="font-family:'Orbitron',monospace;font-size:0.6rem;color:var(--text-dim);letter-spacing:0.08em;display:block;margin-bottom:6px">DATA DE NASCIMENTO *</label>
-        <input type="date" id="novo-guardiao-nascimento" autocomplete="bday" style="width:100%;text-align:center;padding:10px;background:rgba(0,20,50,0.5);color:var(--white);border:1px solid rgba(0,180,255,0.25);border-radius:8px;font-family:'Orbitron',monospace;font-size:0.82rem">
+
+      <div class="ng-row">
+        <div class="ng-field">
+          <label class="ng-label">Gênero *</label>
+          <select id="novo-guardiao-genero" class="ng-input">
+            <option value="">— selecione —</option>
+            <option value="feminino">👩 Feminino</option>
+            <option value="masculino">🧔 Masculino</option>
+            <option value="nao-binario">🧑 Não-binário</option>
+            <option value="prefere-nao-dizer">Prefiro não dizer</option>
+          </select>
+        </div>
+        <div class="ng-field">
+          <label class="ng-label">Data de nascimento *</label>
+          <input type="date" id="novo-guardiao-nascimento" class="ng-input" autocomplete="bday">
+        </div>
       </div>
-      <div style="margin-bottom:12px">
-        <label style="font-family:'Orbitron',monospace;font-size:0.6rem;color:var(--text-dim);letter-spacing:0.08em;display:block;margin-bottom:6px">GRAU DE PARENTESCO *</label>
-        <select id="novo-guardiao-parentesco" style="width:100%;padding:10px;background:rgba(0,20,50,0.5);color:var(--white);border:1px solid rgba(0,180,255,0.25);border-radius:8px;font-family:'Orbitron',monospace;font-size:0.82rem;appearance:auto">
+
+      <div class="ng-field">
+        <label class="ng-label">Grau de parentesco *</label>
+        <select id="novo-guardiao-parentesco" class="ng-input">
           <option value="">— selecione —</option>
           <option value="pai">👨 Pai / Papai</option>
           <option value="mae">👩 Mãe / Mamãe</option>
@@ -781,16 +882,18 @@ textarea{resize:none;min-height:80px;}
           <option value="cuidador">🧑‍🍼 Babá / Cuidador(a)</option>
           <option value="outro">💬 Outro</option>
         </select>
-        <div style="font-size:0.58rem;color:var(--text-dim);margin-top:5px;font-style:italic;line-height:1.4">No futuro, esta informação vai personalizar dicas e relatórios de acordo com seu vínculo com a criança.</div>
+        <div class="ng-hint">Personaliza dicas e relatórios conforme seu vínculo</div>
       </div>
-      <div style="margin-bottom:16px">
-        <label style="font-family:'Orbitron',monospace;font-size:0.6rem;color:var(--text-dim);letter-spacing:0.08em;display:block;margin-bottom:8px">EMBLEMA</label>
+
+      <div class="ng-field">
+        <label class="ng-label">Emblema (avatar)</label>
         <div class="emoji-grid" id="emoji-grid"></div>
       </div>
-      <div class="login-saber" style="margin:14px 0"></div>
-      <div style="display:flex;gap:10px">
-        <button class="btn btn-primary" style="flex:1;font-size:0.68rem" onclick="salvarNovoGuardiao()">⚡ Criar Guardião</button>
-        <button class="btn" style="background:rgba(0,50,100,0.4);border:1px solid rgba(0,180,255,0.2);color:var(--text-dim);font-size:0.68rem" onclick="voltarLogin()">Cancelar</button>
+
+      <div class="login-saber" style="margin:18px 0"></div>
+      <div class="ng-btns">
+        <button class="btn btn-primary ng-btn-primary" onclick="salvarNovoGuardiao()">⚡ Criar Guardião</button>
+        <button class="btn ng-btn-secondary" onclick="voltarLogin()">Cancelar</button>
       </div>
     </div>
   </div>
@@ -840,10 +943,13 @@ textarea{resize:none;min-height:80px;}
     <button onclick="abrirMigracao()" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:none;border:none;color:rgba(57,255,20,0.8);cursor:pointer;border-radius:8px;font-family:'Exo 2',sans-serif;font-size:0.88rem">☁️ Sincronizar dados</button>
     <button onclick="abrirConfiguracaoBebe()" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:none;border:none;color:var(--gold);cursor:pointer;border-radius:8px;font-family:'Exo 2',sans-serif;font-size:0.88rem">⚙️ Configurar bebê</button>
     <button onclick="abrirGestaoCriancas()" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:none;border:none;color:var(--gold);cursor:pointer;border-radius:8px;font-family:'Exo 2',sans-serif;font-size:0.88rem">👶 Crianças cadastradas</button>
+    <button onclick="abrirComparacaoIrmaos()" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:none;border:none;color:var(--purple-neon);cursor:pointer;border-radius:8px;font-family:'Exo 2',sans-serif;font-size:0.88rem">👨‍👩‍👧‍👦 Comparar irmãos</button>
     <button onclick="abrirRelatoriosClinicos()" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:none;border:none;color:var(--purple-neon);cursor:pointer;border-radius:8px;font-family:'Exo 2',sans-serif;font-size:0.88rem">📊 Relatórios Clínicos</button>
     <button onclick="abrirProfissionais()" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:none;border:none;color:var(--white);cursor:pointer;border-radius:8px;font-family:'Exo 2',sans-serif;font-size:0.88rem">👨‍⚕️ Profissionais de saúde</button>
     <div style="height:1px;background:rgba(0,180,255,0.12);margin:4px 8px"></div>
+    <button onclick="abrirAcessibilidade()" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:none;border:none;color:var(--blue-neon);cursor:pointer;border-radius:8px;font-family:'Exo 2',sans-serif;font-size:0.88rem">♿ Acessibilidade</button>
     <button onclick="abrirPrivacidade()" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:none;border:none;color:var(--blue-neon);cursor:pointer;border-radius:8px;font-family:'Exo 2',sans-serif;font-size:0.88rem">🔒 Privacidade e Segurança</button>
+    <button onclick="abrirBackupRestore()" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:none;border:none;color:var(--gold);cursor:pointer;border-radius:8px;font-family:'Exo 2',sans-serif;font-size:0.88rem">💾 Backup e Restauração</button>
     <button id="menu-btn-faceid" onclick="menuToggleFaceID()" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:none;border:none;color:var(--blue-neon);cursor:pointer;border-radius:8px;font-family:'Exo 2',sans-serif;font-size:0.88rem">🔐 <span id="menu-faceid-label">Ativar Face ID</span></button>
     <div style="height:1px;background:rgba(0,180,255,0.12);margin:4px 8px"></div>
     <button onclick="sairSessao()" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:none;border:none;color:var(--text-dim);cursor:pointer;border-radius:8px;font-family:'Exo 2',sans-serif;font-size:0.88rem">↩ Trocar Guardião</button>
@@ -1517,6 +1623,134 @@ textarea{resize:none;min-height:80px;}
   <div id="lista-vacinas"></div>
 </div>
 
+<!-- SINTOMAS (sempre desbloqueado — registro de febre, tosse, dor etc.) -->
+<div id="tab-sintomas" class="tab-panel">
+  <div class="card" style="margin-bottom:12px;background:linear-gradient(135deg,rgba(255,136,136,0.14),rgba(0,60,120,0.15));border:1px solid rgba(255,136,136,0.3)">
+    <div class="section-title">🤒 Registro de Sintomas</div>
+    <div style="font-size:0.72rem;color:var(--text-dim);line-height:1.5">
+      Registre febre, tosse, dor, vômito e outros sintomas. O Oráculo pode ajudar a avaliar sinais de alerta.<br>
+      <strong style="color:var(--gold)">Em emergência</strong>, procure um pediatra imediatamente.
+    </div>
+  </div>
+  <div class="card">
+    <div class="section-title">🤒 Novo Sintoma</div>
+    <div class="row-2">
+      <div class="form-group"><label>Data</label><input type="date" id="sint-data"></div>
+      <div class="form-group"><label>Hora</label><input type="time" id="sint-hora"></div>
+    </div>
+    <div class="form-group">
+      <label>Tipo de Sintoma</label>
+      <select id="sint-tipo">
+        <option value="">— selecione —</option>
+        <option value="febre">🌡️ Febre</option>
+        <option value="colica">🌀 Cólica</option>
+        <option value="refluxo">💧 Refluxo / Regurgitação</option>
+        <option value="tosse">😷 Tosse</option>
+        <option value="coriza">🤧 Coriza / Espirro</option>
+        <option value="dor">😣 Dor</option>
+        <option value="vomito">🤢 Vômito</option>
+        <option value="diarreia">💩 Diarreia</option>
+        <option value="assadura">🌸 Assadura / Brotoeja</option>
+        <option value="irritacao">😤 Irritação / Choro</option>
+        <option value="sonolencia">😴 Sonolência excessiva</option>
+        <option value="outro">💬 Outro</option>
+      </select>
+    </div>
+    <div class="row-2">
+      <div class="form-group">
+        <label>Intensidade</label>
+        <select id="sint-intensidade">
+          <option value="leve">🟢 Leve</option>
+          <option value="moderada" selected>🟡 Moderada</option>
+          <option value="forte">🔴 Forte</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Temperatura (°C) — se febre</label>
+        <input type="number" id="sint-temp" step="0.1" min="35" max="43" placeholder="ex: 38.5">
+      </div>
+    </div>
+    <div class="form-group"><label>Observações</label><input type="text" id="sint-obs" placeholder="ex: início após vacina, vômito único..."></div>
+    <div class="form-group">
+      <label style="display:flex;align-items:center;gap:10px;padding:9px 12px;background:rgba(0,30,70,0.4);border:1px solid rgba(0,180,255,0.2);border-radius:10px;cursor:pointer;margin-bottom:0">
+        <input type="checkbox" id="sint-medicado" style="width:18px;height:18px;accent-color:#00d4ff;cursor:pointer">
+        <span style="font-size:0.76rem;color:var(--white)">💊 Já administrei medicamento</span>
+      </label>
+    </div>
+    <button class="btn btn-primary btn-full" onclick="salvarSintoma()">⚡ Registrar Sintoma</button>
+  </div>
+  <div class="filter-bar" id="sint-filtros"></div>
+  <div id="lista-sintomas"></div>
+</div>
+
+<!-- ESPORTE (desbloqueio manual pelos guardiões) -->
+<div id="tab-esporte" class="tab-panel">
+  <div id="esporte-locked" style="display:none">
+    <div class="card" style="text-align:center;padding:24px 16px;background:linear-gradient(135deg,rgba(120,255,153,0.14),rgba(0,120,200,0.15));border:1px dashed rgba(120,255,153,0.4)">
+      <div style="font-size:3rem;margin-bottom:10px">⚽</div>
+      <div style="font-family:'Orbitron',monospace;font-size:0.95rem;color:#78ff99;font-weight:700;letter-spacing:0.04em;margin-bottom:8px">Módulo Esporte</div>
+      <div style="font-size:0.78rem;color:var(--white);line-height:1.6;margin-bottom:14px">Ainda guardado. Desbloqueie quando seu bebê começar a praticar alguma modalidade.</div>
+      <div style="padding:10px 12px;background:rgba(0,30,70,0.4);border-radius:8px;font-size:0.66rem;color:var(--text-dim);line-height:1.5;text-align:left;margin-bottom:14px">
+        <strong style="color:var(--white)">O que terá aqui:</strong><br>
+        • Registro de aulas e treinos regulares<br>
+        • Duração e intensidade por sessão<br>
+        • Histórico semanal / mensal<br>
+        • Vínculo com marcos de desenvolvimento motor
+      </div>
+      <button onclick="ativarEsporteManual()" style="width:100%;padding:11px;background:linear-gradient(135deg,rgba(120,255,153,0.2),rgba(0,180,255,0.2));border:1px solid rgba(120,255,153,0.5);border-radius:10px;color:#78ff99;font-family:'Orbitron',monospace;font-size:0.7rem;letter-spacing:0.08em;cursor:pointer;font-weight:700">🔓 DESBLOQUEAR MÓDULO ESPORTE</button>
+    </div>
+  </div>
+  <div id="esporte-unlocked" style="display:none">
+    <div class="card" style="margin-bottom:12px;background:linear-gradient(135deg,rgba(120,255,153,0.14),rgba(0,60,120,0.15));border:1px solid rgba(120,255,153,0.3)">
+      <div class="section-title">⚽ Registro de Esporte</div>
+      <div style="font-size:0.72rem;color:var(--text-dim);line-height:1.5">Modalidades, aulas e treinos regulares. Ajuda a mapear o desenvolvimento motor e hábitos saudáveis.</div>
+    </div>
+    <div class="card">
+      <div class="section-title">⚽ Nova Atividade</div>
+      <div class="row-2">
+        <div class="form-group"><label>Data</label><input type="date" id="esp-data"></div>
+        <div class="form-group"><label>Hora</label><input type="time" id="esp-hora"></div>
+      </div>
+      <div class="form-group">
+        <label>Modalidade</label>
+        <input type="text" id="esp-modalidade" placeholder="ex: Futebol, Natação, Judô, Dança">
+      </div>
+      <div class="row-2">
+        <div class="form-group">
+          <label>Duração</label>
+          <select id="esp-duracao">
+            <option value="30">30 min</option>
+            <option value="45">45 min</option>
+            <option value="60" selected>1 hora</option>
+            <option value="90">1h30</option>
+            <option value="120">2h+</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Intensidade</label>
+          <select id="esp-intensidade">
+            <option value="leve">🟢 Leve</option>
+            <option value="moderada" selected>🟡 Moderada</option>
+            <option value="intensa">🔴 Intensa</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label style="display:flex;align-items:center;gap:10px;padding:9px 12px;background:rgba(120,255,153,0.1);border:1px solid rgba(120,255,153,0.25);border-radius:10px;cursor:pointer;margin-bottom:0">
+          <input type="checkbox" id="esp-regular" style="width:18px;height:18px;accent-color:#78ff99;cursor:pointer">
+          <span style="font-size:0.76rem;color:var(--white)">🏋️ É aula/treino regular</span>
+        </label>
+      </div>
+      <div class="form-group"><label>Observações</label><input type="text" id="esp-obs" placeholder="ex: primeira aula, time da escola..."></div>
+      <button class="btn btn-primary btn-full" onclick="salvarEsporte()">⚡ Registrar Atividade</button>
+    </div>
+    <div id="lista-esportes"></div>
+    <div style="text-align:center;margin-top:16px;padding-top:14px;border-top:1px dashed rgba(120,255,153,0.2)">
+      <button onclick="window._reverterEsporte()" style="background:none;border:1px solid rgba(120,255,153,0.3);color:#78ff99;padding:9px 18px;border-radius:20px;font-family:'Orbitron',monospace;font-size:0.58rem;letter-spacing:0.08em;cursor:pointer">🔒 Fechar módulo Esporte</button>
+    </div>
+  </div>
+</div>
+
 <!-- ESCOLA (só renderiza para 3a+) -->
 <div id="tab-escola" class="tab-panel">
   <div id="escola-locked" style="display:none">
@@ -1574,7 +1808,7 @@ textarea{resize:none;min-height:80px;}
 </main>
 
 <!-- ═══ MODAIS ═══ -->
-<div id="modal-editar-mamada" class="modal-overlay" style="display:none">
+<div id="modal-editar-mamada" class="modal-overlay" style="display:none" role="dialog" aria-modal="true">
   <div class="modal-box" style="max-width:340px;text-align:left">
     <div class="modal-icon" style="text-align:center">✏️</div>
     <div class="modal-title" style="text-align:center;color:var(--blue-neon);margin-bottom:14px">EDITAR REGISTRO</div>
@@ -1600,7 +1834,7 @@ textarea{resize:none;min-height:80px;}
   </div>
 </div>
 
-<div id="modal-confirm" class="modal-overlay" style="display:none">
+<div id="modal-confirm" class="modal-overlay" style="display:none" role="dialog" aria-modal="true">
   <div class="modal-box">
     <div class="modal-icon">⚠️</div>
     <div class="modal-title">CONFIRMAR EXCLUSÃO</div>
@@ -1612,11 +1846,11 @@ textarea{resize:none;min-height:80px;}
   </div>
 </div>
 
-<div id="modal-resposta" class="modal-overlay" style="display:none">
+<div id="modal-resposta" class="modal-overlay" style="display:none" role="dialog" aria-modal="true">
   <div class="modal-box" style="border-color:rgba(57,255,20,0.3);max-width:360px">
     <div class="modal-icon">✍️</div>
     <div class="modal-title" style="color:#7fff60">RESPOSTA DO CURANDEIRO</div>
-    <div id="modal-resp-pergunta" style="font-size:0.82rem;color:var(--text-dim);font-style:italic;margin-bottom:10px;padding:8px;background:rgba(0,20,50,0.5);border-radius:6px;line-height:1.4;text-align:left"></div>
+    <div id="modal-resp-pergunta" style="font-size:0.82rem;color:var(--text-dim);font-style:italic;margin-bottom:10px;padding:8px;background:rgba(0,20,50,0.5);border-radius:6px;line-height:1.4;text-align:left" role="dialog" aria-modal="true"></div>
     <textarea id="modal-resp-texto" placeholder="Transcreva aqui a resposta do médico..." style="width:100%;min-height:80px;font-size:0.88rem;background:rgba(0,20,10,0.7);border-color:rgba(57,255,20,0.3);margin-bottom:14px"></textarea>
     <div class="modal-btns">
       <button class="btn btn-responder" style="padding:10px 18px;font-size:0.72rem" onclick="confirmarResposta()">💾 Salvar</button>
@@ -1625,12 +1859,12 @@ textarea{resize:none;min-height:80px;}
   </div>
 </div>
 
-<div id="modal-relatorio-crescimento" class="modal-overlay" style="display:none">
+<div id="modal-relatorio-crescimento" class="modal-overlay" style="display:none" role="dialog" aria-modal="true">
   <div class="modal-box" style="max-width:400px;text-align:left;border-color:rgba(0,212,255,0.3);max-height:85vh;overflow-y:auto">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
       <div style="font-size:1.8rem">📊</div>
       <div style="flex:1"><div class="modal-title" style="text-align:left;margin-bottom:2px;font-size:0.82rem">RELATÓRIO DE CRESCIMENTO</div><div style="font-size:0.6rem;color:var(--text-dim);font-family:'Orbitron',monospace">Referências OMS</div></div>
-      <button onclick="fecharRelatorioCrescimento()" style="background:rgba(0,50,100,0.4);border:1px solid rgba(0,180,255,0.2);border-radius:8px;color:var(--text-dim);width:32px;height:32px;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;flex-shrink:0">✕</button>
+      <button onclick="fecharRelatorioCrescimento()" style="background:rgba(0,50,100,0.4);border:1px solid rgba(0,180,255,0.2);border-radius:8px;color:var(--text-dim);width:32px;height:32px;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;flex-shrink:0" aria-label="Fechar">✕</button>
     </div>
     <div id="rel-cresc-conteudo"></div>
     <div class="modal-btns" style="margin-top:16px">
@@ -1640,12 +1874,12 @@ textarea{resize:none;min-height:80px;}
   </div>
 </div>
 
-<div id="modal-relatorio" class="modal-overlay" style="display:none">
+<div id="modal-relatorio" class="modal-overlay" style="display:none" role="dialog" aria-modal="true">
   <div class="modal-box" style="max-width:400px;text-align:left;border-color:rgba(0,212,255,0.3);max-height:85vh;overflow-y:auto">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
       <div style="font-size:1.8rem">📋</div>
       <div style="flex:1"><div class="modal-title" style="text-align:left;margin-bottom:2px;font-size:0.85rem">RELATÓRIO DIÁRIO</div><div id="rel-data-titulo" style="font-size:0.62rem;color:var(--text-dim);font-family:'Orbitron',monospace;letter-spacing:0.06em"></div></div>
-      <button onclick="fecharRelatorio()" style="background:rgba(0,50,100,0.4);border:1px solid rgba(0,180,255,0.2);border-radius:8px;color:var(--text-dim);width:32px;height:32px;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;flex-shrink:0">✕</button>
+      <button onclick="fecharRelatorio()" style="background:rgba(0,50,100,0.4);border:1px solid rgba(0,180,255,0.2);border-radius:8px;color:var(--text-dim);width:32px;height:32px;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;flex-shrink:0" aria-label="Fechar">✕</button>
     </div>
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
       <button onclick="relNavDia(-1)" style="background:rgba(0,50,100,0.4);border:1px solid rgba(0,180,255,0.2);border-radius:8px;color:var(--blue-neon);padding:6px 12px;cursor:pointer;font-size:1rem">‹</button>
@@ -1660,11 +1894,11 @@ textarea{resize:none;min-height:80px;}
   </div>
 </div>
 
-<div id="modal-nova-vacina" class="modal-overlay" style="display:none">
+<div id="modal-nova-vacina" class="modal-overlay" style="display:none" role="dialog" aria-modal="true">
   <div class="modal-box" style="max-width:380px;text-align:left;border-color:rgba(0,212,255,0.35)">
     <div class="modal-icon" style="text-align:center">🛡️</div>
     <div class="modal-title" style="text-align:center;color:var(--blue-neon);margin-bottom:4px">NOVO ESCUDO</div>
-    <div id="modal-nova-vac-grupo" style="text-align:center;font-size:0.62rem;color:var(--text-dim);font-family:'Orbitron',monospace;letter-spacing:0.08em;margin-bottom:12px"></div>
+    <div id="modal-nova-vac-grupo" style="text-align:center;font-size:0.62rem;color:var(--text-dim);font-family:'Orbitron',monospace;letter-spacing:0.08em;margin-bottom:12px" role="dialog" aria-modal="true"></div>
     <div id="nv-step-1">
       <div style="font-size:0.68rem;color:var(--text-dim);font-family:'Orbitron',monospace;letter-spacing:0.06em;margin-bottom:8px;text-align:center">VACINAS RECOMENDADAS</div>
       <div id="nv-sugestoes-lista" style="max-height:52vh;overflow-y:auto;-webkit-overflow-scrolling:touch"></div>
@@ -1688,7 +1922,7 @@ textarea{resize:none;min-height:80px;}
   </div>
 </div>
 
-<div id="modal-troca-emoji" class="modal-overlay" style="display:none;z-index:99000">
+<div id="modal-troca-emoji" class="modal-overlay" style="display:none;z-index:99000" role="dialog" aria-modal="true">
   <div class="modal-box" style="max-width:320px">
     <div class="modal-icon">✏️</div>
     <div class="modal-title" style="color:var(--blue-neon);margin-bottom:14px">TROCAR EMBLEMA</div>
@@ -1700,12 +1934,12 @@ textarea{resize:none;min-height:80px;}
   </div>
 </div>
 
-<div id="modal-novidades" style="display:none;position:fixed;inset:0;z-index:999998;background:rgba(2,11,24,0.88);align-items:flex-end;justify-content:center;padding-bottom:env(safe-area-inset-bottom,16px);animation:fadeIn 0.3s ease;">
+<div id="modal-novidades" style="display:none;position:fixed;inset:0;z-index:999998;background:rgba(2,11,24,0.88);align-items:flex-end;justify-content:center;padding-bottom:env(safe-area-inset-bottom,16px);animation:fadeIn 0.3s ease;" role="dialog" aria-modal="true">
   <div style="background:linear-gradient(135deg,rgba(0,30,70,0.99),rgba(2,15,40,0.99));border:1px solid rgba(0,180,255,0.3);border-radius:16px 16px 12px 12px;padding:20px 18px 18px;max-width:400px;width:calc(100% - 24px);margin-bottom:8px;box-shadow:0 -4px 40px rgba(0,0,0,0.5);">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
       <div style="font-size:1.6rem" id="nov-emoji">🌌</div>
       <div style="flex:1"><div style="font-family:'Orbitron',monospace;font-size:0.78rem;font-weight:700;color:#00d4ff;letter-spacing:0.08em">NOVIDADES NA GALÁXIA</div><div id="nov-subtitulo" style="font-size:0.68rem;color:#7ab3d4;margin-top:1px"></div></div>
-      <button onclick="fecharNovidades()" style="background:rgba(0,50,100,0.4);border:1px solid rgba(0,180,255,0.2);border-radius:8px;color:#7ab3d4;width:32px;height:32px;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">✕</button>
+      <button onclick="fecharNovidades()" style="background:rgba(0,50,100,0.4);border:1px solid rgba(0,180,255,0.2);border-radius:8px;color:#7ab3d4;width:32px;height:32px;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;" aria-label="Fechar">✕</button>
     </div>
     <div id="nov-lista" style="display:flex;flex-direction:column;gap:7px;margin-bottom:14px;"></div>
     <div id="nov-tempo" style="font-size:0.62rem;color:rgba(122,179,212,0.5);font-family:'Orbitron',monospace;letter-spacing:0.05em;text-align:right;margin-bottom:12px;"></div>
@@ -1713,7 +1947,7 @@ textarea{resize:none;min-height:80px;}
   </div>
 </div>
 
-<div id="modal-migracao" style="display:none;position:fixed;inset:0;z-index:999999;background:rgba(2,11,24,0.95);align-items:center;justify-content:center;padding:20px;">
+<div id="modal-migracao" style="display:none;position:fixed;inset:0;z-index:999999;background:rgba(2,11,24,0.95);align-items:center;justify-content:center;padding:20px;" role="dialog" aria-modal="true">
   <div style="background:linear-gradient(135deg,rgba(5,25,55,0.99),rgba(3,15,35,0.99));border:1px solid rgba(57,255,20,0.35);border-radius:16px;padding:24px 20px;max-width:340px;width:100%;text-align:center;">
     <div style="font-size:2.2rem;margin-bottom:10px">☁️</div>
     <div style="font-family:'Orbitron',monospace;font-size:0.85rem;font-weight:700;color:#7fff60;letter-spacing:0.1em;margin-bottom:8px">SINCRONIZAR COM A NUVEM</div>
@@ -1727,7 +1961,7 @@ textarea{resize:none;min-height:80px;}
   </div>
 </div>
 
-<div id="modal-config-bebe" class="modal-overlay" style="display:none">
+<div id="modal-config-bebe" class="modal-overlay" style="display:none" role="dialog" aria-modal="true">
   <div class="modal-box" style="max-width:340px;text-align:left">
     <div class="modal-icon" style="text-align:center">⚙️</div>
     <div class="modal-title" style="text-align:center;color:var(--gold);margin-bottom:14px">CONFIGURAR BEBÊ</div>
@@ -1768,7 +2002,7 @@ textarea{resize:none;min-height:80px;}
   </div>
 </div>
 
-<div id="modal-foto-arthur" class="modal-overlay" style="display:none">
+<div id="modal-foto-arthur" class="modal-overlay" style="display:none" role="dialog" aria-modal="true">
   <div class="modal-box" style="max-width:300px">
     <div class="modal-icon">🛸</div>
     <div class="modal-title" style="color:var(--blue-neon);margin-bottom:14px">FOTO DO BEBÊ</div>
@@ -1785,7 +2019,7 @@ textarea{resize:none;min-height:80px;}
   </div>
 </div>
 
-<div id="modal-foto-guardiao" class="modal-overlay" style="display:none">
+<div id="modal-foto-guardiao" class="modal-overlay" style="display:none" role="dialog" aria-modal="true">
   <div class="modal-box" style="max-width:300px">
     <div class="modal-icon">📷</div>
     <div class="modal-title" style="color:var(--blue-neon);margin-bottom:14px">FOTO DO GUARDIÃO</div>
@@ -1803,12 +2037,12 @@ textarea{resize:none;min-height:80px;}
 </div>
 
 <!-- GLOSSÁRIO -->
-<div id="modal-glossario" style="display:none;position:fixed;inset:0;z-index:999999;background:rgba(2,11,24,0.97);flex-direction:column;overflow:hidden;">
+<div id="modal-glossario" style="display:none;position:fixed;inset:0;z-index:999999;background:rgba(2,11,24,0.97);flex-direction:column;overflow:hidden;" role="dialog" aria-modal="true">
   <div style="background:linear-gradient(180deg,rgba(0,20,50,0.98) 0%,rgba(2,11,24,0.95) 100%);border-bottom:1px solid rgba(0,180,255,0.2);padding:env(safe-area-inset-top,0) 0 0;flex-shrink:0;">
     <div style="display:flex;align-items:center;gap:12px;padding:14px 16px">
       <div style="font-size:1.4rem">📖</div>
       <div style="flex:1"><div style="font-family:'Orbitron',monospace;font-size:0.85rem;font-weight:700;color:#e8f4fd;letter-spacing:0.08em">GLOSSÁRIO GALÁCTICO</div><div style="font-size:0.65rem;color:#7ab3d4;margin-top:1px">Termos BabyForce · Equivalentes comuns</div></div>
-      <button onclick="fecharGlossario()" style="background:rgba(0,50,100,0.5);border:1px solid rgba(0,180,255,0.25);border-radius:8px;color:#7ab3d4;font-size:1.1rem;width:36px;height:36px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;">✕</button>
+      <button onclick="fecharGlossario()" style="background:rgba(0,50,100,0.5);border:1px solid rgba(0,180,255,0.25);border-radius:8px;color:#7ab3d4;font-size:1.1rem;width:36px;height:36px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;" aria-label="Fechar">✕</button>
     </div>
     <div style="padding:0 16px 14px">
       <input type="text" id="gloss-busca" placeholder="🔍  Buscar..." oninput="filtrarGlossario()" style="width:100%;background:rgba(0,20,50,0.8);border:1px solid rgba(0,180,255,0.25);border-radius:10px;color:#e8f4fd;font-size:16px;font-family:'Exo 2',sans-serif;padding:10px 14px;outline:none;-webkit-appearance:none;">
@@ -2088,7 +2322,7 @@ function renderListaGuardioes(){
           <div class="guardian-info-role">${g.papel||'Guardião da Força'}</div>
         </div>
       </button>
-      ${podeExcluir?`<button onclick="confirmarDeleteGuardiao('${id}')" title="Remover guardião" style="flex-shrink:0;width:44px;height:60px;background:rgba(180,30,30,0.15);border:1px solid rgba(255,59,59,0.25);border-radius:12px;color:rgba(255,100,100,0.65);font-size:1.1rem;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;" onmouseenter="this.style.background='rgba(200,40,40,0.35)'" onmouseleave="this.style.background='rgba(180,30,30,0.15)'">🗑</button>`:''}
+      ${podeExcluir?`<button onclick="confirmarDeleteGuardiao('${id}')" title="Remover guardião" style="flex-shrink:0;width:44px;height:60px;background:rgba(180,30,30,0.15);border:1px solid rgba(255,59,59,0.25);border-radius:12px;color:rgba(255,100,100,0.65);font-size:1.1rem;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;" onmouseenter="this.style.background='rgba(200,40,40,0.35)'" onmouseleave="this.style.background='rgba(180,30,30,0.15)'" aria-label="Remover">🗑</button>`:''}
     </div>
   `).join('');
 }
@@ -2124,8 +2358,12 @@ function abrirCadastroGuardiao(){
   const gEl=document.getElementById('novo-guardiao-genero');if(gEl)gEl.value='';
   const eEl=document.getElementById('novo-guardiao-email');if(eEl)eEl.value='';
   const nEl=document.getElementById('novo-guardiao-nascimento');if(nEl)nEl.value='';
+  const pEl=document.getElementById('novo-guardiao-parentesco');if(pEl)pEl.value='';
   document.getElementById('login-step-1').style.display='none';
   document.getElementById('login-step-3').style.display='block';
+  // Aplica classe 'wide' para acomodar form maior
+  const box = document.querySelector('.login-box');
+  if (box) box.classList.add('wide');
   const grid=document.getElementById('emoji-grid');
   grid.innerHTML=EMOJIS_DISPONIVEIS.map(e=>`<button class="emoji-btn ${e===_emojiSelecionado?'sel':''}" onclick="selecionarEmoji('${e}',this)">${e}</button>`).join('');
 }
@@ -2158,6 +2396,9 @@ function voltarLogin(){
   if (s4) s4.style.display='none';
   document.getElementById('login-step-1').style.display='block';
   document.getElementById('pin-error').textContent='';
+  // Remove classe wide (volta ao tamanho padrão)
+  const box = document.querySelector('.login-box');
+  if (box) box.classList.remove('wide');
   const el=document.getElementById('pin-input-oculto');if(el)el.value='';
   atualizarPinDisplay();renderListaGuardioes();
   // Se saiu do step-4 sem escolher criança, desfaz o login
@@ -2246,16 +2487,120 @@ function pinApagar(){_pinAtual=_pinAtual.slice(0,-1);atualizarPinDisplay();const
 function atualizarPinDisplay(){for(let i=0;i<6;i++){const d=document.getElementById('pd'+i);if(d)d.className='pin-dot'+(i<_pinAtual.length?' filled':'');}}
 
 function verificarSenha(){
-  if(_pinAtual===getAppPIN()){document.getElementById('pin-error').textContent='';fazerLogin(_guardiaoPendente);}
-  else{
-    _pinTentativas++;_pinAtual='';
-    const el=document.getElementById('pin-input-oculto');if(el)el.value='';
-    for(let i=0;i<6;i++){const d=document.getElementById('pd'+i);if(d)d.className='pin-dot error';}
-    const delay=Math.min(1000*_pinTentativas,5000);
-    document.getElementById('pin-error').textContent=_pinTentativas>=3?`Aguarde ${delay/1000}s`:'Código incorreto';
-    setTimeout(()=>{atualizarPinDisplay();},delay);
+  // Rate limiting — NIST SP 800-63-4 AAL2: lockout progressivo
+  if (typeof BFRateLimit !== 'undefined' && BFRateLimit.podeTemtarLogin) {
+    const r = BFRateLimit.podeTemtarLogin('pin');
+    if (!r.permitido) {
+      const restante = Math.ceil(r.esperarMs / 1000);
+      document.getElementById('pin-error').textContent = `🔒 Bloqueado por ${restante}s (muitas tentativas)`;
+      _pinAtual = '';
+      for (let i=0;i<6;i++) {
+        const d = document.getElementById('pd'+i);
+        if (d) d.className = 'pin-dot error';
+      }
+      setTimeout(() => atualizarPinDisplay(), 1200);
+      return;
+    }
+  }
+
+  // Verificação: suporta PIN hasheado (v3 — seguro) OU texto plano (v2 — legado, migração transparente)
+  _verificarPinV3(_pinAtual).then(valido => {
+    if (valido) {
+      // Sucesso: reseta rate limit
+      if (typeof BFRateLimit !== 'undefined' && BFRateLimit.registrarSucesso) BFRateLimit.registrarSucesso('pin');
+      document.getElementById('pin-error').textContent = '';
+      // Migração transparente: se ainda está em texto plano, migra para hash
+      try {
+        const cfg = getAppConfig();
+        if (cfg.pin && !cfg.pinHash) {
+          _migrarPinParaHash(cfg.pin).then(() => {
+            console.log('[BFSec] PIN migrado para hash SHA-256 com salt');
+          });
+        }
+      } catch {}
+      if (typeof BFAudit !== 'undefined') BFAudit.log('login_sucesso', { metodo: 'pin' });
+      fazerLogin(_guardiaoPendente);
+    } else {
+      _pinAtual = '';
+      if (typeof BFRateLimit !== 'undefined' && BFRateLimit.registrarFalha) BFRateLimit.registrarFalha('pin');
+      _pinTentativas++;
+      const el = document.getElementById('pin-input-oculto');
+      if (el) el.value = '';
+      for (let i=0;i<6;i++) {
+        const d = document.getElementById('pd'+i);
+        if (d) d.className = 'pin-dot error';
+      }
+      const delay = Math.min(1000 * _pinTentativas, 5000);
+      document.getElementById('pin-error').textContent = _pinTentativas >= 3 ? `Aguarde ${delay/1000}s` : 'Código incorreto';
+      if (typeof BFAudit !== 'undefined') BFAudit.log('login_falha', { metodo: 'pin', tentativa: _pinTentativas });
+      setTimeout(() => { atualizarPinDisplay(); }, delay);
+    }
+  });
+}
+
+// Verificação compatível com PIN plano (legado) e PIN hasheado (v3)
+async function _verificarPinV3(pinDigitado) {
+  try {
+    const cfg = getAppConfig();
+    // Se há hash armazenado, compara hash
+    if (cfg.pinHash && cfg.pinSalt) {
+      if (typeof BFSec === 'undefined' || !BFSec.sha256) {
+        console.warn('[Login v3] BFSec indisponível, fallback plano');
+        return pinDigitado === cfg.pin;
+      }
+      const hashTentativa = await BFSec.sha256(pinDigitado + cfg.pinSalt);
+      return hashTentativa === cfg.pinHash;
+    }
+    // Legado: compara plano (ainda não migrado)
+    return pinDigitado === (cfg.pin || '000000');
+  } catch (e) {
+    console.warn('[_verificarPinV3]', e);
+    return pinDigitado === getAppPIN();
   }
 }
+
+// Migração transparente: converte PIN em texto plano para hash SHA-256 com salt
+async function _migrarPinParaHash(pinPlano) {
+  try {
+    if (typeof BFSec === 'undefined' || !BFSec.sha256) return;
+    // Gera salt único de 16 bytes
+    const saltBytes = crypto.getRandomValues(new Uint8Array(16));
+    const salt = btoa(String.fromCharCode(...saltBytes));
+    const hash = await BFSec.sha256(pinPlano + salt);
+    const cfg = getAppConfig();
+    cfg.pinHash = hash;
+    cfg.pinSalt = salt;
+    cfg.pinHashVersao = 'v3_sha256_salt';
+    // Remove PIN em plano (mas mantém pin existente para retrocompat até próximo login)
+    delete cfg.pin;
+    saveAppConfig(cfg);
+    if (typeof BFAudit !== 'undefined') BFAudit.log('pin_migrado_v3');
+  } catch (e) {
+    console.warn('[_migrarPinParaHash]', e);
+  }
+}
+
+// Atualizar PIN (usa hash + salt desde a criação)
+window._definirPinSeguro = async function(pinNovo) {
+  if (!/^\d{6}$/.test(pinNovo)) throw new Error('PIN deve ter 6 dígitos');
+  if (typeof BFSec === 'undefined' || !BFSec.sha256) {
+    // Fallback: salva plano (compatibilidade)
+    const cfg = getAppConfig();
+    cfg.pin = pinNovo;
+    saveAppConfig(cfg);
+    return;
+  }
+  const saltBytes = crypto.getRandomValues(new Uint8Array(16));
+  const salt = btoa(String.fromCharCode(...saltBytes));
+  const hash = await BFSec.sha256(pinNovo + salt);
+  const cfg = getAppConfig();
+  cfg.pinHash = hash;
+  cfg.pinSalt = salt;
+  cfg.pinHashVersao = 'v3_sha256_salt';
+  delete cfg.pin;
+  saveAppConfig(cfg);
+  if (typeof BFAudit !== 'undefined') BFAudit.log('pin_redefinido_v3');
+};
 
 function fazerLogin(id){
   usuarioAtual=id;
@@ -2337,6 +2682,7 @@ function _processarShortcutURL() {
 }
 
 function sairSessao(){
+  if (!confirm('Tem certeza que deseja sair?\n\nVocê precisará digitar seu PIN novamente para voltar.')) return;
   const id=usuarioAtual;usuarioAtual=null;_pinAtual='';_guardiaoPendente=null;
   if(_autoLockTimer)clearTimeout(_autoLockTimer);
   try{sessionStorage.removeItem(SESSION_KEY);}catch(e){}
@@ -2568,6 +2914,8 @@ function showTab(id){
   if(id==='fraldas'){initFraldaForm();renderFraldas();renderFraldaStats();}
   if(id==='sono'){initSonoForm();renderSono();renderSonoStats();}
   if(id==='mamadas')initTimerMamaForm();
+  if(id==='sintomas'){ if(typeof initSintomaForm==='function')initSintomaForm(); if(typeof renderSintomas==='function')renderSintomas(); }
+  if(id==='esporte'){ if(typeof aplicarLockEsporte==='function')aplicarLockEsporte(); }
   renderAll();
   // Delega para o hub correto (mantém retrocompatibilidade).
   // IMPORTANTE: se o hub ativo (_hubAtivo) já comporta essa tab, mantemos — isso resolve
@@ -2609,6 +2957,7 @@ const HUB_MAPA = {
     label: 'Saúde', icon: '🛡️',
     subTabs: [
       { id:'vacinas',     label:'🛡️ Escudos',     desc:'Vacinas PNI e SBIm' },
+      { id:'sintomas',    label:'🤒 Sintomas',    desc:'Febre, tosse, dor' },
       { id:'mesversario', label:'📏 Medidas',     desc:'Peso, altura e curvas OMS', subAction:'_focarMedidas' },
       { id:'agenda',      label:'⚗️ Elixires',    desc:'Medicamentos e febres',    subAction:() => { if(typeof showSubTabMissoes==='function') showSubTabMissoes('medicacao'); } },
     ],
@@ -2618,6 +2967,7 @@ const HUB_MAPA = {
     label: 'Desenvolvimento', icon: '🚀',
     subTabs: [
       { id:'mesversario', label:'🌙 Órbitas', desc:'Marcos e mesversários', subAction:'_focarMarcos' },
+      { id:'esporte',     label:'⚽ Esporte', desc:'Modalidades e treinos' },
       { id:'escola',      label:'🏫 Escola',  desc:'Agenda e desempenho (3a+)' },
     ],
     defaultTab: 'mesversario'
@@ -2833,7 +3183,7 @@ function renderMamadas(){
       if (m.ml_formula) partes.push(`<span style="color:#ffc856;font-size:0.68rem">🥛 ${m.ml_formula}ml fórmula</span>`);
       discrim = `<div style="margin-top:3px;display:flex;gap:10px;flex-wrap:wrap">${partes.join('')}</div>`;
     }
-    return `<div class="feed-item ${m.tipo}"><div style="flex:1"><div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><span class="badge badge-${m.tipo}">${tipoLabel[m.tipo]||m.tipo}</span>${m.ml?`<span style="color:var(--blue-neon);font-family:'Orbitron',monospace;font-size:0.75rem">${m.ml}ml</span>`:''}</div><div class="feed-meta">${formatDate(m.data)} · ${m.hora}</div>${discrim}${m.obs?`<div style="font-size:0.8rem;color:#7ab3d4;margin-top:4px">${m.obs}</div>`:''}${m.autor?`<div class="autor-tag">⚔️ ${nomeAutor(m.autor)}</div>`:''}</div><div style="display:flex;flex-direction:column;gap:6px"><button class="btn-edit-mamada" onclick="abrirModalEditarMamada(${m.id})">✏️</button><button class="btn btn-danger btn-sm" onclick="deleteMamada(${m.id})">🗑</button></div></div>`;
+    return `<div class="feed-item ${m.tipo}"><div style="flex:1"><div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><span class="badge badge-${m.tipo}">${tipoLabel[m.tipo]||m.tipo}</span>${m.ml?`<span style="color:var(--blue-neon);font-family:'Orbitron',monospace;font-size:0.75rem">${m.ml}ml</span>`:''}</div><div class="feed-meta">${formatDate(m.data)} · ${m.hora}</div>${discrim}${m.obs?`<div style="font-size:0.8rem;color:#7ab3d4;margin-top:4px">${m.obs}</div>`:''}${m.autor?`<div class="autor-tag">⚔️ ${nomeAutor(m.autor)}</div>`:''}</div><div style="display:flex;flex-direction:column;gap:6px"><button class="btn-edit-mamada" onclick="abrirModalEditarMamada(${m.id})">✏️</button><button class="btn btn-danger btn-sm" onclick="deleteMamada(${m.id})" aria-label="Remover">🗑</button></div></div>`;
   }).join('');
 }
 
@@ -2853,7 +3203,7 @@ function renderDuvidas(){
   if(f==='pendentes')list=list.filter(d=>!d.respondida);else if(f==='respondidas')list=list.filter(d=>d.respondida);
   const el=document.getElementById('lista-duvidas');
   if(!list.length){el.innerHTML=`<div class="empty"><div class="empty-icon">📜</div><p>${f==='pendentes'?'Nenhuma missiva pendente':f==='respondidas'?'Nenhuma missiva respondida':'Nenhuma missiva'}</p></div>`;return;}
-  el.innerHTML=list.map(d=>`<div class="duvida-item ${d.respondida?'respondida':''}"><div style="flex:1"><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px"><span style="font-size:1rem">${catIcon(d.cat)}</span><span style="font-size:0.65rem;color:var(--text-dim);font-family:'Orbitron',monospace">${LABELS_CAT[d.cat]||d.cat}</span><span style="font-size:0.65rem;color:var(--text-dim);margin-left:auto">${formatDate(d.data)}</span></div><div class="duvida-text">${d.texto}</div>${d.resposta?`<div class="resposta-area"><div class="resposta-label">💬 Resposta do Curandeiro</div><div class="resposta-texto">${d.resposta}</div><button class="btn-responder" style="margin-top:6px;font-size:0.62rem" onclick="abrirModalResposta(${d.id})">✏️ Editar</button></div>`:`<button class="btn-responder" style="margin-top:8px" onclick="abrirModalResposta(${d.id})">✍️ Adicionar resposta</button>`}${d.autor?`<div class="autor-tag">⚔️ ${nomeAutor(d.autor)}</div>`:''}</div><div class="duvida-actions"><button class="toggle-btn ${d.respondida?'done':''}" onclick="toggleDuvida(${d.id})">${d.respondida?'✅':'⬜'}</button><button class="btn btn-danger btn-sm" onclick="deleteDuvida(${d.id})">🗑</button></div></div>`).join('');
+  el.innerHTML=list.map(d=>`<div class="duvida-item ${d.respondida?'respondida':''}"><div style="flex:1"><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px"><span style="font-size:1rem">${catIcon(d.cat)}</span><span style="font-size:0.65rem;color:var(--text-dim);font-family:'Orbitron',monospace">${LABELS_CAT[d.cat]||d.cat}</span><span style="font-size:0.65rem;color:var(--text-dim);margin-left:auto">${formatDate(d.data)}</span></div><div class="duvida-text">${d.texto}</div>${d.resposta?`<div class="resposta-area"><div class="resposta-label">💬 Resposta do Curandeiro</div><div class="resposta-texto">${d.resposta}</div><button class="btn-responder" style="margin-top:6px;font-size:0.62rem" onclick="abrirModalResposta(${d.id})">✏️ Editar</button></div>`:`<button class="btn-responder" style="margin-top:8px" onclick="abrirModalResposta(${d.id})">✍️ Adicionar resposta</button>`}${d.autor?`<div class="autor-tag">⚔️ ${nomeAutor(d.autor)}</div>`:''}</div><div class="duvida-actions"><button class="toggle-btn ${d.respondida?'done':''}" onclick="toggleDuvida(${d.id})">${d.respondida?'✅':'⬜'}</button><button class="btn btn-danger btn-sm" onclick="deleteDuvida(${d.id})" aria-label="Remover">🗑</button></div></div>`).join('');
 }
 const TEMAS={alimentacao:{label:'Nutrição e Energia',icon:'🍼'},sono:{label:'Ciclos de Repouso',icon:'😴'},desenvolvimento:{label:'Crescimento',icon:'📈'},saude:{label:'Saúde e Cura',icon:'🏥'},vacinas:{label:'Vacinas',icon:'💉'},comportamento:{label:'Comportamento',icon:'🧠'},outro:{label:'Outros',icon:'💬'}};
 const temaAberto={};
@@ -2894,7 +3244,7 @@ function renderAgenda(){
   if(!list.length){el.innerHTML=`<div class="empty"><div class="empty-icon">🗺️</div><p>Nenhuma missão registrada</p></div>`;return;}
   const futuros=db.eventos.filter(e=>e.data>=hoje);
   const btnExp=futuros.length>0?`<button onclick="exportarAgendaICS()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:11px;margin-bottom:12px;background:linear-gradient(135deg,rgba(0,60,130,0.5),rgba(0,30,80,0.6));border:1px solid rgba(0,180,255,0.3);border-radius:10px;color:var(--blue-neon);font-family:'Orbitron',monospace;font-size:0.65rem;letter-spacing:0.06em;cursor:pointer;">📅 Exportar ${futuros.length} missão(ões) para Calendário</button>`:'';
-  el.innerHTML=btnExp+list.map(e=>`<div class="evento-item ${e.data<hoje?'passado':''}"><div style="flex:1"><div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><span style="font-size:1.1rem">${tipoEvIcon(e.tipo)}</span><span class="feed-title">${e.titulo}</span></div><div class="evento-date">${formatDate(e.data)}${e.hora?' · '+e.hora:''}</div>${e.local?`<div style="font-size:0.78rem;color:var(--text-dim);margin-top:3px">📍 ${e.local}</div>`:''} ${e.profissional?`<div style="font-size:0.72rem;color:rgba(0,212,255,0.6);margin-top:3px">👨‍⚕️ ${e.profissional}</div>`:''}</div><div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">${e.data>=hoje?`<button onclick="adicionarEventoCalendario(${e.id})" style="background:rgba(0,80,180,0.3);border:1px solid rgba(0,180,255,0.3);color:var(--blue-neon);border-radius:8px;padding:6px 10px;font-size:0.68rem;font-family:'Orbitron',monospace;cursor:pointer;">📅</button>`:''}<button class="btn btn-danger btn-sm" onclick="deleteEvento(${e.id})">🗑</button></div></div>`).join('');
+  el.innerHTML=btnExp+list.map(e=>`<div class="evento-item ${e.data<hoje?'passado':''}"><div style="flex:1"><div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><span style="font-size:1.1rem">${tipoEvIcon(e.tipo)}</span><span class="feed-title">${e.titulo}</span></div><div class="evento-date">${formatDate(e.data)}${e.hora?' · '+e.hora:''}</div>${e.local?`<div style="font-size:0.78rem;color:var(--text-dim);margin-top:3px">📍 ${e.local}</div>`:''} ${e.profissional?`<div style="font-size:0.72rem;color:rgba(0,212,255,0.6);margin-top:3px">👨‍⚕️ ${e.profissional}</div>`:''}</div><div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">${e.data>=hoje?`<button onclick="adicionarEventoCalendario(${e.id})" style="background:rgba(0,80,180,0.3);border:1px solid rgba(0,180,255,0.3);color:var(--blue-neon);border-radius:8px;padding:6px 10px;font-size:0.68rem;font-family:'Orbitron',monospace;cursor:pointer;">📅</button>`:''}<button class="btn btn-danger btn-sm" onclick="deleteEvento(${e.id})" aria-label="Remover">🗑</button></div></div>`).join('');
 }
 
 // ── DASHBOARD ──
@@ -3018,7 +3368,7 @@ function renderMesversario(){
   if(!list.length){el.innerHTML='<div class="empty"><div class="empty-icon">🌙</div><p>Nenhum marco registrado</p></div>';return;}
   const grupos={};list.forEach(x=>{if(!grupos[x.mes])grupos[x.mes]=[];grupos[x.mes].push(x);});
   const nomeMes=m=>m===12?'✨ 1 Aninho — Grande Celebração!':'🌙 '+m+'º Mês de Vida';
-  el.innerHTML=Object.keys(grupos).sort((a,b)=>a-b).map(mes=>`<div class="mv-mes-grupo"><div class="mv-mes-header">${nomeMes(parseInt(mes))}</div><div class="mv-mes-items">${grupos[mes].map(x=>`<div class="mv-item"><div class="mv-item-body"><div class="mv-item-titulo">${x.titulo}</div>${x.obs?`<div class="mv-item-obs">${x.obs}</div>`:''}</div><span class="mv-cat-badge">${MV_CATS[x.cat]||x.cat}</span><button class="btn btn-danger btn-sm" onclick="deleteMesversario(${x.id})">🗑</button></div>`).join('')}</div></div>`).join('');
+  el.innerHTML=Object.keys(grupos).sort((a,b)=>a-b).map(mes=>`<div class="mv-mes-grupo"><div class="mv-mes-header">${nomeMes(parseInt(mes))}</div><div class="mv-mes-items">${grupos[mes].map(x=>`<div class="mv-item"><div class="mv-item-body"><div class="mv-item-titulo">${x.titulo}</div>${x.obs?`<div class="mv-item-obs">${x.obs}</div>`:''}</div><span class="mv-cat-badge">${MV_CATS[x.cat]||x.cat}</span><button class="btn btn-danger btn-sm" onclick="deleteMesversario(${x.id})" aria-label="Remover">🗑</button></div>`).join('')}</div></div>`).join('');
 }
 function setMvFiltro(val,btn){mvFiltroMes=val;renderMesversario();}
 function showSubTabMissoes(id){document.querySelectorAll('#tab-agenda .subpanel').forEach(p=>p.classList.remove('active'));document.querySelectorAll('#tab-agenda .sub-tab').forEach(b=>b.classList.remove('active'));document.getElementById('subpanel-'+id).classList.add('active');document.getElementById('stab-'+id).classList.add('active');if(id==='medicacao')renderMedicacao();if(id==='missivas'){renderDuvidas();renderDashboard();}if(id==='oraculo')oraculoInit();if(id==='sabedoria'&&typeof renderSabedoria==='function')renderSabedoria();}
@@ -3058,7 +3408,7 @@ function renderCrescimento(){
   const el=document.getElementById('lista-crescimento');if(!el)return;
   if(!crescData.length){el.innerHTML='<div class="empty"><div class="empty-icon">📏</div><p>Nenhuma medida registrada</p></div>';return;}
   const nomeMes=m=>m===0?'🌌 Nascimento':m===12?'✨ 1 Aninho':`🌙 ${m}º Mês`;
-  el.innerHTML=[...crescData].reverse().map(r=>`<div class="cresc-item"><div class="cresc-item-mes">${nomeMes(r.mes)}</div><div class="cresc-item-body"><div class="cresc-item-data">📅 ${r.data?new Date(r.data+'T12:00:00').toLocaleDateString('pt-BR'):'—'}</div><div class="cresc-item-medidas">${r.peso!=null?`<span class="cresc-badge">⚖️ ${r.peso}kg</span>`:''}${r.altura!=null?`<span class="cresc-badge">📐 ${r.altura}cm</span>`:''}${r.pc!=null?`<span class="cresc-badge">🔵 ${r.pc}cm</span>`:''}</div>${r.obs?`<div class="cresc-item-obs">${r.obs}</div>`:''}</div><button class="btn btn-danger btn-sm" onclick="deleteCrescimento(${r.id})">🗑</button></div>`).join('');
+  el.innerHTML=[...crescData].reverse().map(r=>`<div class="cresc-item"><div class="cresc-item-mes">${nomeMes(r.mes)}</div><div class="cresc-item-body"><div class="cresc-item-data">📅 ${r.data?new Date(r.data+'T12:00:00').toLocaleDateString('pt-BR'):'—'}</div><div class="cresc-item-medidas">${r.peso!=null?`<span class="cresc-badge">⚖️ ${r.peso}kg</span>`:''}${r.altura!=null?`<span class="cresc-badge">📐 ${r.altura}cm</span>`:''}${r.pc!=null?`<span class="cresc-badge">🔵 ${r.pc}cm</span>`:''}</div>${r.obs?`<div class="cresc-item-obs">${r.obs}</div>`:''}</div><button class="btn btn-danger btn-sm" onclick="deleteCrescimento(${r.id})" aria-label="Remover">🗑</button></div>`).join('');
 }
 function renderGraficoCrescimento(){
   const canvas=document.getElementById('cresc-chart');if(!canvas)return;
@@ -3159,7 +3509,7 @@ function abrirModalRegistroVacina(id, tipo){
           <div style="font-family:'Orbitron',monospace;font-size:0.78rem;color:#00d4ff;letter-spacing:0.06em;font-weight:700;line-height:1.2">REGISTRAR VACINA APLICADA</div>
           <div style="font-size:0.64rem;color:#9eb0c8;margin-top:3px">${vacinaInfo.nome} · ${vacinaInfo.grupo}</div>
         </div>
-        <button onclick="document.getElementById('modal-registro-vacina').remove()" style="background:rgba(0,30,70,0.5);border:1px solid rgba(0,180,255,0.3);border-radius:6px;color:#00d4ff;width:32px;height:32px;cursor:pointer;font-size:1rem;line-height:1">✕</button>
+        <button onclick="document.getElementById('modal-registro-vacina').remove()" style="background:rgba(0,30,70,0.5);border:1px solid rgba(0,180,255,0.3);border-radius:6px;color:#00d4ff;width:32px;height:32px;cursor:pointer;font-size:1rem;line-height:1" aria-label="Fechar">✕</button>
       </div>
 
       <div style="background:rgba(0,40,90,0.4);border-left:3px solid #00d4ff;border-radius:6px;padding:9px 11px;margin-bottom:14px;font-size:0.7rem;line-height:1.5;color:#cbd5e1">
@@ -3304,6 +3654,9 @@ window._abrirModalEditarVacina = function(id) {
 // Fonte: Programa Nacional de Imunizações (PNI) — Ministério da Saúde.
 
 window.exportarCaderneta = function() {
+  const hideLoading = (typeof window.bfLoading !== 'undefined')
+    ? window.bfLoading.show('Preparando Caderneta de Vacinação SUS…')
+    : null;
   try {
     // Agregar dados: todas as vacinas aplicadas, ordenadas por data
     const aplicadas = [];
@@ -3385,11 +3738,19 @@ window.exportarCaderneta = function() {
   .status-pend { color: #999; font-style: italic; }
   .footer-doc { margin-top: 16pt; padding-top: 8pt; border-top: 1pt solid #006341; font-size: 7.5pt; color: #555; text-align: center; line-height: 1.5; }
   .aviso-legal { margin-top: 10pt; background: #fff8e1; border-left: 2pt solid #f57c00; padding: 5pt 7pt; font-size: 7.5pt; color: #444; }
-  @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } button { display: none; } }
-  .print-btn { position: fixed; top: 14px; right: 14px; z-index: 999; background: #006341; color: white; border: none; padding: 10px 18px; border-radius: 6px; font-size: 11pt; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+  @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } .action-btns { display: none !important; } }
+  .action-btns { position: fixed; top: 14px; right: 14px; z-index: 999; display: flex; gap: 8px; align-items: center; }
+  .action-btns button { border: none; padding: 10px 16px; border-radius: 6px; font-size: 11pt; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.2); font-family: Arial, sans-serif; font-weight: 600; }
+  .print-btn { background: #006341; color: white; }
+  .print-btn:hover { background: #00794d; }
+  .close-btn { background: #c53030; color: white; width: 44px; height: 44px; padding: 0; font-size: 18pt; border-radius: 50%; display: flex; align-items: center; justify-content: center; line-height: 1; }
+  .close-btn:hover { background: #e53e3e; }
 </style>
 </head><body>
-  <button class="print-btn" onclick="window.print()">🖨️ Imprimir / Salvar PDF</button>
+  <div class="action-btns">
+    <button class="print-btn" onclick="window.print()">🖨️ Imprimir / Salvar PDF</button>
+    <button class="close-btn" onclick="try { window.close(); } catch(e){} setTimeout(() => { if (!window.closed) window.history.back(); }, 150);" title="Fechar caderneta">✕</button>
+  </div>
 
   <div class="header-sus">
     <div class="tarja">
@@ -3471,6 +3832,7 @@ window.exportarCaderneta = function() {
     // Abrir em nova janela
     const w = window.open('', '_blank');
     if (!w) {
+      if (hideLoading) hideLoading();
       alert('⚠️ Pop-ups bloqueados. Permita pop-ups para gerar a caderneta.');
       return;
     }
@@ -3480,8 +3842,10 @@ window.exportarCaderneta = function() {
     if (typeof BFAudit !== 'undefined') {
       BFAudit.log('caderneta_exportada', { aplicadas: totalAplicadas });
     }
+    if (hideLoading) hideLoading();
 
   } catch (e) {
+    if (hideLoading) hideLoading();
     console.error('[Caderneta]', e);
     alert('Erro ao gerar caderneta: ' + e.message);
   }
@@ -3587,7 +3951,7 @@ function renderVacinas(){
     const extrasHTML=extras.map(v=>{
       const s = vacStatus[v.id] || {};
       const feita=!!s.feita;
-      return`<div class="vac-item vac-item-extra ${feita?'feita':''}" onclick="toggleVacinaExtra('${v.id}')"><div class="vac-check">${feita?'✓':''}</div><div class="vac-body" style="flex:1"><div class="vac-nome">${v.nome}</div><div class="vac-doenca">${v.doenca}</div>${v.obs?`<div class="vac-obs">⚠ ${v.obs}</div>`:''}<div class="vac-fonte">📡 ${v.fonte}</div>${feita?`<div class="vac-data-aplicacao">🛡️ Aplicada em ${s.data}</div>${renderInfoExtra(s)}`:''}</div><button class="btn-del-vac-extra" onclick="event.stopPropagation();deleteVacinaExtra(${grupoIdx},'${v.id}')">🗑</button></div>`;
+      return`<div class="vac-item vac-item-extra ${feita?'feita':''}" onclick="toggleVacinaExtra('${v.id}')"><div class="vac-check">${feita?'✓':''}</div><div class="vac-body" style="flex:1"><div class="vac-nome">${v.nome}</div><div class="vac-doenca">${v.doenca}</div>${v.obs?`<div class="vac-obs">⚠ ${v.obs}</div>`:''}<div class="vac-fonte">📡 ${v.fonte}</div>${feita?`<div class="vac-data-aplicacao">🛡️ Aplicada em ${s.data}</div>${renderInfoExtra(s)}`:''}</div><button class="btn-del-vac-extra" onclick="event.stopPropagation();deleteVacinaExtra(${grupoIdx},'${v.id}')" aria-label="Remover">🗑</button></div>`;
     }).join('');
     return`<div class="vac-grupo"><div class="vac-grupo-header"><span>${grupo.icone} ${grupo.grupo}</span><span class="vac-grupo-count">${feitasGrupo}/${todasNoGrupo.length}</span></div><div class="vac-grupo-items">${vacinasHTML}${extrasHTML}<button class="btn-add-vac" onclick="abrirModalNovaVacina(${grupoIdx})">＋ Adicionar vacina</button></div></div>`;
   }).join('');
@@ -4062,7 +4426,7 @@ const FREQ_LABEL={se_necessario:'Se necessário','4h':'A cada 4h','6h':'A cada 6
 function renderMedicacao(){
   const el=document.getElementById('lista-medicacao');if(!el)return;
   if(!medicacoes.length){el.innerHTML='<div class="empty"><div class="empty-icon">💊</div><p>Nenhum remédio registrado</p></div>';return;}
-  el.innerHTML=medicacoes.map(m=>`<div class="card" style="margin-bottom:8px;padding:14px 16px"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px"><div><div style="font-weight:700;color:var(--white);font-size:0.95rem">⚗️ ${m.nome}</div>${m.generico?`<div style="font-size:0.7rem;color:var(--text-dim);margin-top:1px">${m.generico}</div>`:''}</div><button onclick="deleteMedicacao(${m.id})" style="background:none;border:none;color:rgba(255,100,100,0.5);cursor:pointer;font-size:1rem">🗑</button></div><div style="display:flex;flex-wrap:wrap;gap:6px;font-size:0.72rem">${m.dose?`<span style="background:rgba(0,100,200,0.2);border:1px solid rgba(0,180,255,0.2);border-radius:6px;padding:2px 8px;color:var(--blue-neon)">💉 ${m.dose}</span>`:''} ${m.freq?`<span style="background:rgba(0,100,200,0.2);border:1px solid rgba(0,180,255,0.2);border-radius:6px;padding:2px 8px;color:var(--text-dim)">⏱ ${FREQ_LABEL[m.freq]||m.freq}</span>`:''} ${m.inicio?`<span style="background:rgba(0,100,200,0.2);border:1px solid rgba(0,180,255,0.2);border-radius:6px;padding:2px 8px;color:var(--text-dim)">📅 ${formatDate(m.inicio)}${m.fim?' → '+formatDate(m.fim):''}</span>`:''}</div>${m.obs?`<div style="font-size:0.72rem;color:var(--text-dim);margin-top:6px;font-style:italic">📝 ${m.obs}</div>`:''}</div>`).join('');
+  el.innerHTML=medicacoes.map(m=>`<div class="card" style="margin-bottom:8px;padding:14px 16px"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px"><div><div style="font-weight:700;color:var(--white);font-size:0.95rem">⚗️ ${m.nome}</div>${m.generico?`<div style="font-size:0.7rem;color:var(--text-dim);margin-top:1px">${m.generico}</div>`:''}</div><button onclick="deleteMedicacao(${m.id})" style="background:none;border:none;color:rgba(255,100,100,0.5);cursor:pointer;font-size:1rem" aria-label="Remover">🗑</button></div><div style="display:flex;flex-wrap:wrap;gap:6px;font-size:0.72rem">${m.dose?`<span style="background:rgba(0,100,200,0.2);border:1px solid rgba(0,180,255,0.2);border-radius:6px;padding:2px 8px;color:var(--blue-neon)">💉 ${m.dose}</span>`:''} ${m.freq?`<span style="background:rgba(0,100,200,0.2);border:1px solid rgba(0,180,255,0.2);border-radius:6px;padding:2px 8px;color:var(--text-dim)">⏱ ${FREQ_LABEL[m.freq]||m.freq}</span>`:''} ${m.inicio?`<span style="background:rgba(0,100,200,0.2);border:1px solid rgba(0,180,255,0.2);border-radius:6px;padding:2px 8px;color:var(--text-dim)">📅 ${formatDate(m.inicio)}${m.fim?' → '+formatDate(m.fim):''}</span>`:''}</div>${m.obs?`<div style="font-size:0.72rem;color:var(--text-dim);margin-top:6px;font-style:italic">📝 ${m.obs}</div>`:''}</div>`).join('');
 }
 
 // ── TIMER AMAMENTAÇÃO ──
@@ -4082,7 +4446,7 @@ function renderFraldas(){
   const el=document.getElementById('lista-fraldas');if(!el)return;const hoje=todayISO();const lista=db.fraldas||[];
   if(!lista.length){el.innerHTML='<div class="empty"><div class="empty-icon">🩲</div><p>Nenhuma troca registrada</p></div>';return;}
   const tipoLabel={molhada:'💧 Molhada',suja:'💩 Suja',mista:'💧💩 Mista',seca:'✅ Seca'};
-  el.innerHTML=lista.slice(0,30).map(f=>`<div class="fralda-item"><div><span class="fralda-badge ${f.tipo||'molhada'}">${tipoLabel[f.tipo]||f.tipo}</span>${f.obs?`<div style="font-size:0.7rem;color:var(--text-dim);margin-top:3px">${f.obs}</div>`:''}${f.autor?`<div class="autor-tag">⚔️ ${nomeAutor(f.autor)}</div>`:''}</div><div style="margin-left:auto;text-align:right"><div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--white)">${f.hora}</div><div style="font-size:0.65rem;color:var(--text-dim)">${formatDate(f.data)}${f.data===hoje?' · hoje':''}</div></div><button class="btn btn-danger btn-sm" onclick="deleteFralda(${f.id})">🗑</button></div>`).join('');
+  el.innerHTML=lista.slice(0,30).map(f=>`<div class="fralda-item"><div><span class="fralda-badge ${f.tipo||'molhada'}">${tipoLabel[f.tipo]||f.tipo}</span>${f.obs?`<div style="font-size:0.7rem;color:var(--text-dim);margin-top:3px">${f.obs}</div>`:''}${f.autor?`<div class="autor-tag">⚔️ ${nomeAutor(f.autor)}</div>`:''}</div><div style="margin-left:auto;text-align:right"><div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--white)">${f.hora}</div><div style="font-size:0.65rem;color:var(--text-dim)">${formatDate(f.data)}${f.data===hoje?' · hoje':''}</div></div><button class="btn btn-danger btn-sm" onclick="deleteFralda(${f.id})" aria-label="Remover">🗑</button></div>`).join('');
 }
 function renderFraldaStats(){
   const el=document.getElementById('fr-stats-hoje');if(!el)return;const hoje=todayISO();const list=(db.fraldas||[]).filter(f=>f.data===hoje);const cont={molhada:0,suja:0,mista:0,seca:0};list.forEach(f=>{if(cont[f.tipo]!==undefined)cont[f.tipo]++;});const total=list.length;
@@ -4109,7 +4473,7 @@ function renderSono(){
   const el=document.getElementById('lista-sono');if(!el)return;
   if(!db.sono.length){el.innerHTML='<div class="empty"><div class="empty-icon">😴</div><p>Nenhum sono registrado</p></div>';return;}
   const fmtDur=min=>{const h=Math.floor(min/60),m=min%60;return h>0?`${h}h ${m}min`:`${m}min`;};
-  el.innerHTML=db.sono.slice(0,30).map(s=>`<div class="sono-item"><div style="flex:1"><div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><span style="font-size:0.8rem">${s.tipo==='noite'?'🌙 Noturno':'💤 Cochilo'}</span><span style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--blue-neon)">${fmtDur(s.duracao)}</span></div><div style="font-size:0.68rem;color:var(--text-dim)">${s.inicio} → ${s.fim} · ${formatDate(s.data)}</div>${s.obs?`<div style="font-size:0.68rem;color:var(--text-dim);margin-top:2px;font-style:italic">${s.obs}</div>`:''}${s.autor?`<div class="autor-tag">⚔️ ${nomeAutor(s.autor)}</div>`:''}</div><button class="btn btn-danger btn-sm" onclick="deleteSono(${s.id})">🗑</button></div>`).join('');
+  el.innerHTML=db.sono.slice(0,30).map(s=>`<div class="sono-item"><div style="flex:1"><div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><span style="font-size:0.8rem">${s.tipo==='noite'?'🌙 Noturno':'💤 Cochilo'}</span><span style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--blue-neon)">${fmtDur(s.duracao)}</span></div><div style="font-size:0.68rem;color:var(--text-dim)">${s.inicio} → ${s.fim} · ${formatDate(s.data)}</div>${s.obs?`<div style="font-size:0.68rem;color:var(--text-dim);margin-top:2px;font-style:italic">${_rcEsc(s.obs)}</div>`:''}${s.autor?`<div class="autor-tag">⚔️ ${_rcEsc(nomeAutor(s.autor))}</div>`:''}</div><button class="btn btn-danger btn-sm" aria-label="Remover sono" onclick="deleteSono(${s.id})">🗑</button></div>`).join('');
 }
 function renderSonoStats(){
   const el=document.getElementById('so-stats-hoje');if(!el)return;const hoje=todayISO();const lista=(db.sono||[]).filter(s=>s.data===hoje);if(!lista.length){el.innerHTML='<div style="color:var(--text-dim);font-size:0.8rem">Nenhum registro hoje</div>';return;}
@@ -4486,7 +4850,7 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 
 <!-- MODAL DELETE GUARDIÃO -->
-<div id="modal-del-guardiao" class="modal-overlay" style="display:none">
+<div id="modal-del-guardiao" class="modal-overlay" style="display:none" role="dialog" aria-modal="true">
   <div class="modal-box" style="max-width:300px">
     <div class="modal-icon">⚠️</div>
     <div class="modal-title">REMOVER GUARDIÃO</div>
@@ -4583,7 +4947,29 @@ function obValidarPins(){
   else{statusEl.textContent='❌ PINs não coincidem';statusEl.className='ob-pin-status erro';btn.disabled=true;btn.style.opacity='0.4';}
 }
 function obConfirmarPin(){
-  if(_obPin1!==_obPin2||_obPin1.length!==6)return;
+  if(_obPin1!==_obPin2||_obPin1.length!==6){
+    // Erro amigável
+    const errEl = document.getElementById('ob-pin-error');
+    if (errEl) errEl.textContent = _obPin1.length !== 6 ? 'PIN deve ter 6 dígitos' : 'Os PINs não conferem';
+    return;
+  }
+  // Bloqueia PINs triviais (consistente com _salvarNovoPin)
+  if (/^(\d)\1{5}$/.test(_obPin1)) {
+    const errEl = document.getElementById('ob-pin-error');
+    if (errEl) errEl.textContent = 'Evite PINs com dígitos repetidos (ex: 111111)';
+    else alert('⚠️ Evite PINs com dígitos repetidos (ex: 111111)');
+    _obPin1 = ''; _obPin2 = '';
+    if (typeof obRenderPinDots === 'function') obRenderPinDots();
+    return;
+  }
+  if (['123456','654321','012345','098765','123123','456456'].includes(_obPin1)) {
+    const errEl = document.getElementById('ob-pin-error');
+    if (errEl) errEl.textContent = 'PIN muito óbvio. Escolha outro.';
+    else alert('⚠️ PIN muito óbvio. Escolha outro.');
+    _obPin1 = ''; _obPin2 = '';
+    if (typeof obRenderPinDots === 'function') obRenderPinDots();
+    return;
+  }
   saveAppConfig({pin:_obPin1,setupDone:false});
   _obCurrentStep=3;
   document.getElementById('ob-step-2').classList.remove('active');
@@ -5182,6 +5568,8 @@ function _showQuickToast(emoji, texto, opcoes) {
   if (old) old.remove();
   const t = document.createElement('div');
   t.id = 'quick-toast-float';
+  t.setAttribute('role', 'status');
+  t.setAttribute('aria-live', 'polite');
   t.style.cssText = `
     position:fixed;bottom:70px;left:50%;transform:translateX(-50%);
     background:linear-gradient(135deg,rgba(0,30,70,0.98),rgba(10,40,90,0.98));
@@ -5363,7 +5751,7 @@ function _showQuickMedConfirm(med) {
     <div style="font-weight:500;margin-bottom:10px">💊 ${med.nome}${med.dose?` · ${med.dose}`:''}</div>
     <div style="display:flex;gap:8px">
       <button onclick="quickRepetirMed(${med.id})" style="flex:1;background:rgba(0,212,255,0.2);border:1px solid rgba(0,212,255,0.4);color:var(--blue-neon);padding:8px 12px;border-radius:8px;cursor:pointer;font-family:'Orbitron',monospace;font-size:0.68rem;letter-spacing:0.05em">✓ REGISTRAR AGORA</button>
-      <button onclick="document.getElementById('quick-med-confirm').remove()" style="background:rgba(255,80,80,0.15);border:1px solid rgba(255,100,100,0.3);color:#ff8080;padding:8px 12px;border-radius:8px;cursor:pointer;font-family:'Orbitron',monospace;font-size:0.68rem;letter-spacing:0.05em">✕</button>
+      <button onclick="document.getElementById('quick-med-confirm').remove()" style="background:rgba(255,80,80,0.15);border:1px solid rgba(255,100,100,0.3);color:#ff8080;padding:8px 12px;border-radius:8px;cursor:pointer;font-family:'Orbitron',monospace;font-size:0.68rem;letter-spacing:0.05em" aria-label="Fechar">✕</button>
     </div>`;
   document.body.appendChild(t);
   setTimeout(() => { if (t.parentNode) t.remove(); }, 8000);
@@ -10390,8 +10778,15 @@ function exportarRelatorioDesenvolvimento() {
     alert('⚠️ Aguarde o carregamento do módulo PDF.');
     return;
   }
+  const hideLoading = (typeof window.bfLoading !== 'undefined')
+    ? window.bfLoading.show('Gerando relatório de desenvolvimento…')
+    : null;
   if (typeof showToast === 'function') showToast('📄 Gerando relatório de desenvolvimento...');
-  setTimeout(_gerarPDFDesenvolvimento, 300);
+  setTimeout(() => {
+    try { _gerarPDFDesenvolvimento(); }
+    catch (e) { console.warn('[relatorio]', e); alert('Erro ao gerar relatório: ' + e.message); }
+    finally { if (hideLoading) hideLoading(); }
+  }, 300);
 }
 
 function _gerarPDFDesenvolvimento() {
@@ -13487,7 +13882,7 @@ function _exibirFogosDeArtificio() {
       EXPLORAR ✨
     </button>
 
-    <button onclick="_fecharFogos(false)" style="position:absolute;top:24px;right:24px;z-index:3;background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.2);color:#fff;width:40px;height:40px;border-radius:50%;cursor:pointer;font-size:1.1rem;backdrop-filter:blur(6px)">×</button>
+    <button onclick="_fecharFogos(false)" style="position:absolute;top:24px;right:24px;z-index:3;background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.2);color:#fff;width:40px;height:40px;border-radius:50%;cursor:pointer;font-size:1.1rem;backdrop-filter:blur(6px)" aria-label="Fechar">×</button>
   `;
 
   document.body.appendChild(overlay);
@@ -13953,6 +14348,1216 @@ function _celebrarMilestoneAmou(total) {
   if (typeof BFAudit !== 'undefined') BFAudit.log('milestone_alimentos_amou', { total });
 }
 
+// ═══════════════════════════════════════════════════════════════
+// MÓDULO SINTOMAS — sempre disponível em Saúde
+// Registro de febre, tosse, dor, vômito etc.
+// Integra com o QL de sintomas existente (QL_KEYS.sintoma)
+// ═══════════════════════════════════════════════════════════════
+function initSintomaForm() {
+  const hoje = new Date();
+  const y = hoje.getFullYear(), m = String(hoje.getMonth()+1).padStart(2,'0'), d = String(hoje.getDate()).padStart(2,'0');
+  const hh = String(hoje.getHours()).padStart(2,'0'), mm = String(hoje.getMinutes()).padStart(2,'0');
+  const dEl = document.getElementById('sint-data');
+  const hEl = document.getElementById('sint-hora');
+  if (dEl && !dEl.value) dEl.value = `${y}-${m}-${d}`;
+  if (hEl && !hEl.value) hEl.value = `${hh}:${mm}`;
+}
+
+window.salvarSintoma = function() {
+  const data = document.getElementById('sint-data')?.value;
+  const hora = document.getElementById('sint-hora')?.value;
+  const tipo = document.getElementById('sint-tipo')?.value;
+  const intensidade = document.getElementById('sint-intensidade')?.value;
+  const temp = document.getElementById('sint-temp')?.value;
+  const obs = document.getElementById('sint-obs')?.value?.trim() || '';
+  const medicado = document.getElementById('sint-medicado')?.checked || false;
+  if (!data || !hora) { alert('⚠️ Defina data e hora'); return; }
+  if (!tipo) { alert('⚠️ Escolha o tipo de sintoma'); return; }
+  // Grava no mesmo storage do QL_KEYS.sintoma (sincronização total)
+  const registro = {
+    id: Date.now(),
+    data, hora, tipo, intensidade,
+    temperatura: temp ? parseFloat(temp) : null,
+    obs, medicado,
+    autor: (typeof usuarioAtual !== 'undefined') ? usuarioAtual : null,
+  };
+  try {
+    const arr = JSON.parse(localStorage.getItem(QL_KEYS.sintoma) || '[]');
+    arr.push(registro);
+    localStorage.setItem(QL_KEYS.sintoma, JSON.stringify(arr.slice(-500)));
+  } catch (e) { console.warn('[salvarSintoma]', e); }
+  // Limpar form
+  document.getElementById('sint-tipo').value = '';
+  document.getElementById('sint-temp').value = '';
+  document.getElementById('sint-obs').value = '';
+  document.getElementById('sint-medicado').checked = false;
+  renderSintomas();
+  if (typeof showToast === 'function') showToast('🤒 Sintoma registrado');
+  // Alerta se febre alta
+  if (tipo === 'febre' && temp && parseFloat(temp) >= 39) {
+    setTimeout(() => {
+      if (confirm('🌡️ Febre alta (≥39°C). Quer consultar o Oráculo sobre sinais de alerta?')) {
+        if (typeof showTab === 'function') showTab('agenda');
+        setTimeout(() => {
+          if (typeof showSubTabMissoes === 'function') showSubTabMissoes('oraculo');
+          const inp = document.getElementById('oraculo-input');
+          if (inp) { inp.value = `Meu bebê está com febre de ${temp}°C. Quando procurar pronto-socorro?`; inp.focus(); }
+        }, 200);
+      }
+    }, 500);
+  }
+};
+
+function renderSintomas() {
+  const el = document.getElementById('lista-sintomas');
+  if (!el) return;
+  let arr = [];
+  try { arr = JSON.parse(localStorage.getItem(QL_KEYS.sintoma) || '[]'); } catch {}
+  // Ordenar: mais recentes primeiro
+  arr.sort((a,b) => (b.data + (b.hora||'') ).localeCompare(a.data + (a.hora||'')));
+  if (!arr.length) {
+    el.innerHTML = `<div style="text-align:center;padding:26px;color:var(--text-dim)">
+      <div style="font-size:2.2rem;opacity:0.4;margin-bottom:8px">🤒</div>
+      <div style="font-size:0.78rem;color:var(--white);margin-bottom:6px">Nenhum sintoma registrado</div>
+      <div style="font-size:0.66rem;opacity:0.8;max-width:260px;margin:0 auto;line-height:1.5">Use esta aba para registrar episódios de febre, tosse, dor ou outros sintomas importantes.</div>
+    </div>`;
+    return;
+  }
+  const emojiTipo = { febre:'🌡️', colica:'🌀', refluxo:'💧', tosse:'😷', coriza:'🤧', dor:'😣', vomito:'🤢', diarreia:'💩', assadura:'🌸', irritacao:'😤', sonolencia:'😴', outro:'💬' };
+  const corInt = { leve:'#78ff99', moderada:'#FAC775', forte:'#ff6666' };
+  el.innerHTML = arr.map(s => {
+    const emoji = emojiTipo[s.tipo] || '💬';
+    const cor = corInt[s.intensidade] || '#9eb0c8';
+    const dataFmt = s.data ? new Date(s.data + 'T' + (s.hora||'12:00')).toLocaleDateString('pt-BR') : '—';
+    return `<div style="background:rgba(0,30,70,0.5);border-left:3px solid ${cor};border-radius:10px;padding:11px 13px;margin-bottom:8px;display:flex;gap:10px">
+      <div style="font-size:1.6rem;flex-shrink:0">${emoji}</div>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:3px">
+          <strong style="color:var(--white);font-size:0.82rem;text-transform:capitalize">${s.tipo||'sintoma'}</strong>
+          <span style="font-size:0.58rem;color:${cor};background:${cor}22;padding:1px 6px;border-radius:8px;font-family:Orbitron,monospace;letter-spacing:0.06em;text-transform:uppercase">${s.intensidade||''}</span>
+          ${s.temperatura?`<span style="font-size:0.74rem;color:#FAC775;font-family:Orbitron,monospace">🌡️ ${s.temperatura}°C</span>`:''}
+        </div>
+        <div style="font-size:0.66rem;color:var(--text-dim)">${dataFmt} · ${s.hora||''}</div>
+        ${s.obs?`<div style="font-size:0.7rem;color:#9eb0c8;margin-top:4px;line-height:1.4">${_rcEsc(s.obs)}</div>`:''}
+        ${s.medicado?`<div style="font-size:0.6rem;color:var(--blue-neon);margin-top:3px">💊 Medicado</div>`:''}
+      </div>
+      <button onclick="window._removerSintoma(${s.id})" style="background:none;border:1px solid rgba(255,100,100,0.25);color:rgba(255,120,120,0.7);padding:5px 8px;border-radius:6px;font-size:0.7rem;cursor:pointer;flex-shrink:0" aria-label="Remover">🗑</button>
+    </div>`;
+  }).join('');
+}
+
+window._removerSintoma = function(id) {
+  if (!confirm('Remover este registro de sintoma?')) return;
+  try {
+    let arr = JSON.parse(localStorage.getItem(QL_KEYS.sintoma) || '[]');
+    arr = arr.filter(s => s.id !== id);
+    localStorage.setItem(QL_KEYS.sintoma, JSON.stringify(arr));
+    renderSintomas();
+  } catch {}
+};
+
+// ═══════════════════════════════════════════════════════════════
+// MÓDULO ESPORTE — Desbloqueio manual (lógica idêntica à Alimentos)
+// ═══════════════════════════════════════════════════════════════
+const ESPORTE_MANUAL_KEY = 'babyforce_esporte_manual_v1';
+
+function isEsporteDesbloqueado() {
+  try { return localStorage.getItem(ESPORTE_MANUAL_KEY) === 'ativado'; } catch { return false; }
+}
+
+window.ativarEsporteManual = function() {
+  if (!confirm('Desbloquear o módulo Esporte? Você poderá registrar aulas, treinos e práticas esportivas do seu bebê.')) return;
+  try { localStorage.setItem(ESPORTE_MANUAL_KEY, 'ativado'); } catch {}
+  aplicarLockEsporte();
+  _celebrarDesbloqueioEsporte();
+  if (typeof BFAudit !== 'undefined') BFAudit.log('esporte_desbloqueado');
+};
+
+window._reverterEsporte = function() {
+  if (!confirm('Fechar o módulo Esporte? Os registros ficam preservados; você pode reabrir depois.')) return;
+  try { localStorage.removeItem(ESPORTE_MANUAL_KEY); } catch {}
+  aplicarLockEsporte();
+  if (typeof showToast === 'function') showToast('🔒 Módulo Esporte fechado');
+};
+
+function aplicarLockEsporte() {
+  const locked = document.getElementById('esporte-locked');
+  const unlocked = document.getElementById('esporte-unlocked');
+  if (!locked || !unlocked) return;
+  if (isEsporteDesbloqueado()) {
+    locked.style.display = 'none';
+    unlocked.style.display = 'block';
+    initEsporteForm();
+    renderEsportes();
+  } else {
+    locked.style.display = 'block';
+    unlocked.style.display = 'none';
+  }
+}
+
+function initEsporteForm() {
+  const hoje = new Date();
+  const y = hoje.getFullYear(), m = String(hoje.getMonth()+1).padStart(2,'0'), d = String(hoje.getDate()).padStart(2,'0');
+  const hh = String(hoje.getHours()).padStart(2,'0'), mm = String(hoje.getMinutes()).padStart(2,'0');
+  const dEl = document.getElementById('esp-data');
+  const hEl = document.getElementById('esp-hora');
+  if (dEl && !dEl.value) dEl.value = `${y}-${m}-${d}`;
+  if (hEl && !hEl.value) hEl.value = `${hh}:${mm}`;
+}
+
+window.salvarEsporte = function() {
+  const data = document.getElementById('esp-data')?.value;
+  const hora = document.getElementById('esp-hora')?.value;
+  const modalidade = document.getElementById('esp-modalidade')?.value?.trim();
+  const duracao = parseInt(document.getElementById('esp-duracao')?.value, 10);
+  const intensidade = document.getElementById('esp-intensidade')?.value;
+  const regular = document.getElementById('esp-regular')?.checked || false;
+  const obs = document.getElementById('esp-obs')?.value?.trim() || '';
+  if (!data || !hora) { alert('⚠️ Defina data e hora'); return; }
+  if (!modalidade) { alert('⚠️ Informe a modalidade esportiva'); return; }
+  const registro = {
+    id: Date.now(),
+    data, hora, modalidade, duracao, intensidade,
+    treino: regular, obs,
+    autor: (typeof usuarioAtual !== 'undefined') ? usuarioAtual : null,
+  };
+  try {
+    const arr = JSON.parse(localStorage.getItem(QL_KEYS.esporte) || '[]');
+    arr.push(registro);
+    localStorage.setItem(QL_KEYS.esporte, JSON.stringify(arr.slice(-500)));
+  } catch (e) { console.warn('[salvarEsporte]', e); }
+  // Limpar form
+  document.getElementById('esp-modalidade').value = '';
+  document.getElementById('esp-obs').value = '';
+  document.getElementById('esp-regular').checked = false;
+  renderEsportes();
+  if (typeof showToast === 'function') showToast('⚽ Atividade registrada');
+};
+
+function renderEsportes() {
+  const el = document.getElementById('lista-esportes');
+  if (!el) return;
+  let arr = [];
+  try { arr = JSON.parse(localStorage.getItem(QL_KEYS.esporte) || '[]'); } catch {}
+  arr.sort((a,b) => (b.data + (b.hora||'')).localeCompare(a.data + (a.hora||'')));
+  if (!arr.length) {
+    el.innerHTML = `<div style="text-align:center;padding:24px;color:var(--text-dim)">
+      <div style="font-size:2.2rem;opacity:0.4;margin-bottom:8px">⚽</div>
+      <div style="font-size:0.78rem;color:var(--white);margin-bottom:6px">Nenhuma atividade registrada</div>
+      <div style="font-size:0.66rem;opacity:0.8;max-width:260px;margin:0 auto;line-height:1.5">Registre a primeira aula ou treino aqui.</div>
+    </div>`;
+    return;
+  }
+  const corInt = { leve:'#78ff99', moderada:'#FAC775', intensa:'#ff6666' };
+  el.innerHTML = arr.map(s => {
+    const cor = corInt[s.intensidade] || '#9eb0c8';
+    const dataFmt = s.data ? new Date(s.data + 'T' + (s.hora||'12:00')).toLocaleDateString('pt-BR') : '—';
+    return `<div style="background:rgba(0,30,70,0.5);border-left:3px solid ${cor};border-radius:10px;padding:11px 13px;margin-bottom:8px;display:flex;gap:10px">
+      <div style="font-size:1.6rem;flex-shrink:0">⚽</div>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:3px">
+          <strong style="color:var(--white);font-size:0.82rem">${_rcEsc(s.modalidade||'Atividade')}</strong>
+          <span style="font-size:0.58rem;color:${cor};background:${cor}22;padding:1px 6px;border-radius:8px;font-family:Orbitron,monospace;letter-spacing:0.06em;text-transform:uppercase">${s.intensidade||''}</span>
+          ${s.treino?'<span style="font-size:0.54rem;color:#78ff99;background:rgba(120,255,153,0.18);padding:1px 6px;border-radius:8px;font-family:Orbitron,monospace;letter-spacing:0.06em">🏋️ REGULAR</span>':''}
+        </div>
+        <div style="font-size:0.66rem;color:var(--text-dim)">${dataFmt} · ${s.hora||''} · ${s.duracao||'?'} min</div>
+        ${s.obs?`<div style="font-size:0.7rem;color:#9eb0c8;margin-top:4px;line-height:1.4">${_rcEsc(s.obs)}</div>`:''}
+      </div>
+      <button onclick="window._removerEsporte(${s.id})" style="background:none;border:1px solid rgba(255,100,100,0.25);color:rgba(255,120,120,0.7);padding:5px 8px;border-radius:6px;font-size:0.7rem;cursor:pointer;flex-shrink:0" aria-label="Remover">🗑</button>
+    </div>`;
+  }).join('');
+}
+
+window._removerEsporte = function(id) {
+  if (!confirm('Remover este registro de esporte?')) return;
+  try {
+    let arr = JSON.parse(localStorage.getItem(QL_KEYS.esporte) || '[]');
+    arr = arr.filter(s => s.id !== id);
+    localStorage.setItem(QL_KEYS.esporte, JSON.stringify(arr));
+    renderEsportes();
+  } catch {}
+};
+
+function _celebrarDesbloqueioEsporte() {
+  const nome = (typeof getBabyName === 'function') ? getBabyName() : 'seu bebê';
+  const overlay = document.createElement('div');
+  overlay.className = 'alim-celebracao-overlay';
+  overlay.innerHTML = `
+    <div class="alim-celebracao-modal">
+      <div class="alim-emoji-big">⚽</div>
+      <div class="alim-celeb-title">Nova jornada esportiva!</div>
+      <div style="color:var(--white);font-size:0.9rem;margin-top:16px;line-height:1.5">
+        <strong style="color:var(--blue-neon)">${nome}</strong> agora tem um espaço para registrar esportes!
+      </div>
+      <div style="color:var(--text-dim);font-size:0.72rem;margin-top:10px;line-height:1.55;padding:0 6px">
+        Seja natação, futebol, dança ou judô — cada atividade contribui para desenvolvimento motor, social e cognitivo.
+      </div>
+      <div style="margin-top:16px;padding:10px 12px;background:rgba(0,20,50,0.45);border-radius:10px;font-size:0.66rem;color:var(--text-dim);line-height:1.55">
+        <strong style="color:#FAC775">💡 OMS recomenda</strong> pelo menos 60 min/dia de atividade física moderada a vigorosa para crianças de 5-17 anos.
+      </div>
+      <button class="alim-celeb-btn" onclick="document.querySelector('.alim-celebracao-overlay')?.remove()">⚽ COMEÇAR</button>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  if (typeof _dispararConfetes === 'function') _dispararConfetes(overlay);
+  if (typeof _tocarCelebracaoSound === 'function') _tocarCelebracaoSound();
+}
+
+// Inicialização dos módulos em DOMContentLoaded
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => {
+    if (document.getElementById('tab-sintomas')) initSintomaForm();
+    if (document.getElementById('tab-esporte')) aplicarLockEsporte();
+    // Aplicar preferências de acessibilidade salvas
+    if (typeof _aplicarAcessibilidadeSalva === 'function') _aplicarAcessibilidadeSalva();
+  }, 800);
+});
+
+// ═══════════════════════════════════════════════════════════════
+// SPRINT A — ACESSIBILIDADE (Toggle texto grande + alto contraste)
+// ═══════════════════════════════════════════════════════════════
+const ACESSIBILIDADE_KEY = 'babyforce_acessibilidade_v1';
+
+function _getPrefsAcessibilidade() {
+  try { return JSON.parse(localStorage.getItem(ACESSIBILIDADE_KEY) || '{}'); } catch { return {}; }
+}
+function _salvarPrefsAcessibilidade(prefs) {
+  try { localStorage.setItem(ACESSIBILIDADE_KEY, JSON.stringify(prefs)); } catch {}
+}
+
+function _aplicarAcessibilidadeSalva() {
+  const p = _getPrefsAcessibilidade();
+  document.documentElement.classList.toggle('bf-text-large', !!p.textoGrande);
+  document.documentElement.classList.toggle('bf-high-contrast', !!p.altoContraste);
+  document.documentElement.classList.toggle('bf-reduce-motion', !!p.reducaoMovimento);
+  document.documentElement.classList.toggle('bf-tema-claro', !!p.temaClaro);
+}
+
+window.abrirAcessibilidade = function() {
+  const existente = document.getElementById('modal-acessibilidade');
+  if (existente) existente.remove();
+  const prefs = _getPrefsAcessibilidade();
+  const modal = document.createElement('div');
+  modal.id = 'modal-acessibilidade';
+  modal.setAttribute('role', 'dialog');
+  modal.setAttribute('aria-modal', 'true');
+  modal.setAttribute('aria-labelledby', 'acc-modal-title');
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,10,30,0.94);z-index:99998;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(8px);';
+  modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
+  modal.innerHTML = `
+    <div style="max-width:420px;width:100%;background:linear-gradient(135deg,#031027,#0a1a3d);border:1px solid rgba(0,180,255,0.4);border-radius:14px;padding:22px;color:#fff;font-family:'Exo 2',sans-serif;max-height:92vh;overflow-y:auto" onclick="event.stopPropagation()">
+      <div style="text-align:center;font-size:2.4rem;margin-bottom:8px">♿</div>
+      <div id="acc-modal-title" style="text-align:center;font-family:'Orbitron',monospace;font-size:0.82rem;color:var(--blue-neon);letter-spacing:0.08em;font-weight:700;margin-bottom:6px">ACESSIBILIDADE</div>
+      <div style="font-size:0.74rem;color:var(--text-dim);line-height:1.5;margin-bottom:18px;text-align:center">
+        Ajustes para facilitar a leitura e o uso do app.
+      </div>
+
+      <label style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:rgba(0,30,70,0.5);border:1px solid rgba(0,180,255,0.25);border-radius:10px;cursor:pointer;margin-bottom:10px">
+        <input type="checkbox" id="acc-texto-grande" ${prefs.textoGrande?'checked':''} onchange="window._toggleAcessibilidade('textoGrande', this.checked)" style="width:22px;height:22px;accent-color:#00d4ff;cursor:pointer;flex-shrink:0" aria-label="Texto grande">
+        <div style="flex:1">
+          <div style="font-size:0.88rem;color:var(--white);font-weight:600">🔠 Texto grande</div>
+          <div style="font-size:0.68rem;color:var(--text-dim);margin-top:3px;line-height:1.45">Aumenta as fontes em 20% para facilitar a leitura</div>
+        </div>
+      </label>
+
+      <label style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:rgba(0,30,70,0.5);border:1px solid rgba(0,180,255,0.25);border-radius:10px;cursor:pointer;margin-bottom:10px">
+        <input type="checkbox" id="acc-alto-contraste" ${prefs.altoContraste?'checked':''} onchange="window._toggleAcessibilidade('altoContraste', this.checked)" style="width:22px;height:22px;accent-color:#00d4ff;cursor:pointer;flex-shrink:0" aria-label="Alto contraste">
+        <div style="flex:1">
+          <div style="font-size:0.88rem;color:var(--white);font-weight:600">🌓 Alto contraste</div>
+          <div style="font-size:0.68rem;color:var(--text-dim);margin-top:3px;line-height:1.45">Aumenta a luminosidade dos textos secundários</div>
+        </div>
+      </label>
+
+      <label style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:rgba(0,30,70,0.5);border:1px solid rgba(0,180,255,0.25);border-radius:10px;cursor:pointer;margin-bottom:10px">
+        <input type="checkbox" id="acc-reduce-motion" ${prefs.reducaoMovimento?'checked':''} onchange="window._toggleAcessibilidade('reducaoMovimento', this.checked)" style="width:22px;height:22px;accent-color:#00d4ff;cursor:pointer;flex-shrink:0" aria-label="Reduzir animações">
+        <div style="flex:1">
+          <div style="font-size:0.88rem;color:var(--white);font-weight:600">🎬 Reduzir animações</div>
+          <div style="font-size:0.68rem;color:var(--text-dim);margin-top:3px;line-height:1.45">Minimiza transições e efeitos visuais</div>
+        </div>
+      </label>
+
+      <label style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:rgba(0,30,70,0.5);border:1px solid rgba(0,180,255,0.25);border-radius:10px;cursor:pointer;margin-bottom:18px">
+        <input type="checkbox" id="acc-tema-claro" ${prefs.temaClaro?'checked':''} onchange="window._toggleAcessibilidade('temaClaro', this.checked)" style="width:22px;height:22px;accent-color:#00d4ff;cursor:pointer;flex-shrink:0" aria-label="Tema claro">
+        <div style="flex:1">
+          <div style="font-size:0.88rem;color:var(--white);font-weight:600">☀️ Tema claro (experimental)</div>
+          <div style="font-size:0.68rem;color:var(--text-dim);margin-top:3px;line-height:1.45">Fundo claro para uso em ambientes iluminados</div>
+        </div>
+      </label>
+
+      <div style="background:rgba(0,180,255,0.08);border-left:3px solid var(--blue-neon);padding:10px 12px;border-radius:6px;font-size:0.7rem;color:var(--text-dim);line-height:1.5;margin-bottom:14px">
+        💡 <strong style="color:var(--white)">Dica:</strong> as preferências são salvas automaticamente e se mantêm ativas em todas as sessões.
+      </div>
+
+      <button onclick="document.getElementById('modal-acessibilidade').remove()" aria-label="Fechar acessibilidade" style="width:100%;padding:12px;background:rgba(0,60,120,0.6);border:1px solid rgba(0,180,255,0.4);border-radius:8px;color:var(--blue-neon);font-family:'Orbitron',monospace;font-size:0.7rem;letter-spacing:0.06em;cursor:pointer">✓ CONCLUÍDO</button>
+    </div>
+  `;
+  document.body.appendChild(modal);
+};
+
+window._toggleAcessibilidade = function(key, valor) {
+  const prefs = _getPrefsAcessibilidade();
+  prefs[key] = valor;
+  _salvarPrefsAcessibilidade(prefs);
+  _aplicarAcessibilidadeSalva();
+  if (typeof showToast === 'function') {
+    const labels = { textoGrande: 'Texto grande', altoContraste: 'Alto contraste', reducaoMovimento: 'Reduzir animações', temaClaro: 'Tema claro' };
+    showToast(`${valor ? '✓' : '○'} ${labels[key]} ${valor ? 'ativado' : 'desativado'}`);
+  }
+};
+
+// ═══════════════════════════════════════════════════════════════
+// SPRINT A — BACKUP E RESTAURAÇÃO (exportar + importar JSON)
+// ═══════════════════════════════════════════════════════════════
+window.abrirBackupRestore = function() {
+  const existente = document.getElementById('modal-backup-restore');
+  if (existente) existente.remove();
+  const modal = document.createElement('div');
+  modal.id = 'modal-backup-restore';
+  modal.setAttribute('role', 'dialog');
+  modal.setAttribute('aria-modal', 'true');
+  modal.setAttribute('aria-labelledby', 'backup-modal-title');
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,10,30,0.94);z-index:99998;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(8px);';
+  modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
+
+  // Contar crianças para informar ao usuário
+  let totalCriancas = 1;
+  try {
+    const lista = (typeof getBabies === 'function') ? getBabies() : [];
+    if (lista && lista.length) totalCriancas = lista.length;
+  } catch {}
+
+  modal.innerHTML = `
+    <div style="max-width:440px;width:100%;background:linear-gradient(135deg,#031027,#0a1a3d);border:1px solid rgba(250,199,117,0.4);border-radius:14px;padding:22px;color:#fff;font-family:'Exo 2',sans-serif;max-height:92vh;overflow-y:auto" onclick="event.stopPropagation()">
+      <div style="text-align:center;font-size:2.4rem;margin-bottom:8px">💾</div>
+      <div id="backup-modal-title" style="text-align:center;font-family:'Orbitron',monospace;font-size:0.82rem;color:var(--gold);letter-spacing:0.08em;font-weight:700;margin-bottom:6px">BACKUP E RESTAURAÇÃO</div>
+      <div style="font-size:0.72rem;color:var(--text-dim);line-height:1.5;margin-bottom:16px;text-align:center">
+        Proteja os dados de <strong style="color:var(--white)">${totalCriancas} ${totalCriancas===1?'criança':'crianças'}</strong> cadastradas.
+      </div>
+
+      <div style="background:rgba(120,255,153,0.08);border:1px solid rgba(120,255,153,0.3);border-radius:10px;padding:14px;margin-bottom:12px">
+        <div style="font-family:'Orbitron',monospace;font-size:0.68rem;color:#78ff99;letter-spacing:0.08em;font-weight:700;margin-bottom:8px">⬇ EXPORTAR</div>
+        <div style="font-size:0.7rem;color:var(--text-dim);line-height:1.5;margin-bottom:10px">Baixe um arquivo JSON com todos os dados da família (mamadas, sono, vacinas, marcos, fotos).</div>
+        <button onclick="window._exportarBackupCompleto()" aria-label="Baixar backup completo" style="width:100%;padding:11px;background:linear-gradient(135deg,rgba(120,255,153,0.25),rgba(0,180,255,0.15));border:1px solid rgba(120,255,153,0.5);border-radius:8px;color:#78ff99;font-family:'Orbitron',monospace;font-size:0.68rem;letter-spacing:0.06em;cursor:pointer;font-weight:700">⬇ BAIXAR BACKUP COMPLETO</button>
+      </div>
+
+      <div style="background:rgba(250,199,117,0.08);border:1px solid rgba(250,199,117,0.3);border-radius:10px;padding:14px;margin-bottom:12px">
+        <div style="font-family:'Orbitron',monospace;font-size:0.68rem;color:var(--gold);letter-spacing:0.08em;font-weight:700;margin-bottom:8px">⬆ RESTAURAR</div>
+        <div style="font-size:0.7rem;color:var(--text-dim);line-height:1.5;margin-bottom:10px">Importar um backup salvo anteriormente. Você pode escolher entre sobrescrever ou mesclar.</div>
+        <input type="file" id="backup-file-input" accept=".json,application/json" onchange="window._lerArquivoBackup(this)" aria-label="Selecionar arquivo de backup" style="width:100%;padding:9px;background:rgba(0,20,50,0.6);border:1px dashed rgba(250,199,117,0.4);border-radius:8px;color:var(--white);font-family:'Exo 2',sans-serif;font-size:0.74rem;cursor:pointer;box-sizing:border-box">
+        <div id="backup-file-info" style="font-size:0.66rem;color:var(--text-dim);margin-top:8px;line-height:1.45"></div>
+        <div id="backup-actions" style="display:none;margin-top:10px;display:none;gap:8px">
+          <button onclick="window._importarBackup('sobrescrever')" aria-label="Sobrescrever dados" style="flex:1;padding:10px;background:rgba(255,80,80,0.15);border:1px solid rgba(255,100,100,0.4);border-radius:8px;color:#ff8080;font-family:'Orbitron',monospace;font-size:0.62rem;letter-spacing:0.06em;cursor:pointer">⚠ SOBRESCREVER</button>
+          <button onclick="window._importarBackup('mesclar')" aria-label="Mesclar dados" style="flex:1;padding:10px;background:rgba(120,255,153,0.15);border:1px solid rgba(120,255,153,0.4);border-radius:8px;color:#78ff99;font-family:'Orbitron',monospace;font-size:0.62rem;letter-spacing:0.06em;cursor:pointer">🔀 MESCLAR</button>
+        </div>
+      </div>
+
+      <div style="background:rgba(0,180,255,0.08);border-left:3px solid var(--blue-neon);padding:10px 12px;border-radius:6px;font-size:0.68rem;color:var(--text-dim);line-height:1.5;margin-bottom:14px">
+        💡 <strong style="color:var(--white)">Dica:</strong> faça backup antes de trocar de celular ou desinstalar o app. LGPD Art. 18 garante o direito à portabilidade dos seus dados.
+      </div>
+
+      <button onclick="document.getElementById('modal-backup-restore').remove()" aria-label="Fechar backup" style="width:100%;padding:11px;background:rgba(0,60,120,0.6);border:1px solid rgba(0,180,255,0.4);border-radius:8px;color:var(--blue-neon);font-family:'Orbitron',monospace;font-size:0.66rem;letter-spacing:0.06em;cursor:pointer">Fechar</button>
+    </div>
+  `;
+  document.body.appendChild(modal);
+};
+
+window._exportarBackupCompleto = function() {
+  const hideLoading = (typeof window.bfLoading !== 'undefined')
+    ? window.bfLoading.show('Coletando dados para backup…') : null;
+  try {
+    // Coleta tudo do localStorage que começa com 'babyforce_' ou 'bf_'
+    const dump = {
+      _meta: {
+        versao: '2.0',
+        data: new Date().toISOString(),
+        sha_app: '7565f269',
+        formato: 'babyforce_full_backup_v2',
+      },
+      dados: {},
+    };
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (!key) continue;
+      if (key.startsWith('babyforce_') || key.startsWith('bf_')) {
+        dump.dados[key] = localStorage.getItem(key);
+      }
+    }
+    const blob = new Blob([JSON.stringify(dump, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `babyforce_backup_${new Date().toISOString().slice(0,10)}.json`;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 500);
+    if (hideLoading) hideLoading();
+    if (typeof showToast === 'function') showToast(`💾 Backup baixado! ${Object.keys(dump.dados).length} chaves`);
+    if (typeof BFAudit !== 'undefined') BFAudit.log('backup_exportado', { chaves: Object.keys(dump.dados).length });
+  } catch (e) {
+    if (hideLoading) hideLoading();
+    alert('Erro ao exportar backup: ' + e.message);
+    console.error('[backup]', e);
+  }
+};
+
+window._lerArquivoBackup = function(inputEl) {
+  const arq = inputEl.files && inputEl.files[0];
+  if (!arq) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const dump = JSON.parse(e.target.result);
+      if (!dump._meta || !dump._meta.formato || !dump._meta.formato.startsWith('babyforce')) {
+        throw new Error('Formato inválido — não parece ser um backup BabyForce');
+      }
+      const chaves = Object.keys(dump.dados || {}).length;
+      if (!chaves) throw new Error('Arquivo sem dados');
+      window._backupPendente = dump;
+      document.getElementById('backup-file-info').innerHTML =
+        `<div style="color:var(--white)">✓ Backup válido: <strong style="color:var(--gold)">${chaves}</strong> chaves · data: ${dump._meta.data ? new Date(dump._meta.data).toLocaleString('pt-BR') : '—'}</div>` +
+        `<div style="margin-top:4px;color:#FAC775;font-size:0.62rem">Escolha uma ação abaixo.</div>`;
+      const actions = document.getElementById('backup-actions');
+      if (actions) actions.style.display = 'flex';
+    } catch (err) {
+      document.getElementById('backup-file-info').innerHTML = `<div style="color:#ff8080">✗ ${_rcEsc(err.message)}</div>`;
+      window._backupPendente = null;
+    }
+  };
+  reader.onerror = () => {
+    document.getElementById('backup-file-info').innerHTML = '<div style="color:#ff8080">✗ Erro ao ler o arquivo</div>';
+  };
+  reader.readAsText(arq);
+};
+
+window._importarBackup = function(modo) {
+  if (!window._backupPendente) return alert('Selecione um arquivo primeiro');
+  const msg = modo === 'sobrescrever'
+    ? 'SOBRESCREVER TODOS os dados atuais?\n\nEsta ação apaga o que está salvo e substitui pelo backup. Não pode ser desfeita.\n\nContinuar?'
+    : 'MESCLAR o backup com os dados atuais?\n\nRegistros do backup serão adicionados onde não existirem. Registros atuais não são apagados.\n\nContinuar?';
+  if (!confirm(msg)) return;
+
+  const hideLoading = (typeof window.bfLoading !== 'undefined')
+    ? window.bfLoading.show(modo === 'sobrescrever' ? 'Restaurando backup…' : 'Mesclando backup…') : null;
+  // setTimeout para garantir que o overlay aparece antes do trabalho pesado
+  setTimeout(() => {
+    try {
+    const dados = window._backupPendente.dados || {};
+    let importadas = 0;
+    if (modo === 'sobrescrever') {
+      // Remove tudo que começa com babyforce_ ou bf_, depois injeta do backup
+      const toRemove = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && (k.startsWith('babyforce_') || k.startsWith('bf_'))) toRemove.push(k);
+      }
+      toRemove.forEach(k => localStorage.removeItem(k));
+      for (const [k, v] of Object.entries(dados)) {
+        localStorage.setItem(k, v);
+        importadas++;
+      }
+    } else {
+      // Mesclar: só adiciona chaves que ainda não existem, OU mescla arrays de registros
+      for (const [k, v] of Object.entries(dados)) {
+        const atual = localStorage.getItem(k);
+        if (!atual) {
+          localStorage.setItem(k, v);
+          importadas++;
+        } else {
+          // Tentar mesclar arrays (registros de mamadas/sono/etc.)
+          try {
+            const arrAtual = JSON.parse(atual);
+            const arrBackup = JSON.parse(v);
+            if (Array.isArray(arrAtual) && Array.isArray(arrBackup)) {
+              const idsAtuais = new Set(arrAtual.map(r => r && r.id).filter(Boolean));
+              const novos = arrBackup.filter(r => r && r.id && !idsAtuais.has(r.id));
+              if (novos.length) {
+                const merged = [...arrAtual, ...novos].sort((a,b) => (a.id||0) - (b.id||0));
+                localStorage.setItem(k, JSON.stringify(merged));
+                importadas++;
+              }
+            }
+          } catch { /* não é array JSON — ignora mescla, preserva atual */ }
+        }
+      }
+    }
+    if (typeof BFAudit !== 'undefined') BFAudit.log('backup_importado', { modo, chaves: importadas });
+    if (hideLoading) hideLoading();
+    alert(`✓ Backup importado com sucesso!\n\n${importadas} chaves ${modo === 'sobrescrever' ? 'restauradas' : 'mescladas'}.\n\nO app será recarregado para aplicar as mudanças.`);
+    setTimeout(() => window.location.reload(), 300);
+  } catch (e) {
+    if (hideLoading) hideLoading();
+    alert('Erro ao importar: ' + e.message);
+    console.error('[backup import]', e);
+  }
+  }, 50);
+};
+
+// ═══════════════════════════════════════════════════════════════
+// SPRINT A — RECUPERAÇÃO DE PIN
+// Dupla estratégia: (1) pergunta de segurança offline (2) email via Firebase (futuro)
+// ═══════════════════════════════════════════════════════════════
+window.abrirRecuperacaoPin = function() {
+  const existente = document.getElementById('modal-recuperar-pin');
+  if (existente) existente.remove();
+
+  // Pegar lista de crianças cadastradas para a pergunta de segurança
+  let criancas = [];
+  try {
+    if (typeof getBabies === 'function') {
+      criancas = getBabies() || [];
+    }
+  } catch {}
+  const temCriancas = criancas.length > 0;
+
+  // Pegar primeiro guardião (dono do email) para oferecer magic link
+  let emailGuardiao = null;
+  try {
+    if (typeof GUARDIOES !== 'undefined') {
+      const ids = Object.keys(GUARDIOES || {});
+      if (ids.length) emailGuardiao = GUARDIOES[ids[0]]?.email;
+    }
+  } catch {}
+
+  const modal = document.createElement('div');
+  modal.id = 'modal-recuperar-pin';
+  modal.setAttribute('role', 'dialog');
+  modal.setAttribute('aria-modal', 'true');
+  modal.setAttribute('aria-labelledby', 'recpin-title');
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,10,30,0.96);z-index:99999;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(10px);';
+  modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
+
+  modal.innerHTML = `
+    <div style="max-width:420px;width:100%;background:linear-gradient(135deg,#0a1a3d,#1a0a3d);border:1px solid rgba(199,125,255,0.4);border-radius:14px;padding:24px;color:#fff;font-family:'Exo 2',sans-serif;max-height:92vh;overflow-y:auto" onclick="event.stopPropagation()">
+      <div style="text-align:center;font-size:2.6rem;margin-bottom:8px">🔓</div>
+      <div id="recpin-title" style="text-align:center;font-family:'Orbitron',monospace;font-size:0.82rem;color:var(--purple-neon);letter-spacing:0.08em;font-weight:700;margin-bottom:6px">RECUPERAR ACESSO</div>
+      <div style="font-size:0.74rem;color:var(--text-dim);line-height:1.5;margin-bottom:18px;text-align:center">
+        Esqueceu o código da Força? Confirme uma criança cadastrada para redefinir seu PIN.
+      </div>
+
+      ${temCriancas ? `
+        <div style="display:flex;gap:8px;margin-bottom:14px;background:rgba(0,20,50,0.6);border-radius:10px;padding:4px">
+          <button id="rec-tab-pergunta" onclick="window._alternarTabRecuperacao('pergunta')" style="flex:1;padding:9px;background:rgba(199,125,255,0.25);border:1px solid rgba(199,125,255,0.4);border-radius:7px;color:#fff;font-family:'Orbitron',monospace;font-size:0.62rem;letter-spacing:0.06em;cursor:pointer;font-weight:700">🔑 OFFLINE</button>
+          <button id="rec-tab-email" onclick="window._alternarTabRecuperacao('email')" ${!emailGuardiao?'disabled':''} style="flex:1;padding:9px;background:transparent;border:1px solid rgba(0,180,255,0.25);border-radius:7px;color:${emailGuardiao?'var(--blue-neon)':'#555'};font-family:'Orbitron',monospace;font-size:0.62rem;letter-spacing:0.06em;cursor:${emailGuardiao?'pointer':'not-allowed'}">📧 EMAIL</button>
+        </div>
+
+        <div id="rec-panel-pergunta">
+          <div class="ng-field">
+            <label class="ng-label">Qual o nome da primeira criança cadastrada?</label>
+            <input type="text" id="recpin-nome" class="ng-input" placeholder="Digite o primeiro nome" autocomplete="off" autocapitalize="words" spellcheck="false">
+            <div class="ng-hint">Apenas o primeiro nome. Não diferencia maiúsculas/minúsculas.</div>
+          </div>
+
+          <div class="ng-field">
+            <label class="ng-label">Data de nascimento da criança</label>
+            <input type="date" id="recpin-data" class="ng-input">
+            <div class="ng-hint">Para confirmar que é você</div>
+          </div>
+
+          <div id="recpin-error" style="color:#ff8080;font-size:0.72rem;text-align:center;min-height:18px;margin-bottom:10px"></div>
+
+          <button onclick="window._confirmarRecuperacaoPin()" aria-label="Confirmar identidade" style="width:100%;padding:13px;background:linear-gradient(135deg,#c77dff,#00d4ff);border:none;border-radius:10px;color:#fff;font-family:'Orbitron',monospace;font-size:0.74rem;letter-spacing:0.08em;cursor:pointer;font-weight:700;margin-bottom:10px">🔓 CONFIRMAR IDENTIDADE</button>
+        </div>
+
+        <div id="rec-panel-email" style="display:none">
+          <div class="ng-field">
+            <label class="ng-label">Email cadastrado</label>
+            <input type="email" id="recmail-email" class="ng-input" placeholder="seu@email.com" value="${emailGuardiao?_rcEsc(emailGuardiao):''}" autocomplete="email" inputmode="email" spellcheck="false">
+            <div class="ng-hint">Enviaremos um link seguro para redefinir seu PIN. Requer conexão com internet.</div>
+          </div>
+
+          <div id="recmail-status" style="font-size:0.72rem;text-align:center;min-height:18px;margin-bottom:10px"></div>
+
+          <button onclick="window._enviarMagicLinkRecuperacao()" aria-label="Enviar link por email" style="width:100%;padding:13px;background:linear-gradient(135deg,#00d4ff,#0066aa);border:none;border-radius:10px;color:#fff;font-family:'Orbitron',monospace;font-size:0.74rem;letter-spacing:0.08em;cursor:pointer;font-weight:700;margin-bottom:10px">📧 ENVIAR LINK POR EMAIL</button>
+        </div>
+      ` : `
+        <div style="background:rgba(255,136,136,0.1);border:1px solid rgba(255,136,136,0.3);border-radius:8px;padding:12px;font-size:0.76rem;color:#ff8080;line-height:1.5;margin-bottom:16px">
+          ⚠ Nenhuma criança cadastrada neste dispositivo.<br>
+          Sem dados no app, não há como validar identidade offline.
+        </div>
+      `}
+
+      <div style="background:rgba(0,180,255,0.08);border-left:3px solid var(--blue-neon);padding:10px 12px;border-radius:6px;font-size:0.66rem;color:var(--text-dim);line-height:1.5;margin-bottom:14px">
+        🔒 <strong style="color:var(--white)">Segurança:</strong> após 5 tentativas erradas, esta tela fica bloqueada por 1 hora. Seus dados permanecem criptografados.
+      </div>
+
+      <button onclick="document.getElementById('modal-recuperar-pin').remove()" aria-label="Cancelar recuperação" style="width:100%;padding:11px;background:rgba(0,60,120,0.5);border:1px solid rgba(0,180,255,0.3);border-radius:8px;color:var(--blue-neon);font-family:'Orbitron',monospace;font-size:0.66rem;letter-spacing:0.06em;cursor:pointer">Cancelar</button>
+    </div>
+  `;
+  document.body.appendChild(modal);
+  setTimeout(() => { const i = document.getElementById('recpin-nome'); if (i) i.focus(); }, 100);
+};
+
+window._alternarTabRecuperacao = function(tab) {
+  const btnP = document.getElementById('rec-tab-pergunta');
+  const btnE = document.getElementById('rec-tab-email');
+  const panP = document.getElementById('rec-panel-pergunta');
+  const panE = document.getElementById('rec-panel-email');
+  if (!btnP || !btnE) return;
+  if (tab === 'email') {
+    btnE.style.background = 'rgba(0,180,255,0.25)';
+    btnE.style.color = '#fff';
+    btnE.style.fontWeight = '700';
+    btnP.style.background = 'transparent';
+    btnP.style.color = 'var(--purple-neon)';
+    btnP.style.fontWeight = '400';
+    panP.style.display = 'none';
+    panE.style.display = 'block';
+  } else {
+    btnP.style.background = 'rgba(199,125,255,0.25)';
+    btnP.style.color = '#fff';
+    btnP.style.fontWeight = '700';
+    btnE.style.background = 'transparent';
+    btnE.style.color = 'var(--blue-neon)';
+    btnE.style.fontWeight = '400';
+    panE.style.display = 'none';
+    panP.style.display = 'block';
+  }
+};
+
+window._confirmarRecuperacaoPin = function() {
+  // Rate limit específico para recuperação (mais rígido)
+  if (typeof BFRateLimit !== 'undefined' && BFRateLimit.podeTemtarLogin) {
+    const r = BFRateLimit.podeTemtarLogin('pin_recover');
+    if (!r.permitido) {
+      const restante = Math.ceil(r.esperarMs / 1000);
+      document.getElementById('recpin-error').textContent = `🔒 Bloqueado por ${restante}s (muitas tentativas)`;
+      return;
+    }
+  }
+
+  const nome = (document.getElementById('recpin-nome')?.value || '').trim().toLowerCase();
+  const data = document.getElementById('recpin-data')?.value || '';
+  if (!nome || !data) {
+    document.getElementById('recpin-error').textContent = 'Preencha nome e data de nascimento';
+    return;
+  }
+
+  let criancas = [];
+  try { criancas = (typeof getBabies === 'function') ? (getBabies() || []) : []; } catch {}
+
+  // Ordenar por ordem de cadastro (presume id crescente = ordem) e pegar a primeira
+  criancas.sort((a,b) => {
+    const tA = a.criadoEm ? new Date(a.criadoEm).getTime() : 0;
+    const tB = b.criadoEm ? new Date(b.criadoEm).getTime() : 0;
+    return tA - tB;
+  });
+  const primeira = criancas[0];
+
+  if (!primeira) {
+    document.getElementById('recpin-error').textContent = 'Nenhuma criança cadastrada';
+    return;
+  }
+
+  // Validação: primeiro nome (case-insensitive) + data nascimento exata
+  const nomeCadastrado = String(primeira.nome || '').trim().toLowerCase().split(/\s+/)[0];
+  const dataCadastrada = primeira.nasc || '';
+
+  if (nome === nomeCadastrado && data === dataCadastrada) {
+    if (typeof BFRateLimit !== 'undefined' && BFRateLimit.registrarSucesso) BFRateLimit.registrarSucesso('pin_recover');
+    if (typeof BFAudit !== 'undefined') BFAudit.log('pin_recover_sucesso', { metodo: 'pergunta' });
+    document.getElementById('modal-recuperar-pin').remove();
+    window._abrirDefinicaoNovoPin();
+  } else {
+    if (typeof BFRateLimit !== 'undefined' && BFRateLimit.registrarFalha) BFRateLimit.registrarFalha('pin_recover');
+    if (typeof BFAudit !== 'undefined') BFAudit.log('pin_recover_falha', { metodo: 'pergunta' });
+    document.getElementById('recpin-error').textContent = 'Dados não conferem. Verifique e tente novamente.';
+  }
+};
+
+// ═══════════════════════════════════════════════════════════════
+// MAGIC LINK via Firebase Auth — recuperação por email
+// ═══════════════════════════════════════════════════════════════
+const MAGIC_LINK_PENDING_KEY = 'babyforce_magic_link_pending_v1';
+
+window._enviarMagicLinkRecuperacao = async function() {
+  const emailEl = document.getElementById('recmail-email');
+  const statusEl = document.getElementById('recmail-status');
+  if (!emailEl || !statusEl) return;
+  const email = (emailEl.value || '').trim().toLowerCase();
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    statusEl.innerHTML = '<span style="color:#ff8080">✗ Email inválido</span>';
+    return;
+  }
+
+  // Verificar se email bate com algum guardião cadastrado (evita spam a emails alheios)
+  let emailValido = false;
+  try {
+    if (typeof GUARDIOES !== 'undefined') {
+      for (const id of Object.keys(GUARDIOES || {})) {
+        const g = GUARDIOES[id];
+        if (g && String(g.email || '').trim().toLowerCase() === email) {
+          emailValido = true; break;
+        }
+      }
+    }
+  } catch {}
+
+  if (!emailValido) {
+    statusEl.innerHTML = '<span style="color:#ff8080">✗ Email não corresponde a nenhum guardião cadastrado</span>';
+    if (typeof BFAudit !== 'undefined') BFAudit.log('magic_link_falha', { motivo: 'email_nao_cadastrado' });
+    return;
+  }
+
+  // Rate limit
+  if (typeof BFRateLimit !== 'undefined' && BFRateLimit.podeTemtarLogin) {
+    const r = BFRateLimit.podeTemtarLogin('magic_link');
+    if (!r.permitido) {
+      const restante = Math.ceil(r.esperarMs / 1000);
+      statusEl.innerHTML = `<span style="color:#ff8080">🔒 Aguarde ${restante}s antes de solicitar novo link</span>`;
+      return;
+    }
+  }
+
+  statusEl.innerHTML = '<span style="color:var(--blue-neon)">⏳ Enviando link...</span>';
+
+  try {
+    if (typeof firebase === 'undefined' || !firebase.auth) {
+      throw new Error('Firebase não disponível. Use a recuperação OFFLINE.');
+    }
+    // Garante que o firebase foi inicializado
+    if (typeof initFirebaseRefs === 'function') initFirebaseRefs();
+
+    const actionCodeSettings = {
+      url: window.location.origin + window.location.pathname + '?recoverPin=1',
+      handleCodeInApp: true,
+    };
+    await firebase.auth().sendSignInLinkToEmail(email, actionCodeSettings);
+    // Salva email pendente para verificação quando usuário clica no link
+    try { localStorage.setItem(MAGIC_LINK_PENDING_KEY, email); } catch {}
+    if (typeof BFRateLimit !== 'undefined' && BFRateLimit.registrarFalha) BFRateLimit.registrarFalha('magic_link');
+    if (typeof BFAudit !== 'undefined') BFAudit.log('magic_link_enviado', { email: email.substring(0,3) + '***' });
+
+    statusEl.innerHTML = `<div style="color:#78ff99;line-height:1.5;padding:8px;background:rgba(120,255,153,0.1);border-radius:6px;text-align:left;font-size:0.7rem">
+      ✓ <strong>Link enviado!</strong><br>
+      Verifique seu email em <strong>${_rcEsc(email)}</strong>.<br>
+      O link expira em <strong>1 hora</strong> e só funciona neste dispositivo.
+    </div>`;
+  } catch (e) {
+    console.warn('[magic link]', e);
+    statusEl.innerHTML = `<span style="color:#ff8080">✗ Erro: ${_rcEsc(e.message || 'falha ao enviar')}</span>`;
+    if (typeof BFAudit !== 'undefined') BFAudit.log('magic_link_falha', { erro: e.code || 'unknown' });
+  }
+};
+
+// Verifica se a URL atual contém o link mágico → se sim, valida e abre tela de novo PIN
+window._verificarMagicLinkAtivo = async function() {
+  try {
+    if (typeof firebase === 'undefined' || !firebase.auth) return;
+    if (typeof initFirebaseRefs === 'function') initFirebaseRefs();
+    const auth = firebase.auth();
+    if (!auth.isSignInWithEmailLink(window.location.href)) return;
+
+    let email = null;
+    try { email = localStorage.getItem(MAGIC_LINK_PENDING_KEY); } catch {}
+    if (!email) {
+      email = window.prompt('Confirme o email para completar a recuperação:');
+      if (!email) return;
+    }
+
+    // Autentica no Firebase (não faz login de sessão — apenas valida o link)
+    await auth.signInWithEmailLink(email, window.location.href);
+    try { localStorage.removeItem(MAGIC_LINK_PENDING_KEY); } catch {}
+    // Desloga imediatamente (só queríamos validar o link, não manter sessão Firebase)
+    try { await auth.signOut(); } catch {}
+
+    // Limpa URL (remove query strings do magic link)
+    try { window.history.replaceState({}, document.title, window.location.pathname); } catch {}
+
+    if (typeof BFAudit !== 'undefined') BFAudit.log('magic_link_validado');
+    // Abrir direto o modal de novo PIN
+    alert('✓ Email confirmado!\n\nDefina seu novo PIN de 6 dígitos.');
+    setTimeout(() => window._abrirDefinicaoNovoPin(), 200);
+  } catch (e) {
+    console.warn('[magic link verify]', e);
+    if (e && e.code === 'auth/invalid-action-code') {
+      alert('Link expirado ou já utilizado.\n\nUse a recuperação OFFLINE ou solicite novo link.');
+    }
+    if (typeof BFAudit !== 'undefined') BFAudit.log('magic_link_validacao_falha', { erro: e.code || 'unknown' });
+  }
+};
+
+// Disparar verificação ao carregar
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => {
+    if (location.search.includes('recoverPin=1') || (typeof firebase !== 'undefined' && firebase.auth && firebase.auth().isSignInWithEmailLink && firebase.auth().isSignInWithEmailLink(location.href))) {
+      window._verificarMagicLinkAtivo();
+    }
+  }, 1500);
+});
+
+window._abrirDefinicaoNovoPin = function() {
+  const existente = document.getElementById('modal-novo-pin');
+  if (existente) existente.remove();
+  const modal = document.createElement('div');
+  modal.id = 'modal-novo-pin';
+  modal.setAttribute('role', 'dialog');
+  modal.setAttribute('aria-modal', 'true');
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,10,30,0.96);z-index:99999;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(10px);';
+  modal.innerHTML = `
+    <div style="max-width:360px;width:100%;background:linear-gradient(135deg,#031a3d,#0a3a1d);border:1px solid rgba(120,255,153,0.5);border-radius:14px;padding:24px;color:#fff;font-family:'Exo 2',sans-serif">
+      <div style="text-align:center;font-size:2.6rem;margin-bottom:8px">✓</div>
+      <div style="text-align:center;font-family:'Orbitron',monospace;font-size:0.82rem;color:#78ff99;letter-spacing:0.08em;font-weight:700;margin-bottom:6px">IDENTIDADE CONFIRMADA</div>
+      <div style="font-size:0.76rem;color:var(--text-dim);line-height:1.5;margin-bottom:18px;text-align:center">
+        Defina seu novo código da Força (6 dígitos).
+      </div>
+
+      <div class="ng-field">
+        <label class="ng-label">Novo PIN</label>
+        <input type="tel" id="novopin-1" class="ng-input" maxlength="6" pattern="[0-9]*" inputmode="numeric" placeholder="• • • • • •" style="text-align:center;letter-spacing:0.5em;font-size:1.5rem;font-family:'Orbitron',monospace">
+      </div>
+
+      <div class="ng-field">
+        <label class="ng-label">Confirme o novo PIN</label>
+        <input type="tel" id="novopin-2" class="ng-input" maxlength="6" pattern="[0-9]*" inputmode="numeric" placeholder="• • • • • •" style="text-align:center;letter-spacing:0.5em;font-size:1.5rem;font-family:'Orbitron',monospace">
+      </div>
+
+      <div id="novopin-error" style="color:#ff8080;font-size:0.72rem;text-align:center;min-height:18px;margin-bottom:10px"></div>
+
+      <button onclick="window._salvarNovoPin()" aria-label="Salvar novo PIN" style="width:100%;padding:13px;background:linear-gradient(135deg,#78ff99,#00d4ff);border:none;border-radius:10px;color:#031027;font-family:'Orbitron',monospace;font-size:0.74rem;letter-spacing:0.08em;cursor:pointer;font-weight:700">✓ DEFINIR NOVO PIN</button>
+    </div>
+  `;
+  document.body.appendChild(modal);
+  setTimeout(() => { const i = document.getElementById('novopin-1'); if (i) i.focus(); }, 100);
+};
+
+window._salvarNovoPin = async function() {
+  const p1 = (document.getElementById('novopin-1')?.value || '').trim();
+  const p2 = (document.getElementById('novopin-2')?.value || '').trim();
+  const errEl = document.getElementById('novopin-error');
+  if (!/^\d{6}$/.test(p1)) { errEl.textContent = 'PIN deve ter 6 dígitos'; return; }
+  if (p1 !== p2) { errEl.textContent = 'Os PINs não conferem'; return; }
+  // Prevenir PINs óbvios
+  if (/^(\d)\1{5}$/.test(p1)) { errEl.textContent = 'Evite PINs com dígitos repetidos (ex: 111111)'; return; }
+  if (['123456','654321','012345','098765'].includes(p1)) { errEl.textContent = 'PIN muito óbvio. Escolha outro.'; return; }
+
+  try {
+    if (typeof window._definirPinSeguro === 'function') {
+      await window._definirPinSeguro(p1);
+    } else {
+      // Fallback: usa saveAppConfig direto
+      const cfg = (typeof getAppConfig === 'function') ? getAppConfig() : {};
+      cfg.pin = p1; delete cfg.pinHash; delete cfg.pinSalt;
+      if (typeof saveAppConfig === 'function') saveAppConfig(cfg);
+    }
+    // Resetar rate limits do PIN
+    if (typeof BFRateLimit !== 'undefined' && BFRateLimit.registrarSucesso) {
+      BFRateLimit.registrarSucesso('pin');
+      BFRateLimit.registrarSucesso('pin_recover');
+    }
+    document.getElementById('modal-novo-pin').remove();
+    alert('✓ PIN redefinido com sucesso!\n\nUse o novo PIN para entrar.');
+    if (typeof BFAudit !== 'undefined') BFAudit.log('pin_redefinido_v3');
+  } catch (e) {
+    errEl.textContent = 'Erro: ' + e.message;
+  }
+};
+
+// ═══════════════════════════════════════════════════════════════
+// SPRINT C — LOADING STATES globais
+// Uso: const hide = bfLoading.show('Gerando relatório...'); ... hide();
+// ═══════════════════════════════════════════════════════════════
+window.bfLoading = {
+  _count: 0,
+  show(texto) {
+    this._count++;
+    const id = 'bf-loading-overlay-' + Date.now();
+    const el = document.createElement('div');
+    el.className = 'bf-loading-overlay';
+    el.id = id;
+    el.setAttribute('role', 'status');
+    el.setAttribute('aria-live', 'assertive');
+    el.innerHTML = `<div class="bf-spinner bf-spinner-lg" aria-hidden="true"></div><div class="bf-loading-text">${_rcEsc(texto || 'Carregando...')}</div>`;
+    document.body.appendChild(el);
+    return () => {
+      const e = document.getElementById(id);
+      if (e) e.remove();
+      this._count = Math.max(0, this._count - 1);
+    };
+  },
+  inline(texto) {
+    return `<div style="display:flex;align-items:center;gap:10px;padding:12px;color:var(--text-dim);font-size:0.78rem"><div class="bf-spinner" aria-hidden="true"></div>${_rcEsc(texto || 'Carregando...')}</div>`;
+  },
+};
+
+// Wrapper: envolve função async com loading overlay
+window.bfWithLoading = async function(texto, fn) {
+  const hide = window.bfLoading.show(texto);
+  try { return await fn(); }
+  finally { hide(); }
+};
+
+// ═══════════════════════════════════════════════════════════════
+// SPRINT C — COMPARAÇÃO ENTRE IRMÃOS
+// Painel que mostra marcos, peso/altura, mamadas/dia lado a lado
+// Só aparece quando há 2+ crianças cadastradas
+// ═══════════════════════════════════════════════════════════════
+window.abrirComparacaoIrmaos = function() {
+  const lista = (typeof getBabies === 'function') ? (getBabies() || []) : [];
+  if (lista.length < 2) {
+    alert('A comparação entre irmãos precisa de pelo menos 2 crianças cadastradas.\n\nVocê tem ' + lista.length + ' criança' + (lista.length===1?'':'s') + ' cadastrada' + (lista.length===1?'':'s') + '.');
+    return;
+  }
+  if (typeof fecharMenuGuardiao === 'function') fecharMenuGuardiao();
+
+  const existente = document.getElementById('modal-comparacao-irmaos');
+  if (existente) existente.remove();
+
+  const modal = document.createElement('div');
+  modal.id = 'modal-comparacao-irmaos';
+  modal.setAttribute('role', 'dialog');
+  modal.setAttribute('aria-modal', 'true');
+  modal.setAttribute('aria-labelledby', 'cmp-modal-title');
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,10,30,0.94);z-index:99998;display:flex;align-items:flex-start;justify-content:center;padding:12px;backdrop-filter:blur(8px);overflow-y:auto;';
+  modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
+
+  modal.innerHTML = `
+    <div style="max-width:640px;width:100%;background:linear-gradient(135deg,#031027,#0a1a3d);border:1px solid rgba(199,125,255,0.4);border-radius:14px;padding:20px;color:#fff;font-family:'Exo 2',sans-serif;margin:auto;max-height:none" onclick="event.stopPropagation()">
+      <div style="text-align:center;font-size:2rem;margin-bottom:6px">👨‍👩‍👧‍👦</div>
+      <div id="cmp-modal-title" style="text-align:center;font-family:'Orbitron',monospace;font-size:0.8rem;color:var(--purple-neon);letter-spacing:0.08em;font-weight:700;margin-bottom:4px">COMPARAR IRMÃOS</div>
+      <div style="text-align:center;font-size:0.7rem;color:var(--text-dim);margin-bottom:16px">${lista.length} crianças cadastradas · desenvolvimento lado a lado</div>
+
+      <div id="cmp-content">${window.bfLoading.inline('Calculando comparação...')}</div>
+
+      <div style="background:rgba(250,199,117,0.08);border-left:3px solid rgba(250,199,117,0.4);padding:10px 12px;border-radius:6px;font-size:0.66rem;color:var(--text-dim);line-height:1.5;margin-top:14px">
+        💡 <strong style="color:var(--gold)">Lembre-se:</strong> cada criança tem seu ritmo. Comparações servem apenas como referência — diferenças entre irmãos são normais e não indicam atraso ou avanço.
+      </div>
+
+      <button onclick="document.getElementById('modal-comparacao-irmaos').remove()" aria-label="Fechar comparação" style="width:100%;padding:11px;margin-top:12px;background:rgba(0,60,120,0.6);border:1px solid rgba(0,180,255,0.4);border-radius:8px;color:var(--blue-neon);font-family:'Orbitron',monospace;font-size:0.66rem;letter-spacing:0.06em;cursor:pointer">Fechar</button>
+    </div>
+  `;
+  document.body.appendChild(modal);
+
+  // Computa comparação de forma async (permite UI responder)
+  setTimeout(() => _renderizarComparacaoIrmaos(lista), 100);
+};
+
+function _renderizarComparacaoIrmaos(lista) {
+  const cont = document.getElementById('cmp-content');
+  if (!cont) return;
+
+  try {
+    const dadosPorCrianca = lista.map(b => _coletarDadosCrianca(b));
+    // Ordenar por ordem de cadastro (mais velho cadastrado primeiro)
+    const maxCols = Math.min(dadosPorCrianca.length, 4);
+    const dados = dadosPorCrianca.slice(0, maxCols);
+
+    cont.innerHTML = `
+      <!-- Header com nomes e idade atual -->
+      <div style="display:grid;grid-template-columns:repeat(${dados.length},1fr);gap:8px;margin-bottom:14px">
+        ${dados.map(d => `
+          <div style="background:rgba(0,30,70,0.5);border:1px solid rgba(0,180,255,0.25);border-radius:10px;padding:10px;text-align:center">
+            <div style="font-size:1.6rem;margin-bottom:4px">${d.generoIcon}</div>
+            <div style="font-size:0.8rem;font-weight:700;color:var(--white);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${_rcEsc(d.nome)}</div>
+            <div style="font-size:0.64rem;color:var(--text-dim);margin-top:2px">${d.idadeAtual}</div>
+          </div>
+        `).join('')}
+      </div>
+
+      <!-- Marcos alcançados -->
+      <div style="background:rgba(199,125,255,0.08);border-left:3px solid rgba(199,125,255,0.4);padding:10px 12px;border-radius:6px;margin-bottom:12px">
+        <div style="font-family:'Orbitron',monospace;font-size:0.66rem;color:var(--purple-neon);letter-spacing:0.08em;font-weight:700;margin-bottom:8px">🌙 MARCOS ALCANÇADOS</div>
+        <div style="display:grid;grid-template-columns:repeat(${dados.length},1fr);gap:8px;font-size:0.74rem">
+          ${dados.map(d => `
+            <div>
+              <div style="font-size:1.3rem;color:var(--gold);font-weight:700">${d.marcos.length}</div>
+              <div style="font-size:0.62rem;color:var(--text-dim)">registrados</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+
+      <!-- Medidas mais recentes -->
+      <div style="background:rgba(120,255,153,0.08);border-left:3px solid rgba(120,255,153,0.4);padding:10px 12px;border-radius:6px;margin-bottom:12px">
+        <div style="font-family:'Orbitron',monospace;font-size:0.66rem;color:#78ff99;letter-spacing:0.08em;font-weight:700;margin-bottom:8px">📏 ÚLTIMA MEDIDA</div>
+        <div style="display:grid;grid-template-columns:repeat(${dados.length},1fr);gap:8px;font-size:0.72rem">
+          ${dados.map(d => `
+            <div>
+              <div style="font-size:0.82rem;color:var(--white);font-weight:600">${d.ultimaMedida.peso || '—'} ${d.ultimaMedida.peso ? 'kg' : ''}</div>
+              <div style="font-size:0.7rem;color:#9eb0c8;margin-top:2px">${d.ultimaMedida.altura || '—'} ${d.ultimaMedida.altura ? 'cm' : ''}</div>
+              <div style="font-size:0.58rem;color:var(--text-dim);margin-top:3px">${d.ultimaMedida.data ? d.ultimaMedida.data : 'sem dados'}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+
+      <!-- Vacinas tomadas -->
+      <div style="background:rgba(0,212,255,0.08);border-left:3px solid rgba(0,212,255,0.4);padding:10px 12px;border-radius:6px;margin-bottom:12px">
+        <div style="font-family:'Orbitron',monospace;font-size:0.66rem;color:var(--blue-neon);letter-spacing:0.08em;font-weight:700;margin-bottom:8px">🛡️ VACINAS TOMADAS</div>
+        <div style="display:grid;grid-template-columns:repeat(${dados.length},1fr);gap:8px;font-size:0.74rem">
+          ${dados.map(d => `
+            <div>
+              <div style="font-size:1.3rem;color:var(--blue-neon);font-weight:700">${d.vacinasTomadas}</div>
+              <div style="font-size:0.62rem;color:var(--text-dim)">doses aplicadas</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+
+      <!-- Marcos por idade — comparação "quando cada um fez tal marco" -->
+      ${_renderComparacaoMarcosPorIdade(dados)}
+    `;
+  } catch (e) {
+    console.warn('[comparacao]', e);
+    cont.innerHTML = `<div style="color:#ff8080;padding:14px;background:rgba(255,100,100,0.1);border-radius:8px;font-size:0.76rem">Erro ao calcular comparação: ${_rcEsc(e.message)}</div>`;
+  }
+}
+
+function _coletarDadosCrianca(baby) {
+  // Ler dados com namespacing por baby (via _bfKey que usa getActiveBabyId)
+  // Estratégia: cria chave manual com sufixo __{id} se baby não é principal
+  const principalId = (typeof getBabyPrincipalId === 'function') ? getBabyPrincipalId() : null;
+  const ehPrincipal = baby.id === principalId;
+  const suf = ehPrincipal ? '' : '__' + baby.id;
+
+  function ler(baseKey, defaultVal) {
+    try {
+      const raw = localStorage.getItem(baseKey + suf) || localStorage.getItem(baseKey);
+      return raw ? JSON.parse(raw) : defaultVal;
+    } catch { return defaultVal; }
+  }
+
+  // Idade atual
+  let idadeAtual = '—';
+  if (baby.nasc) {
+    try {
+      const n = new Date(baby.nasc + 'T00:00:00');
+      const dias = Math.floor((new Date() - n) / (1000*60*60*24));
+      if (dias < 60) idadeAtual = `${dias} dias`;
+      else {
+        const meses = Math.floor(dias / 30.44);
+        if (meses < 24) idadeAtual = `${meses} ${meses===1?'mês':'meses'}`;
+        else {
+          const anos = Math.floor(meses / 12);
+          const mR = meses % 12;
+          if (anos < 3 && mR > 0) idadeAtual = `${anos}a ${mR}m`;
+          else idadeAtual = `${anos} ${anos===1?'ano':'anos'}`;
+        }
+      }
+    } catch {}
+  }
+
+  // Marcos (mesversario_v1)
+  const marcos = ler('babyforce_mesversario_v1', []) || [];
+
+  // Medidas (peso/altura — assumindo babyforce_medidas_v1 ou similar)
+  const medidas = ler('babyforce_medidas_v1', []) || [];
+  const medidasOrd = [...medidas].sort((a,b) => (b.data||'').localeCompare(a.data||''));
+  const ultima = medidasOrd[0] || {};
+  const ultimaMedida = {
+    peso: ultima.peso || null,
+    altura: ultima.altura || null,
+    data: ultima.data ? new Date(ultima.data + 'T12:00').toLocaleDateString('pt-BR') : null,
+  };
+
+  // Vacinas
+  const vacinas = ler('babyforce_vacinas_v1', []) || [];
+  const vacinasTomadas = vacinas.filter(v => v && v.aplicada).length;
+
+  // Gênero
+  const generoIcon = baby.genero === 'M' ? '👦' : (baby.genero === 'F' ? '👧' : '🧒');
+
+  return {
+    nome: (baby.nome || '').split(/\s+/)[0] || '?',
+    idadeAtual,
+    generoIcon,
+    marcos,
+    ultimaMedida,
+    vacinasTomadas,
+    nasc: baby.nasc,
+  };
+}
+
+function _renderComparacaoMarcosPorIdade(dados) {
+  // Pega marcos típicos e vê em que idade cada criança os registrou
+  const marcosAComparar = [
+    { busca: /sorriu|sorriso/i, label: '😊 Primeiro sorriso' },
+    { busca: /senta|sentou/i, label: '🪑 Sentou sem apoio' },
+    { busca: /engatinha|engatinhou/i, label: '🐾 Engatinhou' },
+    { busca: /andou|primeiros passos/i, label: '🚶 Primeiros passos' },
+    { busca: /fal(ou|a)|primeiras? palavra/i, label: '🗣️ Primeira palavra' },
+    { busca: /dente|dentinho/i, label: '🦷 Primeiro dentinho' },
+  ];
+
+  const linhas = marcosAComparar.map(m => {
+    const celulas = dados.map(d => {
+      const marcoEncontrado = (d.marcos || []).find(x => x && m.busca.test(String(x.titulo || '') + ' ' + String(x.obs || '')));
+      if (!marcoEncontrado) return '<span style="color:#555">—</span>';
+      const mes = marcoEncontrado.mes;
+      if (mes === undefined || mes === null) return '<span style="color:var(--white)">✓</span>';
+      return `<span style="color:var(--gold);font-weight:600">${mes}m</span>`;
+    });
+    return `<tr><td style="padding:6px 8px;font-size:0.72rem;color:var(--white)">${m.label}</td>${celulas.map(c => `<td style="padding:6px 4px;text-align:center;font-size:0.72rem">${c}</td>`).join('')}</tr>`;
+  });
+
+  return `
+    <div style="background:rgba(250,199,117,0.08);border-left:3px solid rgba(250,199,117,0.4);padding:10px 12px;border-radius:6px">
+      <div style="font-family:'Orbitron',monospace;font-size:0.66rem;color:var(--gold);letter-spacing:0.08em;font-weight:700;margin-bottom:8px">⏱️ IDADE EM CADA MARCO</div>
+      <div style="overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse;font-family:'Exo 2',sans-serif">
+          <thead>
+            <tr style="border-bottom:1px solid rgba(250,199,117,0.3)">
+              <th style="padding:6px 8px;text-align:left;font-size:0.6rem;color:var(--text-dim);font-weight:600">Marco</th>
+              ${dados.map(d => `<th style="padding:6px 4px;text-align:center;font-size:0.6rem;color:var(--text-dim);font-weight:600">${_rcEsc(d.nome)}</th>`).join('')}
+            </tr>
+          </thead>
+          <tbody>${linhas.join('')}</tbody>
+        </table>
+      </div>
+      <div style="font-size:0.6rem;color:var(--text-dim);margin-top:6px;line-height:1.4">Valores em meses. — significa que o marco ainda não foi registrado para essa criança.</div>
+    </div>
+  `;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// HANDLER QUOTA EXCEEDED — previne crash silencioso em storage cheio
+// ═══════════════════════════════════════════════════════════════
+(function() {
+  const _origSetItem = Storage.prototype.setItem;
+  let _alertaExibido = false;
+  Storage.prototype.setItem = function(key, value) {
+    try {
+      return _origSetItem.call(this, key, value);
+    } catch (e) {
+      if (e && (e.name === 'QuotaExceededError' || e.code === 22 || e.code === 1014 || String(e).toLowerCase().includes('quota'))) {
+        if (!_alertaExibido) {
+          _alertaExibido = true;
+          console.warn('[STORAGE] Cota excedida:', key);
+          try { if (typeof BFAudit !== 'undefined') BFAudit.log('storage_quota_excedida', { key, size: value?.length }); } catch {}
+          setTimeout(() => {
+            const aceitar = confirm(
+              '⚠️ Armazenamento quase cheio!\n\n' +
+              'O app atingiu o limite de dados no seu navegador. ' +
+              'Para continuar registrando, você pode:\n\n' +
+              '1. Baixar um backup dos dados\n' +
+              '2. Limpar registros antigos\n\n' +
+              'Deseja abrir a tela de Backup agora?'
+            );
+            _alertaExibido = false;
+            if (aceitar && typeof window.abrirBackupRestore === 'function') {
+              window.abrirBackupRestore();
+            }
+          }, 100);
+        }
+        return;  // Não propaga — app continua funcionando
+      }
+      throw e;
+    }
+  };
+})();
+
+document.addEventListener('keydown', (e) => {
+  if (e.key !== 'Escape') return;
+  // Fechar modais abertos (ordem de prioridade: mais recente primeiro)
+  const seletores = [
+    '#modal-novo-pin', '#modal-recuperar-pin', '#modal-acessibilidade',
+    '#modal-backup-restore', '#modal-comparacao-irmaos', '#modal-desmame',
+    '#modal-registro-vacina', '#modal-vac-livre', '.alim-celebracao-overlay',
+  ];
+  for (const sel of seletores) {
+    const el = document.querySelector(sel);
+    if (el) { el.remove(); break; }
+  }
+});
+
 // ══════════════════════════════════════════════════════════
 // RENDERIZAÇÃO DO PANEL ALIMENTOS (locked ou unlocked)
 // ══════════════════════════════════════════════════════════
@@ -14130,7 +15735,7 @@ function _renderListaRefeicoes(refs) {
           <div style="font-size:0.6rem;color:var(--text-dim);font-family:'Orbitron',monospace;letter-spacing:0.04em;margin-top:2px">${dataFmt} · ${r.hora} · ${r.textura}</div>
           ${r.obs ? `<div style="font-size:0.66rem;color:var(--text-dim);margin-top:4px;font-style:italic">${_escapeHtml(r.obs)}</div>` : ''}
         </div>
-        <button onclick="deletarRefeicao(${r.id})" class="btn" style="padding:4px 8px;background:rgba(255,80,80,0.15);border:1px solid rgba(255,80,80,0.3);color:#ff8888;border-radius:6px;font-size:0.7rem;cursor:pointer">🗑</button>
+        <button onclick="deletarRefeicao(${r.id})" class="btn" style="padding:4px 8px;background:rgba(255,80,80,0.15);border:1px solid rgba(255,80,80,0.3);color:#ff8888;border-radius:6px;font-size:0.7rem;cursor:pointer" aria-label="Remover">🗑</button>
       </div>`;
   }).join('');
 }
@@ -16044,7 +17649,7 @@ function salvarEdicaoGuardiao() {
 }
 </style>
 
-<div id="modal-edit-guardiao" onclick="if(event.target.id==='modal-edit-guardiao'&&document.getElementById('edit-g-obrigatorio').style.display==='none'){fecharEdicaoGuardiao();}">
+<div id="modal-edit-guardiao" onclick="if(event.target.id==='modal-edit-guardiao'&&document.getElementById('edit-g-obrigatorio').style.display==='none'){fecharEdicaoGuardiao();}" role="dialog" aria-modal="true">
   <div class="mg-box">
     <div class="mg-title">👤 DADOS DO GUARDIÃO</div>
     <div class="mg-sub">INFORMAÇÕES OBRIGATÓRIAS</div>
@@ -16354,7 +17959,7 @@ function _qlModalBase(titulo, icone, cor, corpoHtml, onSalvar) {
           <div style="font-family:'Orbitron',monospace;font-size:0.95rem;color:${cor};font-weight:700;letter-spacing:0.04em">${titulo}</div>
           <div style="font-size:0.64rem;color:var(--text-dim);margin-top:2px">registro rápido</div>
         </div>
-        <button onclick="_qlFecharModal()" style="background:none;border:none;color:var(--text-dim);font-size:1.4rem;cursor:pointer;padding:4px 10px">×</button>
+        <button onclick="_qlFecharModal()" style="background:none;border:none;color:var(--text-dim);font-size:1.4rem;cursor:pointer;padding:4px 10px" aria-label="Fechar">×</button>
       </div>
       <div id="ql-modal-corpo">${corpoHtml}</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px">
@@ -17068,6 +18673,9 @@ function _rcAtualizarBotoes() {
 }
 
 function _rcEsc(s) { return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+// Alias universal para escape de HTML (usado em várias camadas)
+window._escapeHtml = _rcEsc;
+window._rcEsc = _rcEsc;
 
 // ──────────────────────────────────────────
 // ANÁLISE POR IA (Claude API)
@@ -17306,7 +18914,7 @@ function _renderListaProfissionais() {
         ${p.email?`<div style="font-size:0.58rem;color:var(--blue-neon);margin-top:2px">📧 ${_rcEsc(p.email)}</div>`:''}
         ${p.whatsapp?`<div style="font-size:0.58rem;color:#78ff99;margin-top:2px">💬 ${_rcEsc(p.whatsapp)}</div>`:''}
       </div>
-      ${!p._default?`<button onclick="_removerProfissional('${p.id}')" style="background:rgba(255,80,80,0.15);border:1px solid rgba(255,80,80,0.3);color:#ff8888;padding:4px 8px;border-radius:6px;font-size:0.7rem;cursor:pointer">🗑</button>`:''}
+      ${!p._default?`<button onclick="_removerProfissional('${p.id}')" style="background:rgba(255,80,80,0.15);border:1px solid rgba(255,80,80,0.3);color:#ff8888;padding:4px 8px;border-radius:6px;font-size:0.7rem;cursor:pointer" aria-label="Remover">🗑</button>`:''}
     </div>
   `;
   }).join('');
@@ -17556,7 +19164,7 @@ if (document.readyState === 'loading') {
 <!-- ═══════════════════════════════════════════════════════════════
      MÓDULO CRIANÇAS — lista de filhos cadastrados, cadastro, edição
      ═══════════════════════════════════════════════════════════════ -->
-<div id="modal-criancas" style="display:none;position:fixed;inset:0;z-index:99500;background:rgba(0,0,0,0.8);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);align-items:flex-start;justify-content:center;padding:12px;overflow-y:auto" onclick="if(event.target===this)fecharGestaoCriancas()">
+<div id="modal-criancas" style="display:none;position:fixed;inset:0;z-index:99500;background:rgba(0,0,0,0.8);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);align-items:flex-start;justify-content:center;padding:12px;overflow-y:auto" onclick="if(event.target===this)fecharGestaoCriancas()" role="dialog" aria-modal="true">
   <div class="cri-modal" style="background:linear-gradient(160deg,rgba(0,30,70,0.98),rgba(0,15,40,0.99));border:1px solid rgba(199,125,255,0.32);border-radius:16px;padding:16px;max-width:500px;width:100%;margin:auto 0;box-shadow:0 10px 50px rgba(199,125,255,0.25)">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
       <div style="font-size:1.8rem">👶</div>
@@ -17564,7 +19172,7 @@ if (document.readyState === 'loading') {
         <div style="font-family:'Orbitron',monospace;font-size:1rem;color:var(--purple-neon);font-weight:700;letter-spacing:0.04em">Crianças cadastradas</div>
         <div style="font-size:0.68rem;color:var(--text-dim);margin-top:2px">Gerencie os perfis dos pequenos</div>
       </div>
-      <button onclick="fecharGestaoCriancas()" style="background:none;border:none;color:var(--text-dim);font-size:1.4rem;cursor:pointer;padding:4px 10px">×</button>
+      <button onclick="fecharGestaoCriancas()" style="background:none;border:none;color:var(--text-dim);font-size:1.4rem;cursor:pointer;padding:4px 10px" aria-label="Fechar">×</button>
     </div>
 
     <div id="cri-lista"></div>
@@ -17580,7 +19188,7 @@ if (document.readyState === 'loading') {
 </div>
 
 <!-- Modal de cadastro/edição de criança -->
-<div id="modal-crianca-form" style="display:none;position:fixed;inset:0;z-index:99600;background:rgba(0,0,0,0.85);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);align-items:flex-start;justify-content:center;padding:12px;overflow-y:auto" onclick="if(event.target===this)fecharCadastroCrianca()">
+<div id="modal-crianca-form" style="display:none;position:fixed;inset:0;z-index:99600;background:rgba(0,0,0,0.85);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);align-items:flex-start;justify-content:center;padding:12px;overflow-y:auto" onclick="if(event.target===this)fecharCadastroCrianca()" role="dialog" aria-modal="true">
   <div style="background:linear-gradient(160deg,rgba(0,30,70,0.98),rgba(0,15,40,0.99));border:1px solid rgba(0,180,255,0.32);border-radius:16px;padding:16px;max-width:440px;width:100%;margin:auto 0;box-shadow:0 10px 50px rgba(0,180,255,0.25)">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
       <div id="cri-form-icon" style="font-size:1.8rem">🍼</div>
@@ -17588,7 +19196,7 @@ if (document.readyState === 'loading') {
         <div id="cri-form-titulo" style="font-family:'Orbitron',monospace;font-size:0.95rem;color:var(--blue-neon);font-weight:700;letter-spacing:0.04em">Cadastrar criança</div>
         <div style="font-size:0.64rem;color:var(--text-dim);margin-top:2px">Preencha os dados do pequeno</div>
       </div>
-      <button onclick="fecharCadastroCrianca()" style="background:none;border:none;color:var(--text-dim);font-size:1.4rem;cursor:pointer;padding:4px 10px">×</button>
+      <button onclick="fecharCadastroCrianca()" style="background:none;border:none;color:var(--text-dim);font-size:1.4rem;cursor:pointer;padding:4px 10px" aria-label="Fechar">×</button>
     </div>
 
     <div style="margin-bottom:12px">
@@ -17756,7 +19364,7 @@ function renderListaCriancas() {
         </div>
         <div class="cri-actions">
           <button class="cri-action-btn" onclick="editarCrianca('${b.id}')" title="Editar">✏️</button>
-          ${principal ? '' : `<button class="cri-action-btn danger" onclick="removerCrianca('${b.id}')" title="Remover">🗑</button>`}
+          ${principal ? '' : `<button class="cri-action-btn danger" onclick="removerCrianca('${b.id}')" title="Remover" aria-label="Remover">🗑</button>`}
         </div>
       </div>
     `;
@@ -17913,11 +19521,37 @@ window.removerCrianca = function(id) {
     return;
   }
   const nome = lista[idx].nome;
-  if (!confirm(`Remover o perfil de ${nome}?\n\nEsta ação não apaga nenhum dado de mamadas, sono ou vacinas — apenas o cadastro do perfil.`)) return;
+  if (!confirm(`Remover o perfil de ${nome}?\n\nIsso apagará TODOS os dados desta criança (mamadas, sono, vacinas, marcos, fotos, etc.). Esta ação NÃO pode ser desfeita.`)) return;
+
+  // 1. Remove todos os dados namespaced desta criança (chaves com sufixo __id)
+  try {
+    const sufixo = '__' + id;
+    const toRemove = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k && k.endsWith(sufixo)) toRemove.push(k);
+    }
+    toRemove.forEach(k => localStorage.removeItem(k));
+  } catch (e) { console.warn('[removerCrianca] cleanup:', e); }
+
+  // 2. Se a criança removida era a ativa, volta para a principal
+  try {
+    if (typeof getActiveBabyId === 'function' && getActiveBabyId() === id) {
+      const principal = lista[0];
+      if (principal) {
+        if (typeof setActiveBabyId === 'function') setActiveBabyId(principal.id);
+      }
+    }
+  } catch {}
+
+  // 3. Remove da lista
   lista.splice(idx, 1);
   saveBabies(lista);
-  renderListaCriancas();
-  if (typeof showToast === 'function') showToast('🗑 Perfil removido');
+
+  if (typeof BFAudit !== 'undefined') BFAudit.log('crianca_removida', { id, nome });
+  if (typeof renderListaCriancas === 'function') renderListaCriancas();
+  if (typeof renderSeletorCriancaHeader === 'function') renderSeletorCriancaHeader();
+  if (typeof showToast === 'function') showToast('🗑 Perfil e dados removidos');
 };
 
 // ═══════════════════════════════════════════════════════════════
@@ -18032,6 +19666,9 @@ window.trocarCriancaAtiva = function(babyId) {
   const lista = getBabies();
   const alvo = lista.find(b => b.id === babyId);
   if (!alvo) { console.warn('[TROCA] baby não existe:', babyId); return; }
+
+  const idAnterior = (typeof getActiveBabyId === 'function') ? getActiveBabyId() : null;
+  if (typeof BFAudit !== 'undefined') BFAudit.log('crianca_ativa_trocada', { de: idAnterior, para: babyId });
 
   // 1. Cancela listener anterior do Firebase (Arthur para de vazar dados para Maria)
   if (typeof _syncTempoRealUnsub === 'function') {
@@ -18833,7 +20470,7 @@ function _escolaRenderProfs(el) {
         <div style="font-size:0.85rem;color:var(--white);font-weight:600">${_rcEsc?_rcEsc(p.nome):p.nome}</div>
         <div style="font-size:0.68rem;color:var(--text-dim);margin-top:2px">${_rcEsc?_rcEsc(p.disciplina||'—'):p.disciplina||'—'}${p.contato?' · '+(_rcEsc?_rcEsc(p.contato):p.contato):''}</div>
       </div>
-      <button onclick="_escolaRemoverProf(${p.id})" style="width:32px;height:32px;background:rgba(180,30,30,0.15);border:1px solid rgba(255,59,59,0.25);border-radius:8px;color:rgba(255,100,100,0.7);cursor:pointer;font-size:0.9rem">🗑</button>
+      <button onclick="_escolaRemoverProf(${p.id})" style="width:32px;height:32px;background:rgba(180,30,30,0.15);border:1px solid rgba(255,59,59,0.25);border-radius:8px;color:rgba(255,100,100,0.7);cursor:pointer;font-size:0.9rem" aria-label="Remover">🗑</button>
     </div>
   `).join('') : `<div class="empty" style="padding:18px;text-align:center;color:var(--text-dim);font-size:0.76rem">Nenhum professor cadastrado.</div>`;
 
@@ -18946,7 +20583,7 @@ function _escolaRenderAmigos(el) {
         <div style="font-size:0.85rem;color:var(--white);font-weight:600">${_rcEsc?_rcEsc(a.nome):a.nome}</div>
         <div style="font-size:0.68rem;color:var(--text-dim);margin-top:2px">${_rcEsc?_rcEsc(a.obs||'—'):a.obs||'—'}</div>
       </div>
-      <button onclick="_escolaRemoverAmigo(${a.id})" style="width:32px;height:32px;background:rgba(180,30,30,0.15);border:1px solid rgba(255,59,59,0.25);border-radius:8px;color:rgba(255,100,100,0.7);cursor:pointer;font-size:0.9rem">🗑</button>
+      <button onclick="_escolaRemoverAmigo(${a.id})" style="width:32px;height:32px;background:rgba(180,30,30,0.15);border:1px solid rgba(255,59,59,0.25);border-radius:8px;color:rgba(255,100,100,0.7);cursor:pointer;font-size:0.9rem" aria-label="Remover">🗑</button>
     </div>
   `).join('') : `<div class="empty" style="padding:18px;text-align:center;color:var(--text-dim);font-size:0.76rem">Nenhum amigo cadastrado.</div>`;
 
@@ -19849,7 +21486,7 @@ const BFPrivacy = (() => {
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
           <div style="font-size:1.3rem">📄</div>
           <div style="flex:1;font-family:'Orbitron',monospace;font-size:0.8rem;color:#00d4ff;letter-spacing:0.06em;font-weight:700">${titulo.toUpperCase()}</div>
-          <button onclick="document.getElementById('bf-doc-modal').remove()" style="background:none;border:1px solid rgba(0,180,255,0.3);border-radius:6px;color:#00d4ff;width:30px;height:30px;cursor:pointer;font-size:1.2rem">✕</button>
+          <button onclick="document.getElementById('bf-doc-modal').remove()" style="background:none;border:1px solid rgba(0,180,255,0.3);border-radius:6px;color:#00d4ff;width:30px;height:30px;cursor:pointer;font-size:1.2rem" aria-label="Fechar">✕</button>
         </div>
         <div style="font-size:0.74rem;line-height:1.65;color:#cbd5e1;white-space:pre-wrap;max-height:68vh;overflow-y:auto;padding-right:6px">${corpo}</div>
       </div>
@@ -20082,7 +21719,7 @@ window.abrirPrivacidade = function() {
           <div style="font-family:'Orbitron',monospace;font-size:0.82rem;color:#00d4ff;letter-spacing:0.06em;font-weight:700">PRIVACIDADE E SEGURANÇA</div>
           <div style="font-size:0.66rem;color:var(--text-dim);margin-top:2px">Controle total dos seus dados · LGPD + GDPR</div>
         </div>
-        <button onclick="document.getElementById('bf-privacy-panel').remove()" style="background:rgba(0,30,70,0.5);border:1px solid rgba(0,180,255,0.3);border-radius:6px;color:#00d4ff;width:32px;height:32px;cursor:pointer;font-size:1.2rem">✕</button>
+        <button onclick="document.getElementById('bf-privacy-panel').remove()" style="background:rgba(0,30,70,0.5);border:1px solid rgba(0,180,255,0.3);border-radius:6px;color:#00d4ff;width:32px;height:32px;cursor:pointer;font-size:1.2rem" aria-label="Fechar">✕</button>
       </div>
 
       <!-- SEÇÃO: SEUS DIREITOS -->
