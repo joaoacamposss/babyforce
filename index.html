@@ -1085,7 +1085,7 @@ html.bf-tema-claro [style*="color: var(--white)"] { color: var(--white) !importa
 
     <!-- SEÇÃO 4: SAÚDE & RELATÓRIOS -->
     <div style="font-family:'Orbitron',monospace;font-size:0.58rem;color:var(--text-dim);letter-spacing:0.1em;padding:8px 12px 4px;opacity:0.6">SAÚDE & RELATÓRIOS</div>
-    <button onclick="abrirRelatoriosClinicos()" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:none;border:none;color:var(--purple-neon);cursor:pointer;border-radius:8px;font-family:'Exo 2',sans-serif;font-size:0.88rem">📊 Relatórios Clínicos</button>
+    <button onclick="abrirRelatoriosClinicos()" data-je-allow="true" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:none;border:none;color:var(--purple-neon);cursor:pointer;border-radius:8px;font-family:'Exo 2',sans-serif;font-size:0.88rem">📊 Relatórios Clínicos</button>
     <button onclick="abrirProfissionais()" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:none;border:none;color:var(--white);cursor:pointer;border-radius:8px;font-family:'Exo 2',sans-serif;font-size:0.88rem">👨‍⚕️ Profissionais de saúde</button>
 
     <div style="height:1px;background:rgba(0,180,255,0.12);margin:6px 8px"></div>
@@ -1160,7 +1160,7 @@ html.bf-tema-claro [style*="color: var(--white)"] { color: var(--white) !importa
     <div><div style="font-family:'Orbitron',monospace;font-size:0.65rem;letter-spacing:0.08em;color:var(--white)">RELATÓRIO DO CICLO</div><div style="font-size:0.65rem;color:var(--text-dim);margin-top:1px">Resumo de nutrição diária</div></div>
     <span style="margin-left:auto;color:var(--blue-neon);font-size:0.9rem">›</span>
   </button>
-  <button class="btn-relatorio-diario" onclick="exportarPDFPediatra()" style="border-color:rgba(255,200,80,0.3)">
+  <button class="btn-relatorio-diario" onclick="exportarPDFPediatra()" data-je-allow="true" style="border-color:rgba(255,200,80,0.3)">
     <span style="font-size:1.1rem">📄</span>
     <div><div style="font-family:'Orbitron',monospace;font-size:0.65rem;letter-spacing:0.08em;color:var(--white)">RELATÓRIO PARA PEDIATRA</div><div style="font-size:0.65rem;color:var(--text-dim);margin-top:1px">PDF completo</div></div>
     <span style="margin-left:auto;color:var(--gold);font-size:0.9rem">›</span>
@@ -31392,74 +31392,47 @@ const _JORNADA_FUNCOES_BLOQUEADAS = [
 
 // [FIX] Aplica wrapping em todas as funções listadas
 // Wrapping é idempotente (flag __jornadaWrapped)
-// [FIX REAL] Event delegation em capture phase intercepta o click ANTES
-// do handler onclick inline ser executado. Funciona mesmo com function
-// declarations (que não respeitam window[nome] = wrapper).
-const _JORNADA_REGEX = new RegExp(
-  '\\b(' + _JORNADA_FUNCOES_BLOQUEADAS.map(n => n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') + ')\\s*\\(',
-  'i'
-);
-
-function _jornadaInterceptarClick(ev) {
-  // Só intercepta se jornada está encerrada
+// [NOVO] Listener que detecta quando o usuário tenta clicar em área bloqueada
+// e exibe toast explicativo. Não BLOQUEIA (CSS já faz isso via pointer-events),
+// apenas AVISA. Listener em capture phase no body.
+function _jornadaAvisarTentativa(ev) {
   const info = getJornadaEncerrada();
   if (!info || !info.encerrada) return;
-
-  // Sobe a árvore até achar elemento com onclick (botão, link, div clicável)
+  // Se o click foi em algum elemento dentro de área bloqueada, mostra toast
+  // Verifica se o target ou algum ancestral tem pointer-events: none
   let el = ev.target;
+  let bloqueado = false;
   while (el && el !== document.body) {
-    const onclickStr = el.getAttribute && el.getAttribute('onclick');
-    if (onclickStr && _JORNADA_REGEX.test(onclickStr)) {
-      // Bloqueia propagação e execução
-      ev.preventDefault();
-      ev.stopPropagation();
-      ev.stopImmediatePropagation();
-      if (typeof showToast === 'function') {
-        showToast('🔒 Jornada encerrada — apenas leitura disponível');
-      }
-      return false;
+    const cs = window.getComputedStyle(el);
+    if (cs.pointerEvents === 'none') {
+      bloqueado = true;
+      break;
     }
     el = el.parentElement;
   }
+  if (bloqueado) {
+    if (typeof showToast === 'function') {
+      showToast('🔒 Jornada encerrada — apenas histórico disponível');
+    }
+  }
 }
 
-// Adiciona o listener em CAPTURE phase (true no terceiro arg) para pegar
-// o click ANTES do onclick inline do elemento (que roda em bubble phase).
-// Aplica apenas uma vez (idempotente via flag).
+// Aplica guarda + avisa o usuário
 function _aplicarGuardaJornada() {
   if (!document.body.__jornadaDelegationApplied) {
-    document.body.addEventListener('click', _jornadaInterceptarClick, true);
-    document.body.addEventListener('touchstart', _jornadaInterceptarClick, true);
+    document.body.addEventListener('click', _jornadaAvisarTentativa, true);
+    document.body.addEventListener('touchstart', _jornadaAvisarTentativa, true);
     document.body.__jornadaDelegationApplied = true;
   }
-
-  // Camada 2: mantém wrap em window como defesa em profundidade
-  // (cobre chamadas programáticas tipo _oraculo.executarAcao('salvarMamada'))
-  _JORNADA_FUNCOES_BLOQUEADAS.forEach(nome => {
-    const orig = window[nome];
-    if (typeof orig !== 'function') return;
-    if (orig.__jornadaWrapped) return;
-    const wrapper = function(...args) {
-      if (window._jornadaBloqueado()) return;
-      return orig.apply(this, args);
-    };
-    wrapper.__jornadaWrapped = true;
-    wrapper.__original = orig;
-    window[nome] = wrapper;
-  });
 }
 
-// Aplicar tão logo quanto possível (não espera DOMContentLoaded)
+// Aplicar tão logo quanto possível
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => {
     _aplicarGuardaJornada();
-    setTimeout(_aplicarGuardaJornada, 500);
-    setTimeout(_aplicarGuardaJornada, 2000);
   });
 } else {
   _aplicarGuardaJornada();
-  setTimeout(_aplicarGuardaJornada, 500);
-  setTimeout(_aplicarGuardaJornada, 2000);
 }
 
 // Verifica se o bebê já tem 12 anos completos (12a0m0d)
@@ -32059,53 +32032,153 @@ window._jornadaExecutarEncerramento = function() {
 
 function _aplicarBloqueioJornada() {
   const info = getJornadaEncerrada();
+  const id = 'je-readonly-style';
+  const existente = document.getElementById(id);
+
   if (!info || !info.encerrada) {
-    // [FIX] Se jornada não está encerrada nesta criança, REMOVE badge + restaura botões
+    // NÃO encerrada: remove tudo, restaura UI normal
+    if (existente) existente.remove();
+    document.body.classList.remove('jornada-encerrada-mode');
     const badge = document.getElementById('je-header-badge');
     if (badge) badge.remove();
-    document.querySelectorAll('[data-jornada-blocked="1"]').forEach(btn => {
-      btn.disabled = false;
-      btn.style.opacity = '';
-      btn.style.cursor = '';
-      btn.removeAttribute('aria-disabled');
-      btn.removeAttribute('data-jornada-blocked');
-      btn.removeAttribute('title');
-    });
     return;
   }
-  // [FIX] Seletores ampliados — incluem edit/delete inline renderizados dinamicamente
-  const seletores = [
-    // Botões de registrar (save)
-    '[onclick*="salvarMamada"]','[onclick*="salvarSono"]','[onclick*="salvarFralda"]',
-    '[onclick*="salvarSintoma"]','[onclick*="salvarEsporte"]','[onclick*="salvarRefeicao"]',
-    '[onclick*="salvarCrescimento"]','[onclick*="salvarMedicacao"]','[onclick*="salvarEvento"]',
-    '[onclick*="salvarMesversario"]','[onclick*="salvarNovaPergunta"]','[onclick*="toggleSono"]',
-    '[onclick*="salvarVacina"]','[onclick*="salvarVacinaExtra"]','[onclick*="salvarResposta"]',
-    '[onclick*="abrirModalDesmame"]','[onclick*="abrirModalFimFraldas"]',
-    // Botões de editar
-    '[onclick*="abrirModalEditarMamada"]','[onclick*="abrirModalResposta"]','[onclick*="editarMesversario"]',
-    // Botões de deletar
-    '[onclick*="deleteMamada"]','[onclick*="deleteSono"]','[onclick*="deleteFralda"]',
-    '[onclick*="deleteMedicacao"]','[onclick*="deleteEvento"]','[onclick*="deleteMesversario"]',
-    '[onclick*="deleteCrescimento"]','[onclick*="deleteDuvida"]','[onclick*="deleteVacinaExtra"]',
-    '[onclick*="_removerSintoma"]','[onclick*="_removerEsporte"]',
-    // Toggle de vacinas (click no card)
-    '[onclick*="toggleVacina"]', '[onclick*="toggleDuvida"]',
-  ];
-  document.querySelectorAll(seletores.join(',')).forEach(btn => {
-    if (btn.dataset.jornadaBlocked === '1') return;
-    btn.dataset.jornadaBlocked = '1';
-    btn.disabled = true;
-    btn.style.opacity = '0.35';
-    btn.style.cursor = 'not-allowed';
-    btn.setAttribute('aria-disabled', 'true');
-    btn.setAttribute('title', 'Jornada encerrada — apenas histórico disponível');
-  });
-  // Badge fixo no header
+
+  // ENCERRADA: aplica modo read-only global via CSS
+  document.body.classList.add('jornada-encerrada-mode');
+
+  // Estilo global: TUDO cinza e sem interação, EXCETO o que está na allowlist
+  if (!existente) {
+    const style = document.createElement('style');
+    style.id = id;
+    style.textContent = `
+      /* ═══ MODO READ-ONLY GLOBAL ═══ */
+      /* Quando body tem .jornada-encerrada-mode: */
+      /* 1. Toda página fica em escala de cinza + opacidade reduzida */
+      /* 2. Pointer-events: none em TUDO, exceto no allowlist */
+
+      body.jornada-encerrada-mode {
+        --je-readonly-filter: grayscale(0.6) opacity(0.85);
+      }
+
+      /* Aplicar filter apenas nos painéis de conteúdo (não no modal épico) */
+      body.jornada-encerrada-mode #main-content > .tab-panel,
+      body.jornada-encerrada-mode .tab-panel,
+      body.jornada-encerrada-mode .orbitas-panel,
+      body.jornada-encerrada-mode .subpanel {
+        filter: var(--je-readonly-filter);
+      }
+
+      /* Desabilitar TUDO dentro do main (mesmo fora de .tab-panel) */
+      body.jornada-encerrada-mode #main-content button:not([data-je-allow]):not(.orbitas-stab):not(.sub-tab):not(.sub-tab-btn):not(.filter-btn):not(.conq-filtro-btn):not(.ostab-btn),
+      body.jornada-encerrada-mode #main-content input:not([data-je-allow]),
+      body.jornada-encerrada-mode #main-content select:not([data-je-allow]),
+      body.jornada-encerrada-mode #main-content textarea:not([data-je-allow]),
+      body.jornada-encerrada-mode #main-content [onclick]:not([data-je-allow]):not(.orbitas-stab):not(.sub-tab):not(.sub-tab-btn):not(.filter-btn):not(.conq-filtro-btn):not(.ostab-btn):not([onclick*="showOrbitasTab"]):not([onclick*="showHub"]):not([onclick*="showTab"]):not([onclick*="showSubTab"]):not([onclick*="filtrar"]):not([onclick*="Filtrar"]):not([onclick*="_conquistas"]):not([onclick*="renderConquistas"]):not([onclick*="abrirRelatorios"]):not([onclick*="exportarPDF"]):not([onclick*="exportar"]):not([onclick*="gerarPDF"]):not([onclick*="abrirMenu"]):not([onclick*="fecharMenu"]):not([onclick*="abrirConfiguracaoBebe"]):not([onclick*="setActiveBabyId"]):not([onclick*="_jornadaTeste"]):not([onclick*="abrirModalJornadaEncerrada"]):not([onclick*="_atualizarBotoesModoMadrugada"]):not([onclick*="ModoMadrugada"]) {
+        pointer-events: none !important;
+        opacity: 0.5 !important;
+        cursor: not-allowed !important;
+        user-select: none !important;
+      }
+
+      /* Inputs ficam visualmente travados */
+      body.jornada-encerrada-mode .tab-panel input:not([data-je-allow]):not([type="hidden"]),
+      body.jornada-encerrada-mode .tab-panel select:not([data-je-allow]),
+      body.jornada-encerrada-mode .tab-panel textarea:not([data-je-allow]) {
+        background: rgba(40,40,60,0.3) !important;
+        color: rgba(180,180,200,0.7) !important;
+      }
+
+      /* EXCEÇÕES — estes ficam ATIVOS (allowlist explícita): */
+
+      /* 1. Navegação principal (bottom nav, sub-tabs) — sempre ativa */
+      body.jornada-encerrada-mode .bottom-nav,
+      body.jornada-encerrada-mode .bottom-nav *,
+      body.jornada-encerrada-mode .orbitas-subtabs,
+      body.jornada-encerrada-mode .orbitas-subtabs *,
+      body.jornada-encerrada-mode .sub-tabs,
+      body.jornada-encerrada-mode .sub-tabs * {
+        pointer-events: auto !important;
+        opacity: 1 !important;
+        cursor: pointer !important;
+        filter: none !important;
+      }
+
+      /* 2. Menu guardião + overlay de configuração */
+      body.jornada-encerrada-mode #guardiao-menu-overlay,
+      body.jornada-encerrada-mode #guardiao-menu-overlay *,
+      body.jornada-encerrada-mode .guardiao-menu-btn,
+      body.jornada-encerrada-mode .guardiao-menu-btn * {
+        pointer-events: auto !important;
+        opacity: 1 !important;
+        filter: none !important;
+      }
+
+      /* 3. Modais (BFModal, relatórios clínicos, jornada encerrada) — sempre ativos */
+      body.jornada-encerrada-mode .bfmodal-overlay,
+      body.jornada-encerrada-mode .bfmodal-overlay *,
+      body.jornada-encerrada-mode #modal-jornada-encerrada,
+      body.jornada-encerrada-mode #modal-jornada-encerrada *,
+      body.jornada-encerrada-mode #rc-overlay,
+      body.jornada-encerrada-mode #rc-overlay *,
+      body.jornada-encerrada-mode .rc-overlay,
+      body.jornada-encerrada-mode .rc-overlay * {
+        pointer-events: auto !important;
+        opacity: 1 !important;
+        filter: none !important;
+      }
+
+      /* 4. Toasts + header badge */
+      body.jornada-encerrada-mode #toast,
+      body.jornada-encerrada-mode #toast *,
+      body.jornada-encerrada-mode #je-header-badge {
+        pointer-events: auto !important;
+        opacity: 1 !important;
+        filter: none !important;
+      }
+
+      /* 5. Elementos marcados explicitamente com data-je-allow (botões de relatório, download PDF, etc.) */
+      body.jornada-encerrada-mode [data-je-allow="true"],
+      body.jornada-encerrada-mode [data-je-allow="true"] * {
+        pointer-events: auto !important;
+        opacity: 1 !important;
+        cursor: pointer !important;
+        filter: none !important;
+      }
+
+      /* 6. Scroll sempre permitido */
+      body.jornada-encerrada-mode * {
+        -webkit-overflow-scrolling: touch !important;
+      }
+
+      /* Badge fixo no header — posicionamento para iOS */
+      body.jornada-encerrada-mode #je-header-badge {
+        position: fixed;
+        top: calc(12px + env(safe-area-inset-top, 0px));
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 9500;
+        background: linear-gradient(135deg, rgba(199,125,255,0.25), rgba(0,180,255,0.15));
+        border: 1px solid rgba(199,125,255,0.5);
+        border-radius: 20px;
+        padding: 6px 16px;
+        font-family: 'Orbitron', monospace;
+        font-size: 0.62rem;
+        color: #d6a3ff;
+        letter-spacing: 0.1em;
+        font-weight: 700;
+        cursor: pointer !important;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  // Badge fixo
   if (!document.getElementById('je-header-badge')) {
     const badge = document.createElement('div');
     badge.id = 'je-header-badge';
-    badge.style.cssText = 'position:fixed;top:calc(12px + env(safe-area-inset-top, 0px));left:50%;transform:translateX(-50%);z-index:9500;background:linear-gradient(135deg,rgba(199,125,255,0.15),rgba(0,180,255,0.1));border:1px solid rgba(199,125,255,0.4);border-radius:20px;padding:5px 14px;font-family:Orbitron,monospace;font-size:0.6rem;color:var(--purple-glow);letter-spacing:0.08em;cursor:pointer;backdrop-filter:blur(8px)';
     badge.textContent = '🌟 JORNADA ENCERRADA';
     badge.setAttribute('role', 'status');
     badge.setAttribute('aria-label', 'Jornada infantil encerrada — apenas histórico disponível');
