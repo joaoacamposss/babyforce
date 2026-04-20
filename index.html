@@ -31369,8 +31369,10 @@ const _JORNADA_FUNCOES_BLOQUEADAS = [
   'salvarRefeicao', 'salvarCrescimento', 'salvarMedicacao', 'salvarEvento',
   'salvarMesversario', 'salvarNovaPergunta', 'salvarVacina', 'salvarVacinaExtra',
   'salvarResposta', 'salvarHumor', 'salvarBanheiro', 'salvarAtividade', 'salvarEscola',
+  'salvarDuvida', 'salvarDoTimer', 'salvarEdicaoMamada',
+  'salvarNovaVacina', 'abrirModalNovaVacina', 'abrirModalRegistroVacinaLivre',
   // Toggle timers
-  'toggleSono',
+  'toggleSono', 'toggleTimerMama', 'toggleCaptura',
   // Editar
   'abrirModalEditarMamada', 'atualizarMamada',
   'abrirModalResposta', 'toggleDuvida',
@@ -31378,7 +31380,7 @@ const _JORNADA_FUNCOES_BLOQUEADAS = [
   // Deletar
   'deleteMamada', 'deleteSono', 'deleteFralda', 'deleteMedicacao', 'deleteEvento',
   'deleteMesversario', 'deleteCrescimento', 'deleteDuvida', 'deleteVacinaExtra',
-  '_removerSintoma', '_removerEsporte',
+  '_removerSintoma', '_removerEsporte', '_reverterEsporte',
   // Módulos especiais (desmame, fim fraldas)
   'abrirModalDesmame', '_confirmarDesmame', '_reverterDesmame',
   'abrirModalFimFraldas', '_confirmarFimFraldas', '_reverterFimFraldas',
@@ -31390,11 +31392,53 @@ const _JORNADA_FUNCOES_BLOQUEADAS = [
 
 // [FIX] Aplica wrapping em todas as funções listadas
 // Wrapping é idempotente (flag __jornadaWrapped)
+// [FIX REAL] Event delegation em capture phase intercepta o click ANTES
+// do handler onclick inline ser executado. Funciona mesmo com function
+// declarations (que não respeitam window[nome] = wrapper).
+const _JORNADA_REGEX = new RegExp(
+  '\\b(' + _JORNADA_FUNCOES_BLOQUEADAS.map(n => n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') + ')\\s*\\(',
+  'i'
+);
+
+function _jornadaInterceptarClick(ev) {
+  // Só intercepta se jornada está encerrada
+  const info = getJornadaEncerrada();
+  if (!info || !info.encerrada) return;
+
+  // Sobe a árvore até achar elemento com onclick (botão, link, div clicável)
+  let el = ev.target;
+  while (el && el !== document.body) {
+    const onclickStr = el.getAttribute && el.getAttribute('onclick');
+    if (onclickStr && _JORNADA_REGEX.test(onclickStr)) {
+      // Bloqueia propagação e execução
+      ev.preventDefault();
+      ev.stopPropagation();
+      ev.stopImmediatePropagation();
+      if (typeof showToast === 'function') {
+        showToast('🔒 Jornada encerrada — apenas leitura disponível');
+      }
+      return false;
+    }
+    el = el.parentElement;
+  }
+}
+
+// Adiciona o listener em CAPTURE phase (true no terceiro arg) para pegar
+// o click ANTES do onclick inline do elemento (que roda em bubble phase).
+// Aplica apenas uma vez (idempotente via flag).
 function _aplicarGuardaJornada() {
+  if (!document.body.__jornadaDelegationApplied) {
+    document.body.addEventListener('click', _jornadaInterceptarClick, true);
+    document.body.addEventListener('touchstart', _jornadaInterceptarClick, true);
+    document.body.__jornadaDelegationApplied = true;
+  }
+
+  // Camada 2: mantém wrap em window como defesa em profundidade
+  // (cobre chamadas programáticas tipo _oraculo.executarAcao('salvarMamada'))
   _JORNADA_FUNCOES_BLOQUEADAS.forEach(nome => {
     const orig = window[nome];
     if (typeof orig !== 'function') return;
-    if (orig.__jornadaWrapped) return; // Já envolvida
+    if (orig.__jornadaWrapped) return;
     const wrapper = function(...args) {
       if (window._jornadaBloqueado()) return;
       return orig.apply(this, args);
@@ -31405,11 +31449,18 @@ function _aplicarGuardaJornada() {
   });
 }
 
-// Aplicar na carga E a cada navegação (alguns módulos só definem funções sob demanda)
-document.addEventListener('DOMContentLoaded', () => {
+// Aplicar tão logo quanto possível (não espera DOMContentLoaded)
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    _aplicarGuardaJornada();
+    setTimeout(_aplicarGuardaJornada, 500);
+    setTimeout(_aplicarGuardaJornada, 2000);
+  });
+} else {
+  _aplicarGuardaJornada();
   setTimeout(_aplicarGuardaJornada, 500);
-  setTimeout(_aplicarGuardaJornada, 2000); // segunda passada pra pegar lazy-loaded
-});
+  setTimeout(_aplicarGuardaJornada, 2000);
+}
 
 // Verifica se o bebê já tem 12 anos completos (12a0m0d)
 function _verificarMaioridadeInfantil() {
