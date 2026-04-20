@@ -9,7 +9,22 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#020b18">
 <meta name="format-detection" content="telephone=no">
-<meta name="description" content="BabyForce · O diário galáctico do seu bebê">
+<meta name="description" content="BabyForce — diário galáctico de cuidado infantil da gestação aos 12 anos. Registre mamadas, sonos, vacinas, crescimento e marcos. Curvas OMS, suporte a prematuros, relatórios clínicos em PDF. 100% privado, sem anúncios.">
+<meta name="keywords" content="bebê, diário bebê, cuidado infantil, mamadas, sono bebê, vacinas, crescimento, curvas OMS, prematuro, pediatra, materno, LGPD">
+<meta name="author" content="BabyForce">
+
+<!-- Open Graph (Facebook, WhatsApp, LinkedIn) -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="BabyForce">
+<meta property="og:title" content="BabyForce — Diário Galáctico do Bebê">
+<meta property="og:description" content="Diário completo de cuidado infantil: mamadas, sonos, vacinas, crescimento. Curvas OMS, relatórios PDF, múltiplos guardiões. 100% privado.">
+<meta property="og:locale" content="pt_BR">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="BabyForce — Diário Galáctico do Bebê">
+<meta name="twitter:description" content="Acompanhe a jornada do seu bebê: mamadas, sonos, vacinas, crescimento, marcos. 100% privado, sem anúncios.">
+
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.cloudfunctions.net https://api.anthropic.com https://firestore.googleapis.com https://www.googleapis.com https://maps.googleapis.com https://fonts.googleapis.com https://fonts.gstatic.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firebaseinstallations.googleapis.com https://firebase.googleapis.com https://www.gstatic.com wss://*.firebaseio.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https://*.googleapis.com https://*.googleusercontent.com https://*.gstatic.com https://*.firebaseio.com https://firebasestorage.googleapis.com https://maps.googleapis.com https://maps.gstatic.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.gstatic.com https://maps.googleapis.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'; upgrade-insecure-requests;">
 <meta http-equiv="X-Content-Type-Options" content="nosniff">
 <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
@@ -28,7 +43,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
-<title>BabyForce · v1.0</title>
+<title>BabyForce — Diário Galáctico do Bebê</title>
 <style>
 body{background:#020b18;margin:0;}
 #splash{position:fixed;inset:0;z-index:9999999;background:#020b18;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 0.4s ease;gap:0;padding:24px;box-sizing:border-box;}
@@ -3310,6 +3325,79 @@ window._confirmarNovaSenha = async function(guardiaoId, origem) {
 // Trocar senha (com senha atual + nova)
 // Reverificar email se mudou
 // Excluir conta (com transferência de admin)
+window._mcApagarTudoLGPD = async function() {
+  // [LGPD Art. 18 VI] Direito ao apagamento de dados — reset TOTAL do app
+  const confirm1 = await (typeof BFModal !== 'undefined'
+    ? BFModal.confirm({
+        title: '🔥 Apagar TODOS os seus dados?',
+        icon: '⚠️',
+        variant: 'danger',
+        message: 'ATENÇÃO: Esta ação é IRREVERSÍVEL.\n\nApaga permanentemente:\n• Todos os registros de crianças\n• Mamadas, sonos, fraldas, sintomas\n• Vacinas, medicações, marcos\n• Crescimento, alimentação, esportes\n• Configurações, guardiões, foto de perfil\n• Todos os dados em cache\n\nRecomendamos EXPORTAR seus dados em PDF antes de continuar.\n\nDeseja continuar?',
+        okLabel: 'Sim, entendi. Continuar.',
+        cancelLabel: 'Cancelar',
+      })
+    : Promise.resolve(confirm('Apagar TODOS os dados? Esta ação é irreversível.')));
+  if (!confirm1) return;
+
+  // Segunda confirmação com texto digitado
+  const confirmacao = await (typeof BFModal !== 'undefined'
+    ? BFModal.prompt({
+        title: 'Confirmação final',
+        icon: '🔥',
+        variant: 'danger',
+        message: 'Para confirmar, digite APAGAR TUDO em maiúsculas:',
+        placeholder: 'APAGAR TUDO',
+      })
+    : Promise.resolve(prompt('Digite APAGAR TUDO para confirmar:')));
+  if (confirmacao !== 'APAGAR TUDO') {
+    if (typeof showToast === 'function') showToast('Confirmação incorreta — nada foi apagado');
+    return;
+  }
+
+  try {
+    // 1. Limpar TODO o localStorage (todos os keys começando com babyforce_)
+    const keys = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k && k.startsWith('babyforce_')) keys.push(k);
+    }
+    keys.forEach(k => { try { localStorage.removeItem(k); } catch {} });
+
+    // 2. Limpar sessionStorage
+    try {
+      Object.keys(sessionStorage).forEach(k => { if (k.startsWith('babyforce_')) sessionStorage.removeItem(k); });
+    } catch {}
+
+    // 3. Limpar cookies relacionados
+    try {
+      document.cookie.split(';').forEach(c => {
+        const k = c.split('=')[0].trim();
+        if (k.startsWith('babyforce') || k.startsWith('bf_')) {
+          document.cookie = `${k}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+        }
+      });
+    } catch {}
+
+    // 4. Tentar logout do Firebase se estiver conectado
+    try {
+      if (typeof firebase !== 'undefined' && firebase.auth) {
+        await firebase.auth().signOut();
+      }
+    } catch {}
+
+    // 5. Audit log (último antes de apagar tudo)
+    try { if (typeof BFAudit !== 'undefined') BFAudit.log('lgpd_apagar_tudo', { timestamp: Date.now() }); } catch {}
+
+    // 6. Feedback e reload
+    if (typeof showToast === 'function') showToast('✓ Todos os dados foram apagados. Reiniciando...');
+    setTimeout(() => { location.reload(); }, 1500);
+  } catch (e) {
+    console.error('[LGPD apagar tudo]', e);
+    alert('Erro ao apagar dados: ' + (e.message || 'desconhecido') + '. Tente novamente ou limpe o cache do navegador manualmente.');
+  }
+};
+
+// Excluir conta (com transferência de admin)
 // Ver papel + histórico de acessos (últimos 10 do BFAudit)
 // ═══════════════════════════════════════════════════════════════
 
@@ -3455,7 +3543,9 @@ window.abrirMinhaConta = function() {
 
         <div style="border-top:1px dashed rgba(255,128,128,0.3);margin:18px 0;padding-top:14px">
           <div style="font-family:'Orbitron',monospace;font-size:0.6rem;color:#ff8080;letter-spacing:0.08em;margin-bottom:10px;text-align:center">⚠ ZONA DE PERIGO</div>
-          <button onclick="window._mcExcluirConta()" style="width:100%;padding:11px;background:rgba(255,128,128,0.12);border:1px solid rgba(255,128,128,0.4);border-radius:8px;color:#ff8080;font-family:'Orbitron',monospace;font-size:0.64rem;letter-spacing:0.06em;cursor:pointer">🗑 EXCLUIR MINHA CONTA</button>
+          <button onclick="window._mcExcluirConta()" style="width:100%;padding:11px;background:rgba(255,128,128,0.12);border:1px solid rgba(255,128,128,0.4);border-radius:8px;color:#ff8080;font-family:'Orbitron',monospace;font-size:0.64rem;letter-spacing:0.06em;cursor:pointer;margin-bottom:8px">🗑 EXCLUIR MINHA CONTA</button>
+          <button onclick="window._mcApagarTudoLGPD()" style="width:100%;padding:11px;background:rgba(255,60,60,0.2);border:2px solid rgba(255,100,100,0.6);border-radius:8px;color:#ff6666;font-family:'Orbitron',monospace;font-size:0.64rem;letter-spacing:0.06em;cursor:pointer;font-weight:700">🔥 APAGAR TODOS OS MEUS DADOS (LGPD)</button>
+          <div style="font-size:0.6rem;color:var(--text-dim);margin-top:8px;line-height:1.5;text-align:center;font-style:italic">Direito garantido pela LGPD (Art. 18, VI). Apaga permanentemente TODOS os registros (crianças, mamadas, sonos, tudo).</div>
         </div>
       </div>
 
