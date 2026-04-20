@@ -30739,13 +30739,82 @@ window._confirmarDeletarTudo = async function() {
 
 const JORNADA_ENCERRADA_KEY = 'babyforce_jornada_encerrada_v1';
 
+// [FIX] Registra chave como per-child (cada criança tem seu encerramento)
+if (typeof PER_CHILD_KEYS !== 'undefined' && PER_CHILD_KEYS.add) {
+  PER_CHILD_KEYS.add(JORNADA_ENCERRADA_KEY);
+}
+
 function getJornadaEncerrada() {
-  try { return JSON.parse(localStorage.getItem(JORNADA_ENCERRADA_KEY)) || null; } catch { return null; }
+  // [FIX] Usa _bfKey para pegar por-criança
+  const key = (typeof _bfKey === 'function') ? _bfKey(JORNADA_ENCERRADA_KEY) : JORNADA_ENCERRADA_KEY;
+  try { return JSON.parse(localStorage.getItem(key)) || null; } catch { return null; }
 }
 function setJornadaEncerrada(info) {
-  try { localStorage.setItem(JORNADA_ENCERRADA_KEY, info ? JSON.stringify(info) : null); } catch {}
-  if (!info) { try { localStorage.removeItem(JORNADA_ENCERRADA_KEY); } catch {} }
+  const key = (typeof _bfKey === 'function') ? _bfKey(JORNADA_ENCERRADA_KEY) : JORNADA_ENCERRADA_KEY;
+  try { localStorage.setItem(key, info ? JSON.stringify(info) : null); } catch {}
+  if (!info) { try { localStorage.removeItem(key); } catch {} }
 }
+
+// [FIX] Guard centralizado — usado em TODAS as funções de save/edit/delete
+// Retorna true se a jornada está encerrada E exibe toast explicativo
+window._jornadaBloqueado = function() {
+  const info = getJornadaEncerrada();
+  if (info && info.encerrada) {
+    if (typeof showToast === 'function') showToast('🔒 Jornada encerrada — apenas leitura disponível');
+    return true;
+  }
+  return false;
+};
+
+// [FIX] Lista de TODAS as funções de mutação que precisam ser guardadas
+// Cobertura: save, edit, delete, confirm, revert em TODOS os módulos
+const _JORNADA_FUNCOES_BLOQUEADAS = [
+  // Registrar
+  'salvarMamada', 'salvarSono', 'salvarFralda', 'salvarSintoma', 'salvarEsporte',
+  'salvarRefeicao', 'salvarCrescimento', 'salvarMedicacao', 'salvarEvento',
+  'salvarMesversario', 'salvarNovaPergunta', 'salvarVacina', 'salvarVacinaExtra',
+  'salvarResposta', 'salvarHumor', 'salvarBanheiro', 'salvarAtividade', 'salvarEscola',
+  // Toggle timers
+  'toggleSono',
+  // Editar
+  'abrirModalEditarMamada', 'atualizarMamada',
+  'abrirModalResposta', 'toggleDuvida',
+  'editarMesversario',
+  // Deletar
+  'deleteMamada', 'deleteSono', 'deleteFralda', 'deleteMedicacao', 'deleteEvento',
+  'deleteMesversario', 'deleteCrescimento', 'deleteDuvida', 'deleteVacinaExtra',
+  '_removerSintoma', '_removerEsporte',
+  // Módulos especiais (desmame, fim fraldas)
+  'abrirModalDesmame', '_confirmarDesmame', '_reverterDesmame',
+  'abrirModalFimFraldas', '_confirmarFimFraldas', '_reverterFimFraldas',
+  // Vacinas (toggle)
+  'toggleVacina', 'toggleVacinaExtra',
+  // Crianças (bloqueia edição da criança cuja jornada encerrou)
+  'abrirConfiguracaoBebe', 'salvarConfiguracaoBebe',
+];
+
+// [FIX] Aplica wrapping em todas as funções listadas
+// Wrapping é idempotente (flag __jornadaWrapped)
+function _aplicarGuardaJornada() {
+  _JORNADA_FUNCOES_BLOQUEADAS.forEach(nome => {
+    const orig = window[nome];
+    if (typeof orig !== 'function') return;
+    if (orig.__jornadaWrapped) return; // Já envolvida
+    const wrapper = function(...args) {
+      if (window._jornadaBloqueado()) return;
+      return orig.apply(this, args);
+    };
+    wrapper.__jornadaWrapped = true;
+    wrapper.__original = orig;
+    window[nome] = wrapper;
+  });
+}
+
+// Aplicar na carga E a cada navegação (alguns módulos só definem funções sob demanda)
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(_aplicarGuardaJornada, 500);
+  setTimeout(_aplicarGuardaJornada, 2000); // segunda passada pra pegar lazy-loaded
+});
 
 // Verifica se o bebê já tem 12 anos completos (12a0m0d)
 function _verificarMaioridadeInfantil() {
@@ -31335,40 +31404,62 @@ window._jornadaExecutarEncerramento = function() {
   document.getElementById('modal-jornada-encerrada')?.remove();
   // Para música
   if (_jornadaMusicaAtiva && _jornadaAudioCtx) { try { _jornadaAudioCtx.close(); } catch {} _jornadaAudioCtx = null; _jornadaMusicaAtiva = false; }
-  // Aplica bloqueio e badge
+  // [FIX] Aplica bloqueio visual + interceptação funcional
   _aplicarBloqueioJornada();
+  if (typeof _aplicarGuardaJornada === 'function') _aplicarGuardaJornada();
   if (typeof showToast === 'function') showToast('🌟 Jornada encerrada com amor');
   if (typeof BFAudit !== 'undefined') BFAudit.log('jornada_encerrada', { idade: '12a' });
 };
 
 function _aplicarBloqueioJornada() {
   const info = getJornadaEncerrada();
-  if (!info || !info.encerrada) return;
+  if (!info || !info.encerrada) {
+    // [FIX] Se jornada não está encerrada nesta criança, REMOVE badge + restaura botões
+    const badge = document.getElementById('je-header-badge');
+    if (badge) badge.remove();
+    document.querySelectorAll('[data-jornada-blocked="1"]').forEach(btn => {
+      btn.disabled = false;
+      btn.style.opacity = '';
+      btn.style.cursor = '';
+      btn.removeAttribute('aria-disabled');
+      btn.removeAttribute('data-jornada-blocked');
+      btn.removeAttribute('title');
+    });
+    return;
+  }
+  // [FIX] Seletores ampliados — incluem edit/delete inline renderizados dinamicamente
   const seletores = [
+    // Botões de registrar (save)
     '[onclick*="salvarMamada"]','[onclick*="salvarSono"]','[onclick*="salvarFralda"]',
     '[onclick*="salvarSintoma"]','[onclick*="salvarEsporte"]','[onclick*="salvarRefeicao"]',
     '[onclick*="salvarCrescimento"]','[onclick*="salvarMedicacao"]','[onclick*="salvarEvento"]',
     '[onclick*="salvarMesversario"]','[onclick*="salvarNovaPergunta"]','[onclick*="toggleSono"]',
-    '[onclick*="salvarVacina"]','[onclick*="salvarVacinaExtra"]','[onclick*="abrirModalDesmame"]',
-    '[onclick*="abrirModalFimFraldas"]',
+    '[onclick*="salvarVacina"]','[onclick*="salvarVacinaExtra"]','[onclick*="salvarResposta"]',
+    '[onclick*="abrirModalDesmame"]','[onclick*="abrirModalFimFraldas"]',
+    // Botões de editar
+    '[onclick*="abrirModalEditarMamada"]','[onclick*="abrirModalResposta"]','[onclick*="editarMesversario"]',
+    // Botões de deletar
+    '[onclick*="deleteMamada"]','[onclick*="deleteSono"]','[onclick*="deleteFralda"]',
+    '[onclick*="deleteMedicacao"]','[onclick*="deleteEvento"]','[onclick*="deleteMesversario"]',
+    '[onclick*="deleteCrescimento"]','[onclick*="deleteDuvida"]','[onclick*="deleteVacinaExtra"]',
+    '[onclick*="_removerSintoma"]','[onclick*="_removerEsporte"]',
+    // Toggle de vacinas (click no card)
+    '[onclick*="toggleVacina"]', '[onclick*="toggleDuvida"]',
   ];
   document.querySelectorAll(seletores.join(',')).forEach(btn => {
     if (btn.dataset.jornadaBlocked === '1') return;
     btn.dataset.jornadaBlocked = '1';
     btn.disabled = true;
-    btn.style.opacity = '0.4';
+    btn.style.opacity = '0.35';
     btn.style.cursor = 'not-allowed';
     btn.setAttribute('aria-disabled', 'true');
     btn.setAttribute('title', 'Jornada encerrada — apenas histórico disponível');
-    btn.addEventListener('click', (e) => {
-      e.preventDefault(); e.stopPropagation();
-      if (typeof showToast === 'function') showToast('🔒 Jornada encerrada — apenas histórico disponível');
-    }, true);
   });
+  // Badge fixo no header
   if (!document.getElementById('je-header-badge')) {
     const badge = document.createElement('div');
     badge.id = 'je-header-badge';
-    badge.style.cssText = 'position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:9500;background:linear-gradient(135deg,rgba(199,125,255,0.15),rgba(0,180,255,0.1));border:1px solid rgba(199,125,255,0.4);border-radius:20px;padding:5px 14px;font-family:Orbitron,monospace;font-size:0.6rem;color:var(--purple-glow);letter-spacing:0.08em;cursor:pointer;backdrop-filter:blur(8px)';
+    badge.style.cssText = 'position:fixed;top:calc(12px + env(safe-area-inset-top, 0px));left:50%;transform:translateX(-50%);z-index:9500;background:linear-gradient(135deg,rgba(199,125,255,0.15),rgba(0,180,255,0.1));border:1px solid rgba(199,125,255,0.4);border-radius:20px;padding:5px 14px;font-family:Orbitron,monospace;font-size:0.6rem;color:var(--purple-glow);letter-spacing:0.08em;cursor:pointer;backdrop-filter:blur(8px)';
     badge.textContent = '🌟 JORNADA ENCERRADA';
     badge.setAttribute('role', 'status');
     badge.setAttribute('aria-label', 'Jornada infantil encerrada — apenas histórico disponível');
@@ -31399,14 +31490,13 @@ document.addEventListener('DOMContentLoaded', () => {
       const r = _origSetActive.apply(this, args);
       // Depois de trocar criança ativa, reverifica se deve encerrar jornada
       setTimeout(() => {
+        // [FIX] _aplicarBloqueioJornada agora remove badge + restaura botões se criança atual não encerrou
+        _aplicarBloqueioJornada();
+        // Re-aplicar wrapper nas funções (caso novas tenham sido definidas)
+        if (typeof _aplicarGuardaJornada === 'function') _aplicarGuardaJornada();
+        // Se criança atual acaba de completar 12a e ainda não foi encerrada: abre modal
         const info = getJornadaEncerrada();
-        // Remove badge anterior (se a criança anterior tinha jornada encerrada)
-        const badge = document.getElementById('je-header-badge');
-        if (badge) badge.remove();
-        // Reverifica para a criança agora ativa
-        if (info && info.encerrada) {
-          _aplicarBloqueioJornada();
-        } else if (_verificarMaioridadeInfantil()) {
+        if ((!info || !info.encerrada) && _verificarMaioridadeInfantil()) {
           window.abrirModalJornadaEncerrada();
         }
       }, 300);
