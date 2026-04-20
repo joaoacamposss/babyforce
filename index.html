@@ -10132,7 +10132,19 @@ function _ehPrematuro() {
 // [Sprint B] GERADOR DE OPÇÕES DE IDADE — até 11a11m29d
 // Regra: mês-a-mês 0-36m (37 opções), semestral 37-60m (4 opções),
 // anual 5-12a (6 opções). Total: ~47 opções.
+// [Fix iteração] Formato legível: "1 ano e 1 mês", "2 anos e 3 meses"
 // ═══════════════════════════════════════════════════════════════
+function _formatarIdadeLegivel(meses) {
+  if (meses === 0) return 'Ao Nascer';
+  if (meses < 12) return meses + (meses === 1 ? ' mês' : ' meses');
+  const anos = Math.floor(meses / 12);
+  const mesesRest = meses % 12;
+  const anosTxt = anos + (anos === 1 ? ' ano' : ' anos');
+  if (mesesRest === 0) return anosTxt;
+  const mesesTxt = mesesRest + (mesesRest === 1 ? ' mês' : ' meses');
+  return anosTxt + ' e ' + mesesTxt;
+}
+
 function _gerarOpcoesIdadeSelector(incluirNascer) {
   const opcoes = [];
   if (incluirNascer) {
@@ -10141,22 +10153,20 @@ function _gerarOpcoesIdadeSelector(incluirNascer) {
   // Mês a mês: 1 até 36 meses
   for (let m = 1; m <= 36; m++) {
     let label;
-    if (m === 12) label = '✨ 1 Aninho';
-    else if (m === 24) label = '✨ 2 Anos';
-    else if (m === 36) label = '🎂 3 Anos';
-    else if (m < 12) label = `${m}º Mês`;
-    else if (m < 24) label = `${m} meses (${Math.floor(m/12)} ano${m>=24?'s':''} e ${m%12}m)`;
-    else label = `${m} meses (${Math.floor(m/12)} anos e ${m%12}m)`;
+    if (m === 12) label = '✨ 1 ano';
+    else if (m === 24) label = '✨ 2 anos';
+    else if (m === 36) label = '🎂 3 anos';
+    else label = _formatarIdadeLegivel(m);
     opcoes.push({ value: m, label });
   }
   // Semestral: 42, 48, 54, 60 meses (3a6m, 4a, 4a6m, 5a)
   opcoes.push({ value: 42, label: '🎈 3 anos e 6 meses' });
-  opcoes.push({ value: 48, label: '🎂 4 Anos' });
+  opcoes.push({ value: 48, label: '🎂 4 anos' });
   opcoes.push({ value: 54, label: '🎈 4 anos e 6 meses' });
-  opcoes.push({ value: 60, label: '🎂 5 Anos' });
-  // Anual: 6, 7, 8, 9, 10, 11 anos (até 11a11m29d é cobertos pela idade 132m = 11a)
+  opcoes.push({ value: 60, label: '🎂 5 anos' });
+  // Anual: 6, 7, 8, 9, 10, 11 anos (até 11a11m29d é coberto pela idade 132m = 11a)
   for (let ano = 6; ano <= 11; ano++) {
-    opcoes.push({ value: ano * 12, label: `🎂 ${ano} Anos` });
+    opcoes.push({ value: ano * 12, label: '🎂 ' + ano + ' anos' });
   }
   return opcoes;
 }
@@ -30808,7 +30818,7 @@ window.abrirModalJornadaEncerrada = function(forceOpen) {
   modal.id = 'modal-jornada-encerrada';
   modal.setAttribute('role', 'dialog');
   modal.setAttribute('aria-modal', 'true');
-  modal.style.cssText = 'position:fixed;inset:0;background:radial-gradient(ellipse at center, #0a1a3d 0%, #020514 70%, #000 100%);z-index:99999;display:flex;flex-direction:column;overflow:hidden;';
+  modal.style.cssText = 'position:fixed;inset:0;background:radial-gradient(ellipse at center, #0a1a3d 0%, #020514 70%, #000 100%);z-index:99999;display:flex;flex-direction:column;overflow:hidden;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);';
 
   modal.innerHTML = `<style>
     @keyframes je-particle-float { 0% { transform: translateY(100vh) translateX(0) rotate(0deg); opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { transform: translateY(-100vh) translateX(var(--drift,0px)) rotate(360deg); opacity: 0; } }
@@ -30820,7 +30830,7 @@ window.abrirModalJornadaEncerrada = function(forceOpen) {
     @keyframes je-confete-fall { 0% { transform: translateY(-20px) rotate(0deg); opacity: 1; } 100% { transform: translateY(120vh) rotate(720deg); opacity: 0; } }
     .je-particle { position: absolute; width: 6px; height: 6px; border-radius: 50%; background: radial-gradient(circle, #ffe066 20%, #c77dff 70%, transparent 100%); pointer-events: none; animation: je-particle-float linear infinite; }
     .je-nebula { position: absolute; inset: -20%; pointer-events: none; background: radial-gradient(ellipse 60% 50% at 30% 40%, rgba(199,125,255,0.35), transparent 50%), radial-gradient(ellipse 50% 60% at 70% 60%, rgba(0,180,255,0.3), transparent 50%), radial-gradient(ellipse 40% 40% at 50% 20%, rgba(255,200,80,0.25), transparent 60%); animation: je-nebula-pulse 18s ease-in-out infinite; }
-    .je-screen { display: none; flex-direction: column; flex: 1; padding: 24px 20px; overflow-y: auto; position: relative; z-index: 10; }
+    .je-screen { display: none; flex-direction: column; flex: 1; padding: 20px 16px; overflow-y: auto; position: relative; z-index: 10; padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px)); }
     .je-screen.active { display: flex; animation: je-slide-in 0.5s ease-out both; }
     .je-wordmark { font-family: 'Orbitron', monospace; font-weight: 900; letter-spacing: 0.15em; background: linear-gradient(90deg, #ffe066 0%, #c77dff 25%, #00d4ff 50%, #c77dff 75%, #ffe066 100%); background-size: 200% 100%; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; animation: je-wordmark-shine 4s linear infinite; }
     .je-emoji-grand { animation: je-emoji-pulse 2.5s ease-in-out infinite; display:inline-block; }
@@ -30834,7 +30844,7 @@ window.abrirModalJornadaEncerrada = function(forceOpen) {
     .je-dots { display: flex; gap: 8px; justify-content: center; padding: 10px 0; }
     .je-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(0, 180, 255, 0.25); transition: all 0.3s; }
     .je-dot.active { background: #ffe066; width: 24px; border-radius: 4px; box-shadow: 0 0 12px rgba(255,224,102,0.6); }
-    .je-music-toggle { position: absolute; top: 16px; right: 16px; width: 40px; height: 40px; border-radius: 50%; background: rgba(0, 30, 70, 0.7); border: 1px solid rgba(0, 180, 255, 0.4); color: var(--blue-neon); font-size: 1.1rem; cursor: pointer; z-index: 20; }
+    .je-music-toggle { position: absolute; top: calc(16px + env(safe-area-inset-top, 0px)); right: 16px; width: 40px; height: 40px; border-radius: 50%; background: rgba(0, 30, 70, 0.85); border: 1px solid rgba(0, 180, 255, 0.5); color: var(--blue-neon); font-size: 1.1rem; cursor: pointer; z-index: 20; backdrop-filter: blur(10px); }
   </style>
 
   <div class="je-nebula"></div>
@@ -30929,7 +30939,7 @@ window.abrirModalJornadaEncerrada = function(forceOpen) {
     <div class="je-dots"><div class="je-dot"></div><div class="je-dot"></div><div class="je-dot"></div><div class="je-dot"></div><div class="je-dot active"></div></div>
     <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
       <button class="je-btn-secondary" onclick="window._jornadaProximaTela(4)">← Voltar</button>
-      <button class="je-btn-secondary" onclick="window._jornadaBaixarTudo()">💾 Baixar histórico</button>
+      <button class="je-btn-secondary" onclick="window._jornadaBaixarTudo()">📄 Baixar PDF</button>
       <button class="je-btn-primary" onclick="window._jornadaConfirmarEncerramento()">🔒 CONFIRMAR E ENCERRAR</button>
     </div>
   </div>`;
@@ -31103,47 +31113,230 @@ async function _jornadaGerarRelatorioOraculo() {
 }
 
 window._jornadaBaixarTudo = async function() {
+  // [FIX] Público geral não abre JSON. Gera PDF legível com jsPDF.
   try {
-    const backup = {
-      exportadoEm: new Date().toISOString(),
-      motivo: 'jornada_encerrada_12a',
-      babyConfig: (typeof getBabyConfig === 'function') ? getBabyConfig() : null,
-      db: typeof db !== 'undefined' ? db : null,
-      medicacoes: typeof medicacoes !== 'undefined' ? medicacoes : null,
-      crescimento: typeof crescData !== 'undefined' ? crescData : null,
-      vacinas: JSON.parse(localStorage.getItem('babyforce_vacinas_v1') || '{}'),
-    };
-    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    const nome = (typeof getBabyName === 'function') ? getBabyName() : 'bebe';
-    link.href = url;
-    link.download = `BabyForce_JornadaCompleta_${nome.replace(/[^\w]+/g, '_')}_${new Date().toISOString().slice(0,10)}.json`;
-    link.click();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
-    if (typeof showToast === 'function') showToast('💾 Histórico completo baixado');
+    // Garante jsPDF carregado
+    const { jsPDF } = window.jspdf || {};
+    if (!jsPDF) {
+      if (typeof showToast === 'function') showToast('⚠ Módulo PDF ainda carregando, tente novamente');
+      return;
+    }
+    const nome = (typeof getBabyName === 'function') ? getBabyName() : 'Bebê';
+    const birthISO = (typeof getBirthISO === 'function') ? getBirthISO() : null;
+    const stats = _coletarEstatisticasJornada();
+    const babyCfg = (typeof getBabyConfig === 'function') ? getBabyConfig() : {};
+    const dataNasc = birthISO ? new Date(birthISO + 'T12:00').toLocaleDateString('pt-BR', { day:'2-digit', month:'long', year:'numeric' }) : '—';
+    const hoje = new Date().toLocaleDateString('pt-BR', { day:'2-digit', month:'long', year:'numeric' });
+
+    const doc = new jsPDF();
+    const pageW = doc.internal.pageSize.width;
+    const pageH = doc.internal.pageSize.height;
+    let y = 20;
+
+    // ─── CAPA ───
+    doc.setFillColor(10, 26, 61);
+    doc.rect(0, 0, pageW, pageH, 'F');
+    doc.setTextColor(255, 224, 102);
+    doc.setFontSize(22);
+    doc.setFont('helvetica', 'bold');
+    doc.text('BABYFORCE', pageW/2, 50, { align: 'center' });
+    doc.setTextColor(199, 125, 255);
+    doc.text('JORNADA COMPLETA', pageW/2, 62, { align: 'center' });
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(28);
+    doc.text(nome, pageW/2, 92, { align: 'center' });
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(200, 220, 240);
+    doc.text('Diário Galáctico · 12 Anos de Infância', pageW/2, 104, { align: 'center' });
+    doc.setDrawColor(199, 125, 255);
+    doc.setLineWidth(0.5);
+    doc.line(60, 120, pageW-60, 120);
+    doc.setFontSize(10);
+    doc.setTextColor(180, 200, 220);
+    doc.text('Nascimento: ' + dataNasc, pageW/2, 140, { align: 'center' });
+    doc.text('Jornada encerrada em: ' + hoje, pageW/2, 150, { align: 'center' });
+    if (babyCfg.semanasGestacionais) {
+      doc.text('Idade gestacional ao nascer: ' + babyCfg.semanasGestacionais + ' semanas', pageW/2, 160, { align: 'center' });
+    }
+
+    // ─── PÁGINA 2: Estatísticas ───
+    doc.addPage();
+    doc.setFillColor(10, 26, 61);
+    doc.rect(0, 0, pageW, pageH, 'F');
+    y = 20;
+    doc.setTextColor(255, 224, 102);
+    doc.setFontSize(16);
+    doc.setFont('helvetica', 'bold');
+    doc.text('CONQUISTAS DA JORNADA', pageW/2, y, { align: 'center' });
+    y += 15;
+
+    const linhas = [
+      ['Mamadas registradas', stats.mamadas],
+      ['Sonos documentados', stats.sonos],
+      ['Trocas de fralda', stats.fraldas],
+      ['Marcos celebrados', stats.marcos],
+      ['Vacinas aplicadas', stats.vacinas],
+      ['Missões/consultas', stats.missoes],
+      ['Refeições registradas', stats.alimentacao],
+      ['Sintomas registrados', stats.sintomas],
+      ['Medicações administradas', stats.medicacoes],
+      ['Esportes praticados', stats.esportes],
+    ];
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'normal');
+    linhas.forEach((l, i) => {
+      doc.setTextColor(200, 220, 240);
+      doc.text('· ' + l[0], 30, y);
+      doc.setTextColor(255, 224, 102);
+      doc.setFont('helvetica', 'bold');
+      doc.text(String(l[1]), pageW - 30, y, { align: 'right' });
+      doc.setFont('helvetica', 'normal');
+      y += 10;
+    });
+
+    // ─── PÁGINA 3: Linha do tempo ───
+    doc.addPage();
+    doc.setFillColor(10, 26, 61);
+    doc.rect(0, 0, pageW, pageH, 'F');
+    y = 20;
+    doc.setTextColor(255, 224, 102);
+    doc.setFontSize(16);
+    doc.setFont('helvetica', 'bold');
+    doc.text('LINHA DO TEMPO', pageW/2, y, { align: 'center' });
+    y += 14;
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    let marcos = [];
+    try { marcos = (typeof db !== 'undefined' ? (db.mesversario || []) : []).slice().sort((a, b) => (a.mes || 0) - (b.mes || 0)); } catch {}
+    if (!marcos.length) {
+      doc.setTextColor(150, 170, 190);
+      doc.text('Nenhum marco registrado durante a jornada.', pageW/2, y + 20, { align: 'center' });
+    } else {
+      marcos.forEach(m => {
+        if (y > pageH - 30) {
+          doc.addPage();
+          doc.setFillColor(10, 26, 61);
+          doc.rect(0, 0, pageW, pageH, 'F');
+          y = 20;
+        }
+        const idade = m.mes || 0;
+        const idadeLabel = idade === 0 ? 'Nasc.' : idade < 12 ? idade + 'm' : Math.floor(idade/12) + 'a' + (idade%12 ? ' ' + (idade%12) + 'm' : '');
+        doc.setTextColor(255, 224, 102);
+        doc.setFont('helvetica', 'bold');
+        doc.text(idadeLabel, 25, y);
+        doc.setTextColor(255, 255, 255);
+        doc.setFont('helvetica', 'normal');
+        const titulo = (m.titulo || '(sem título)').substring(0, 80);
+        doc.text(titulo, 55, y);
+        if (m.obs) {
+          y += 5;
+          doc.setTextColor(180, 200, 220);
+          doc.setFontSize(8.5);
+          const obs = (m.obs || '').substring(0, 140);
+          doc.text(obs, 55, y);
+          doc.setFontSize(10);
+        }
+        y += 8;
+      });
+    }
+
+    // ─── PÁGINA 4: Mensagem de encerramento ───
+    doc.addPage();
+    doc.setFillColor(10, 26, 61);
+    doc.rect(0, 0, pageW, pageH, 'F');
+    y = 40;
+    doc.setTextColor(199, 125, 255);
+    doc.setFontSize(14);
+    doc.setFont('helvetica', 'bold');
+    doc.text('A FASE INFANTIL CHEGOU AO FIM', pageW/2, y, { align: 'center' });
+    y += 20;
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'normal');
+    const texto = [
+      '',
+      nome + ' viveu 12 anos intensos de descobertas,',
+      'crescimento e cuidado compartilhado.',
+      '',
+      'A partir de agora, esta jornada fica preservada',
+      'como memória. Todos os registros continuarão',
+      'acessíveis para consulta, mas novos registros',
+      'ficam bloqueados.',
+      '',
+      'Parabéns pela jornada.',
+      'Guarde este documento com carinho — ele é',
+      'um álbum da infância.',
+    ];
+    texto.forEach(l => { doc.text(l, pageW/2, y, { align: 'center' }); y += 8; });
+    y += 10;
+    doc.setDrawColor(199, 125, 255);
+    doc.line(60, y, pageW-60, y);
+    y += 14;
+    doc.setFontSize(9);
+    doc.setTextColor(150, 170, 190);
+    doc.text('Próxima jornada: BabyForce Teen (12-18 anos)', pageW/2, y, { align: 'center' });
+    y += 6;
+    doc.text('em desenvolvimento', pageW/2, y, { align: 'center' });
+
+    // Rodapé
+    doc.setFontSize(7);
+    doc.text('BabyForce · Diário Galáctico · Documento gerado em ' + hoje, pageW/2, pageH - 10, { align: 'center' });
+
+    // Salvar
+    const filename = 'BabyForce_JornadaCompleta_' + nome.replace(/[^\w]+/g, '_') + '_' + new Date().toISOString().slice(0,10) + '.pdf';
+    doc.save(filename);
+    if (typeof showToast === 'function') showToast('💾 Histórico completo baixado em PDF');
+    if (typeof BFAudit !== 'undefined') BFAudit.log('jornada_pdf_baixado');
   } catch (e) {
-    console.warn('[jornada baixar]', e);
-    if (typeof showToast === 'function') showToast('⚠ Erro ao baixar histórico');
+    console.warn('[jornada baixar PDF]', e);
+    if (typeof showToast === 'function') showToast('⚠ Erro ao gerar PDF: ' + (e.message || 'desconhecido'));
   }
 };
 
 window._jornadaConfirmarEncerramento = async function() {
-  const confirmar = await (typeof BFModal !== 'undefined'
-    ? BFModal.confirm({
-        title: 'Encerrar a jornada?',
-        icon: '🔒',
-        variant: 'warn',
-        message: 'Ao confirmar, todos os botões de registro (mamada, sono, sintoma, etc) serão bloqueados.\n\n✓ Todo o histórico continua acessível\n✓ Relatórios e gráficos continuam funcionando\n✓ Você pode baixar tudo a qualquer momento\n\n⚠️ Não é possível desfazer esta ação pelo app. Para reativar, será necessário intervenção manual nos dados.',
-        okLabel: 'Sim, encerrar',
-        cancelLabel: 'Cancelar',
-      })
-    : Promise.resolve(confirm('Encerrar a jornada?')));
-  if (!confirmar) return;
+  // [FIX] BFModal.confirm aninhado dentro de modal full-screen (z-index 99999)
+  // estava sendo engolido. Substituí por confirmação inline dentro do próprio modal.
+  const modalJornada = document.getElementById('modal-jornada-encerrada');
+  if (!modalJornada) return;
+  // Remove confirmação anterior se houver
+  const existente = document.getElementById('je-confirm-overlay');
+  if (existente) existente.remove();
+  // Overlay de confirmação interno
+  const conf = document.createElement('div');
+  conf.id = 'je-confirm-overlay';
+  conf.style.cssText = 'position:absolute;inset:0;background:rgba(0,5,20,0.92);z-index:100;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(12px);animation:je-slide-in 0.3s ease-out';
+  conf.innerHTML = `
+    <div style="max-width:360px;width:100%;background:linear-gradient(135deg,#0a1a3d,#031027);border:2px solid rgba(255,200,80,0.5);border-radius:16px;padding:22px;box-shadow:0 20px 60px rgba(0,0,0,0.8)">
+      <div style="text-align:center;font-size:2.6rem;margin-bottom:12px;line-height:1">🔒</div>
+      <div style="text-align:center;font-family:'Orbitron',monospace;font-size:0.78rem;color:#ffc94f;letter-spacing:0.08em;font-weight:700;margin-bottom:10px">ENCERRAR A JORNADA?</div>
+      <div style="font-size:0.78rem;color:var(--white);line-height:1.6;margin-bottom:16px;text-align:center">
+        Ao confirmar, os botões de registro (mamada, sono, sintoma, etc.) serão <strong style="color:#ffc94f">bloqueados</strong>.
+      </div>
+      <div style="font-size:0.72rem;color:var(--text-dim);line-height:1.6;background:rgba(0,30,70,0.5);padding:10px 12px;border-radius:8px;margin-bottom:16px">
+        ✓ Todo o histórico continua acessível<br>
+        ✓ Relatórios continuam funcionando<br>
+        ⚠️ Ação não pode ser desfeita pelo app
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button onclick="document.getElementById('je-confirm-overlay')?.remove()" style="flex:1;min-width:120px;padding:12px;background:rgba(0,60,120,0.6);border:1px solid rgba(0,180,255,0.4);border-radius:8px;color:#00d4ff;font-family:'Orbitron',monospace;font-size:0.7rem;letter-spacing:0.06em;cursor:pointer">Cancelar</button>
+        <button onclick="window._jornadaExecutarEncerramento()" style="flex:1;min-width:140px;padding:12px;background:linear-gradient(135deg,#ffe066,#c77dff);border:none;border-radius:8px;color:#020514;font-family:'Orbitron',monospace;font-size:0.7rem;letter-spacing:0.06em;cursor:pointer;font-weight:800">🔒 SIM, ENCERRAR</button>
+      </div>
+    </div>
+  `;
+  modalJornada.appendChild(conf);
+};
+
+// Executa o encerramento após confirmação inline
+window._jornadaExecutarEncerramento = function() {
   setJornadaEncerrada({ encerrada: true, encerradaEm: new Date().toISOString(), confirmadaPor: (typeof usuarioAtual !== 'undefined') ? usuarioAtual : null });
-  _aplicarBloqueioJornada();
+  // Fecha confirmação e modal principal
+  document.getElementById('je-confirm-overlay')?.remove();
   document.getElementById('modal-jornada-encerrada')?.remove();
+  // Para música
   if (_jornadaMusicaAtiva && _jornadaAudioCtx) { try { _jornadaAudioCtx.close(); } catch {} _jornadaAudioCtx = null; _jornadaMusicaAtiva = false; }
+  // Aplica bloqueio e badge
+  _aplicarBloqueioJornada();
   if (typeof showToast === 'function') showToast('🌟 Jornada encerrada com amor');
   if (typeof BFAudit !== 'undefined') BFAudit.log('jornada_encerrada', { idade: '12a' });
 };
@@ -31197,6 +31390,37 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }, 1500);
 });
+
+// [FIX] Hook em setActiveBabyId para reverificar ao trocar criança ativa
+(function hookTrocaCriancaParaJornada() {
+  const _origSetActive = window.setActiveBabyId;
+  if (typeof _origSetActive === 'function') {
+    window.setActiveBabyId = function(...args) {
+      const r = _origSetActive.apply(this, args);
+      // Depois de trocar criança ativa, reverifica se deve encerrar jornada
+      setTimeout(() => {
+        const info = getJornadaEncerrada();
+        // Remove badge anterior (se a criança anterior tinha jornada encerrada)
+        const badge = document.getElementById('je-header-badge');
+        if (badge) badge.remove();
+        // Reverifica para a criança agora ativa
+        if (info && info.encerrada) {
+          _aplicarBloqueioJornada();
+        } else if (_verificarMaioridadeInfantil()) {
+          window.abrirModalJornadaEncerrada();
+        }
+      }, 300);
+      return r;
+    };
+  }
+})();
+
+// [FIX] Função de teste manual — permite abrir o modal sem esperar 12 anos
+// Uso no console: window._jornadaTeste() ou window.abrirModalJornadaEncerrada(true)
+window._jornadaTeste = function() {
+  console.log('[jornada] Abrindo modal manualmente para teste...');
+  window.abrirModalJornadaEncerrada(true);
+};
 
 (function hookBloqueioJornada() {
   const _origShowHub = window.showHub;
