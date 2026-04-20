@@ -52,6 +52,18 @@ body{background:#020b18;margin:0;}
   --gold:#ffe066;--gold-dim:#c9a227;
   --white:#e8f4fd;--text-dim:#7ab3d4;
   --red-saber:#ff3b3b;--green-saber:#39ff14;
+  /* ═══════════════════════════════════════════════════════════
+     SISTEMA DE Z-INDEX — HIERARQUIA PADRONIZADA (Sprint 3)
+     Use estas vars para qualquer z-index novo. 7 tiers:
+     ═══════════════════════════════════════════════════════════ */
+  --z-base:       1;      /* Elementos flutuantes inline (badges, pills) */
+  --z-sticky:    10;      /* Headers/footers sticky dentro de container */
+  --z-fixed:    200;      /* Bottom nav, header fixo do app */
+  --z-dropdown: 9000;     /* Menus dropdown, tooltips */
+  --z-overlay:  9500;     /* Overlays de loading, backdrop */
+  --z-modal:   99500;     /* Modais regulares (confirmar, editar) */
+  --z-toast:   99800;     /* Toasts e notifs — acima de modais */
+  --z-critical:99999;     /* Alertas críticos (BFModal), splash */
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 html,body{scrollbar-gutter:auto;}
@@ -800,6 +812,32 @@ html.bf-tema-claro [style*="color: var(--white)"] { color: var(--white) !importa
         </div>
         <div style="font-size:0.62rem;color:var(--text-dim);margin-top:6px;line-height:1.4;font-style:italic">A paleta de cores do app poderá ser personalizada conforme sua escolha.</div>
       </div>
+      <!-- [Sprint B] Semanas gestacionais (importante para curva OMS) -->
+      <div class="ob-field">
+        <label class="ob-label">IDADE GESTACIONAL AO NASCER</label>
+        <select class="ob-input" id="ob-semanas-gest">
+          <option value="40">40 semanas (termo — padrão)</option>
+          <option value="42">42 semanas (pós-termo)</option>
+          <option value="41">41 semanas</option>
+          <option value="39">39 semanas</option>
+          <option value="38">38 semanas</option>
+          <option value="37">37 semanas (termo precoce)</option>
+          <option value="36">36 semanas (prematuro tardio)</option>
+          <option value="35">35 semanas (prematuro tardio)</option>
+          <option value="34">34 semanas (prematuro moderado)</option>
+          <option value="33">33 semanas (prematuro moderado)</option>
+          <option value="32">32 semanas (prematuro moderado)</option>
+          <option value="31">31 semanas (muito prematuro)</option>
+          <option value="30">30 semanas (muito prematuro)</option>
+          <option value="29">29 semanas (muito prematuro)</option>
+          <option value="28">28 semanas (muito prematuro)</option>
+          <option value="27">27 semanas (extremo prematuro)</option>
+          <option value="26">26 semanas (extremo prematuro)</option>
+          <option value="25">25 semanas (extremo prematuro)</option>
+          <option value="24">24 semanas (extremo prematuro)</option>
+        </select>
+        <div style="font-size:0.62rem;color:var(--text-dim);margin-top:6px;line-height:1.4;font-style:italic">Para bebês prematuros (&lt;37 sem), o app aplica <strong>idade corrigida</strong> automaticamente na curva OMS até os 2 anos.</div>
+      </div>
       <div id="ob-step3-error" role="alert" aria-live="polite" style="color:#ff8080;font-size:0.76rem;text-align:center;min-height:20px;margin-top:8px;line-height:1.4"></div>
       <button class="ob-btn ob-btn-primary" onclick="obProximo(1)" style="margin-top:8px">Continuar →</button>
       <button class="ob-btn ob-btn-secondary" onclick="obProximo(-3)" style="font-size:0.7rem;margin-top:8px">← Voltar</button>
@@ -1020,30 +1058,59 @@ html.bf-tema-claro [style*="color: var(--white)"] { color: var(--white) !importa
 
 <!-- MENU GUARDIÃO -->
 <div id="menu-guardiao" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;z-index:99000" onclick="fecharMenuGuardiao()">
-  <div style="position:absolute;right:12px;top:140px;background:linear-gradient(135deg,rgba(0,30,70,0.97),rgba(0,15,40,0.99));border:1px solid rgba(0,180,255,0.3);border-radius:12px;padding:6px;min-width:210px;box-shadow:0 8px 30px rgba(0,0,0,0.6)" onclick="event.stopPropagation()">
+  <div style="position:absolute;right:12px;top:140px;background:linear-gradient(135deg,rgba(0,30,70,0.97),rgba(0,15,40,0.99));border:1px solid rgba(0,180,255,0.3);border-radius:12px;padding:6px;min-width:220px;max-height:75vh;overflow-y:auto;box-shadow:0 8px 30px rgba(0,0,0,0.6)" onclick="event.stopPropagation()">
+
+    <!-- SEÇÃO 1: PERFIL -->
+    <div style="font-family:'Orbitron',monospace;font-size:0.58rem;color:var(--text-dim);letter-spacing:0.1em;padding:8px 12px 4px;opacity:0.6">PERFIL</div>
     <button onclick="abrirTrocaEmoji()" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:none;border:none;color:var(--white);cursor:pointer;border-radius:8px;font-family:'Exo 2',sans-serif;font-size:0.88rem">🔲 Trocar emblema</button>
     <button onclick="abrirTrocaFotoGuardiao()" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:none;border:none;color:var(--white);cursor:pointer;border-radius:8px;font-family:'Exo 2',sans-serif;font-size:0.88rem">📷 Trocar foto</button>
     <button onclick="abrirMinhaConta()" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:none;border:none;color:var(--white);cursor:pointer;border-radius:8px;font-family:'Exo 2',sans-serif;font-size:0.88rem">👤 Minha conta</button>
+
+    <div style="height:1px;background:rgba(0,180,255,0.12);margin:6px 8px"></div>
+
+    <!-- SEÇÃO 2: FAMÍLIA -->
+    <div style="font-family:'Orbitron',monospace;font-size:0.58rem;color:var(--text-dim);letter-spacing:0.1em;padding:8px 12px 4px;opacity:0.6">FAMÍLIA</div>
     <button onclick="abrirGestaoFamilia()" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:none;border:none;color:var(--gold);cursor:pointer;border-radius:8px;font-family:'Exo 2',sans-serif;font-size:0.88rem">👨‍👩‍👧‍👦 Gerenciar família</button>
-    <button onclick="abrirGlossario()" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:none;border:none;color:var(--white);cursor:pointer;border-radius:8px;font-family:'Exo 2',sans-serif;font-size:0.88rem">📖 Glossário Galáctico</button>
-    <button onclick="abrirMigracao()" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:none;border:none;color:rgba(57,255,20,0.8);cursor:pointer;border-radius:8px;font-family:'Exo 2',sans-serif;font-size:0.88rem">☁️ Sincronizar dados</button>
+    <button id="menu-btn-gestao-admin" onclick="abrirGestaoAdmin()" style="width:100%;display:none;align-items:center;gap:10px;padding:10px 12px;background:none;border:none;color:var(--gold);cursor:pointer;border-radius:8px;font-family:'Exo 2',sans-serif;font-size:0.88rem">👑 Gestão de Administradores</button>
+
+    <div style="height:1px;background:rgba(0,180,255,0.12);margin:6px 8px"></div>
+
+    <!-- SEÇÃO 3: BEBÊ / CRIANÇAS -->
+    <div style="font-family:'Orbitron',monospace;font-size:0.58rem;color:var(--text-dim);letter-spacing:0.1em;padding:8px 12px 4px;opacity:0.6">BEBÊ</div>
     <button onclick="abrirConfiguracaoBebe()" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:none;border:none;color:var(--gold);cursor:pointer;border-radius:8px;font-family:'Exo 2',sans-serif;font-size:0.88rem">⚙️ Configurar bebê</button>
     <button onclick="abrirGestaoCriancas()" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:none;border:none;color:var(--gold);cursor:pointer;border-radius:8px;font-family:'Exo 2',sans-serif;font-size:0.88rem">👶 Crianças cadastradas</button>
     <button onclick="abrirComparacaoIrmaos()" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:none;border:none;color:var(--purple-neon);cursor:pointer;border-radius:8px;font-family:'Exo 2',sans-serif;font-size:0.88rem">👨‍👩‍👧‍👦 Comparar irmãos</button>
-    <button id="menu-btn-gestao-admin" onclick="abrirGestaoAdmin()" style="width:100%;display:none;align-items:center;gap:10px;padding:10px 12px;background:none;border:none;color:var(--gold);cursor:pointer;border-radius:8px;font-family:'Exo 2',sans-serif;font-size:0.88rem">👑 Gestão de Administradores</button>
-    <button id="menu-btn-firebase-diag" onclick="FirebaseAuthDiag.abrirPainel()" style="width:100%;display:none;align-items:center;gap:10px;padding:10px 12px;background:none;border:none;color:var(--blue-neon);cursor:pointer;border-radius:8px;font-family:'Exo 2',sans-serif;font-size:0.88rem">🔐 Diagnóstico Firebase Auth</button>
-    <button onclick="BilheteCuidado.abrirHistorico()" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:none;border:none;color:var(--purple-glow);cursor:pointer;border-radius:8px;font-family:'Exo 2',sans-serif;font-size:0.88rem">💌 Bilhetes de cuidado</button>
-    <button onclick="ModoDescanso.abrirModal()" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:none;border:none;color:#78ff99;cursor:pointer;border-radius:8px;font-family:'Exo 2',sans-serif;font-size:0.88rem">🌿 Modo descanso</button>
-    <button onclick="Telemetria.abrirPainel()" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:none;border:none;color:var(--blue-neon);cursor:pointer;border-radius:8px;font-family:'Exo 2',sans-serif;font-size:0.88rem">📊 Telemetria & Privacidade</button>
+
+    <div style="height:1px;background:rgba(0,180,255,0.12);margin:6px 8px"></div>
+
+    <!-- SEÇÃO 4: SAÚDE & RELATÓRIOS -->
+    <div style="font-family:'Orbitron',monospace;font-size:0.58rem;color:var(--text-dim);letter-spacing:0.1em;padding:8px 12px 4px;opacity:0.6">SAÚDE & RELATÓRIOS</div>
     <button onclick="abrirRelatoriosClinicos()" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:none;border:none;color:var(--purple-neon);cursor:pointer;border-radius:8px;font-family:'Exo 2',sans-serif;font-size:0.88rem">📊 Relatórios Clínicos</button>
     <button onclick="abrirProfissionais()" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:none;border:none;color:var(--white);cursor:pointer;border-radius:8px;font-family:'Exo 2',sans-serif;font-size:0.88rem">👨‍⚕️ Profissionais de saúde</button>
+
+    <div style="height:1px;background:rgba(0,180,255,0.12);margin:6px 8px"></div>
+
+    <!-- SEÇÃO 5: FERRAMENTAS -->
+    <div style="font-family:'Orbitron',monospace;font-size:0.58rem;color:var(--text-dim);letter-spacing:0.1em;padding:8px 12px 4px;opacity:0.6">FERRAMENTAS</div>
     <button onclick="oraculoConfigKey()" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:none;border:none;color:var(--purple-neon);cursor:pointer;border-radius:8px;font-family:'Exo 2',sans-serif;font-size:0.88rem">🔮 Configurar Oráculo (AI)</button>
-    <div style="height:1px;background:rgba(0,180,255,0.12);margin:4px 8px"></div>
+    <button onclick="BilheteCuidado.abrirHistorico()" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:none;border:none;color:var(--purple-glow);cursor:pointer;border-radius:8px;font-family:'Exo 2',sans-serif;font-size:0.88rem">💌 Bilhetes de cuidado</button>
+    <button onclick="ModoDescanso.abrirModal()" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:none;border:none;color:#78ff99;cursor:pointer;border-radius:8px;font-family:'Exo 2',sans-serif;font-size:0.88rem">🌿 Modo descanso</button>
+    <button onclick="abrirGlossario()" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:none;border:none;color:var(--white);cursor:pointer;border-radius:8px;font-family:'Exo 2',sans-serif;font-size:0.88rem">📖 Glossário Galáctico</button>
+    <button onclick="abrirMigracao()" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:none;border:none;color:rgba(57,255,20,0.8);cursor:pointer;border-radius:8px;font-family:'Exo 2',sans-serif;font-size:0.88rem">☁️ Sincronizar dados</button>
+
+    <div style="height:1px;background:rgba(0,180,255,0.12);margin:6px 8px"></div>
+
+    <!-- SEÇÃO 6: PRIVACIDADE & SISTEMA -->
+    <div style="font-family:'Orbitron',monospace;font-size:0.58rem;color:var(--text-dim);letter-spacing:0.1em;padding:8px 12px 4px;opacity:0.6">PRIVACIDADE & SISTEMA</div>
     <button onclick="abrirAcessibilidade()" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:none;border:none;color:var(--blue-neon);cursor:pointer;border-radius:8px;font-family:'Exo 2',sans-serif;font-size:0.88rem">♿ Acessibilidade</button>
     <button onclick="abrirPrivacidade()" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:none;border:none;color:var(--blue-neon);cursor:pointer;border-radius:8px;font-family:'Exo 2',sans-serif;font-size:0.88rem">🔒 Privacidade e Segurança</button>
+    <button onclick="Telemetria.abrirPainel()" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:none;border:none;color:var(--blue-neon);cursor:pointer;border-radius:8px;font-family:'Exo 2',sans-serif;font-size:0.88rem">📊 Telemetria & Privacidade</button>
     <button onclick="abrirBackupRestore()" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:none;border:none;color:var(--gold);cursor:pointer;border-radius:8px;font-family:'Exo 2',sans-serif;font-size:0.88rem">💾 Backup e Restauração</button>
     <button id="menu-btn-faceid" onclick="menuToggleFaceID()" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:none;border:none;color:var(--blue-neon);cursor:pointer;border-radius:8px;font-family:'Exo 2',sans-serif;font-size:0.88rem">🔐 <span id="menu-faceid-label">Ativar Face ID</span></button>
-    <div style="height:1px;background:rgba(0,180,255,0.12);margin:4px 8px"></div>
+    <button id="menu-btn-firebase-diag" onclick="FirebaseAuthDiag.abrirPainel()" style="width:100%;display:none;align-items:center;gap:10px;padding:10px 12px;background:none;border:none;color:var(--blue-neon);cursor:pointer;border-radius:8px;font-family:'Exo 2',sans-serif;font-size:0.88rem">🔐 Diagnóstico Firebase Auth</button>
+
+    <div style="height:1px;background:rgba(255,100,100,0.15);margin:6px 8px"></div>
+
     <button onclick="sairSessao()" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:none;border:none;color:var(--text-dim);cursor:pointer;border-radius:8px;font-family:'Exo 2',sans-serif;font-size:0.88rem">↩ Trocar Guardião</button>
   </div>
 </div>
@@ -1235,7 +1302,7 @@ html.bf-tema-claro [style*="color: var(--white)"] { color: var(--white) !importa
   <div class="sub-tabs">
     <button class="sub-tab active" id="stab-missoes" onclick="showSubTabMissoes('missoes')">🗺️ Missões</button>
     <button class="sub-tab" id="stab-missivas" onclick="showSubTabMissoes('missivas')">📜 Missivas</button>
-    <button class="sub-tab" id="stab-medicacao" onclick="showSubTabMissoes('medicacao')">⚗️ Elixires</button>
+    <button class="sub-tab" id="stab-medicacao" onclick="showSubTabMissoes('medicacao')">💊 Medicação</button>
     <button class="sub-tab" id="stab-sabedoria" onclick="showSubTabMissoes('sabedoria')">📖 Sabedoria</button>
     <button class="sub-tab" id="stab-oraculo" onclick="showSubTabMissoes('oraculo')">🔮 Oráculo</button>
   </div>
@@ -1280,6 +1347,24 @@ html.bf-tema-claro [style*="color: var(--white)"] { color: var(--white) !importa
     <div id="lista-agenda"></div>
   </div>
   <div id="subpanel-medicacao" class="subpanel">
+    <!-- [Sprint D] Disclaimer IMPORTANTÍSSIMO -->
+    <div style="background:linear-gradient(135deg,rgba(255,200,80,0.14),rgba(255,150,50,0.1));border:2px solid rgba(255,200,80,0.5);border-radius:10px;padding:12px 14px;margin-bottom:12px">
+      <div style="display:flex;align-items:flex-start;gap:10px">
+        <div style="font-size:1.4rem;line-height:1">⚠️</div>
+        <div style="flex:1;font-size:0.74rem;line-height:1.5;color:#ffe066">
+          <strong style="color:#ffc94f;font-family:'Orbitron',monospace;font-size:0.7rem;letter-spacing:0.05em;display:block;margin-bottom:4px">IMPORTANTE</strong>
+          Este app <strong>NÃO substitui</strong> orientação médica. Toda medicação — alopática, homeopática ou fitoterápica — deve ser ministrada com <strong>prescrição e orientação de pediatra</strong>. Em caso de urgência, procure atendimento médico imediato.
+        </div>
+      </div>
+    </div>
+
+    <!-- [Sprint C] 3 Sub-abas de categoria -->
+    <div class="sub-tabs" style="margin-bottom:10px">
+      <button class="sub-tab active" id="medcat-alopatica" onclick="showMedCat('alopatica')">💊 Alopática</button>
+      <button class="sub-tab" id="medcat-homeopatica" onclick="showMedCat('homeopatica')">🌿 Homeopática</button>
+      <button class="sub-tab" id="medcat-fitoterapico" onclick="showMedCat('fitoterapico')">🌱 Fitoterápico</button>
+    </div>
+
     <!-- Card de Vitaminas Profiláticas — referências SBP, Ministério da Saúde, OMS -->
     <div class="card" style="background:linear-gradient(135deg,rgba(255,200,80,0.12),rgba(100,30,180,0.15));border:1px solid rgba(255,200,80,0.3);margin-bottom:12px">
       <div class="section-title" style="display:flex;align-items:center;gap:8px">
@@ -1292,15 +1377,20 @@ html.bf-tema-claro [style*="color: var(--white)"] { color: var(--white) !importa
       <div id="vitaminas-cards" style="display:grid;grid-template-columns:1fr;gap:8px"></div>
       <div style="font-size:0.6rem;color:var(--text-dim);line-height:1.5;margin-top:10px;padding:7px 9px;background:rgba(0,30,70,0.4);border-radius:6px;border-left:2px solid rgba(0,180,255,0.3)">
         💡 <b>Vitamina K ao nascer</b>: aplicada <u>na maternidade</u> como medicamento injetável (IM).
-        Não é vacina — por isso fica aqui em <b>Elixires</b>, não em Escudos.
+        Não é vacina — por isso fica aqui em <b>Medicação</b>, não em Escudos.
       </div>
     </div>
 
     <div class="card">
-      <div class="section-title">⚗️ Novo Elixir da Força</div>
+      <div class="section-title">💊 Nova Medicação</div>
+      <!-- [Sprint C] Tipo da medicação fica embutido no form via med-tipo-hidden -->
+      <input type="hidden" id="med-tipo" value="alopatica">
+      <div id="med-cat-indicator" style="font-size:0.7rem;color:var(--blue-neon);margin-bottom:10px;padding:6px 10px;background:rgba(0,180,255,0.08);border-left:3px solid rgba(0,180,255,0.5);border-radius:6px">
+        Categoria ativa: <strong style="color:var(--white)">💊 Alopática</strong>
+      </div>
       <div class="form-group" style="position:relative">
-        <label>Nome do Elixir</label>
-        <input type="text" id="med-nome" placeholder="Buscar (ex: Dipirona, Amoxicilina...)" oninput="buscarMedicamento(this.value)" autocomplete="off">
+        <label>Nome da Medicação</label>
+        <input type="text" id="med-nome" placeholder="Buscar (ex: Dipirona, Arnica, Camomila...)" oninput="buscarMedicamento(this.value)" autocomplete="off">
         <div id="med-sugestoes" style="display:none;position:absolute;left:0;right:0;z-index:200;background:#0d1a2e;border:1px solid rgba(0,180,255,0.3);border-radius:0 0 8px 8px;max-height:180px;overflow-y:auto;box-shadow:0 8px 20px rgba(0,0,0,0.5);"></div>
       </div>
       <div class="form-group"><label>Princípio Ativo</label><input type="text" id="med-generico" readonly style="background:rgba(0,20,50,0.3);color:var(--text-dim)"></div>
@@ -1325,14 +1415,16 @@ html.bf-tema-claro [style*="color: var(--white)"] { color: var(--white) !importa
         <select id="med-indicado">
           <option value="">— selecionar —</option>
           <option value="Pediatra">👩‍⚕️ Pediatra</option>
+          <option value="Homeopata">🌿 Homeopata</option>
+          <option value="Fitoterapeuta">🌱 Fitoterapeuta</option>
           <option value="Automedicação">🏠 Iniciativa dos Guardiões</option>
           <option value="Outro">✏️ Outro</option>
         </select>
       </div>
       <div class="form-group"><label>Observações</label><input type="text" id="med-obs" placeholder="ex: administrar após alimentação..."></div>
-      <button class="btn btn-primary btn-full" onclick="salvarMedicacao()">⚗️ Ativar Elixir</button>
+      <button class="btn btn-primary btn-full" onclick="salvarMedicacao()">💊 Registrar Medicação</button>
     </div>
-    <div class="section-title" style="margin-top:4px">⚗️ Elixires Ativos</div>
+    <div class="section-title" style="margin-top:4px">💊 Medicações Ativas</div>
     <div id="lista-medicacao"></div>
   </div>
 
@@ -1517,15 +1609,7 @@ html.bf-tema-claro [style*="color: var(--white)"] { color: var(--white) !importa
           <label>Idade / Período</label>
           <select id="mv-mes">
             <option value="0">🌟 Nascimento / Maternidade</option>
-            <option value="1">1º Mês</option><option value="2">2º Mês</option><option value="3">3º Mês</option>
-            <option value="4">4º Mês</option><option value="5">5º Mês</option><option value="6">6º Mês</option>
-            <option value="7">7º Mês</option><option value="8">8º Mês</option><option value="9">9º Mês</option>
-            <option value="10">10º Mês</option><option value="11">11º Mês</option><option value="12">✨ 1 Aninho</option>
-            <option value="13">13º Mês</option><option value="14">14º Mês</option><option value="15">15º Mês</option>
-            <option value="16">16º Mês</option><option value="17">17º Mês</option><option value="18">18 Meses</option>
-            <option value="20">20 Meses</option><option value="22">22 Meses</option><option value="24">✨ 2 Anos</option>
-            <option value="30">30 Meses</option><option value="36">🎂 3 Anos</option>
-            <option value="48">🎂 4 Anos</option><option value="60">🎂 5 Anos</option>
+            <!-- [Sprint B] Opções geradas por _popularSeletorIdade() para evitar gaps -->
           </select>
         </div>
         <div class="form-group">
@@ -1560,22 +1644,19 @@ html.bf-tema-claro [style*="color: var(--white)"] { color: var(--white) !importa
       <div class="row-2">
         <div class="form-group"><label>Data</label><input type="date" id="cresc-data"></div>
         <div class="form-group">
-          <label>Mês de Vida</label>
+          <label>Idade / Período</label>
           <select id="cresc-mes">
             <option value="0">🌌 Ao Nascer</option>
-            <option value="1">1º Mês</option><option value="2">2º Mês</option><option value="3">3º Mês</option>
-            <option value="4">4º Mês</option><option value="5">5º Mês</option><option value="6">6º Mês</option>
-            <option value="7">7º Mês</option><option value="8">8º Mês</option><option value="9">9º Mês</option>
-            <option value="10">10º Mês</option><option value="11">11º Mês</option><option value="12">✨ 1 Aninho</option>
+            <!-- [Sprint B] Opções geradas por _popularSeletorIdade() — vai até 11a11m -->
           </select>
         </div>
       </div>
       <div class="row-2">
-        <div class="form-group"><label>⚖️ Peso (kg)</label><input type="number" id="cresc-peso" placeholder="ex: 3.715" step="0.001" min="0" max="30"></div>
-        <div class="form-group"><label>📐 Altura (cm)</label><input type="number" id="cresc-altura" placeholder="ex: 52.5" step="0.1" min="0" max="120"></div>
+        <div class="form-group"><label>⚖️ Peso (kg)</label><input type="number" id="cresc-peso" placeholder="ex: 3.715" step="0.001" min="0" max="80"></div>
+        <div class="form-group"><label>📐 Altura (cm)</label><input type="number" id="cresc-altura" placeholder="ex: 52.5" step="0.1" min="0" max="180"></div>
       </div>
       <div class="row-2">
-        <div class="form-group"><label>🔵 PC (cm)</label><input type="number" id="cresc-pc" placeholder="ex: 35.0" step="0.1" min="0" max="60"></div>
+        <div class="form-group"><label>🔵 PC (cm)</label><input type="number" id="cresc-pc" placeholder="ex: 35.0" step="0.1" min="0" max="65"></div>
         <div class="form-group"><label>Observações</label><input type="text" id="cresc-obs" placeholder="ex: consulta pediatra"></div>
       </div>
       <button class="btn btn-primary btn-full" onclick="salvarCrescimento()">📏 Registrar Medidas</button>
@@ -1611,30 +1692,37 @@ html.bf-tema-claro [style*="color: var(--white)"] { color: var(--white) !importa
 
 <!-- FRALDAS -->
 <div id="tab-fraldas" class="tab-panel">
-  <div class="card">
-    <div class="section-title">🩲 Registrar Troca</div>
-    <div class="row-2">
-      <div class="form-group"><label>Data</label><input type="date" id="fr-data"></div>
-      <div class="form-group"><label>Hora</label><input type="time" id="fr-hora"></div>
-    </div>
-    <div class="form-group">
-      <label>Tipo</label>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px">
-        <button class="btn-fralda-tipo ativo" data-tipo="molhada" onclick="selecionarTipoFralda(this)">💧 Molhada</button>
-        <button class="btn-fralda-tipo" data-tipo="suja" onclick="selecionarTipoFralda(this)">💩 Suja</button>
-        <button class="btn-fralda-tipo" data-tipo="mista" onclick="selecionarTipoFralda(this)">💧💩 Mista</button>
-        <button class="btn-fralda-tipo" data-tipo="seca" onclick="selecionarTipoFralda(this)">✅ Seca</button>
+  <div id="fraldas-panel-conteudo">
+    <div class="card">
+      <div class="section-title">🩲 Registrar Troca</div>
+      <div class="row-2">
+        <div class="form-group"><label>Data</label><input type="date" id="fr-data"></div>
+        <div class="form-group"><label>Hora</label><input type="time" id="fr-hora"></div>
       </div>
-      <input type="hidden" id="fr-tipo" value="molhada">
+      <div class="form-group">
+        <label>Tipo</label>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px">
+          <button class="btn-fralda-tipo ativo" data-tipo="molhada" onclick="selecionarTipoFralda(this)">💧 Molhada</button>
+          <button class="btn-fralda-tipo" data-tipo="suja" onclick="selecionarTipoFralda(this)">💩 Suja</button>
+          <button class="btn-fralda-tipo" data-tipo="mista" onclick="selecionarTipoFralda(this)">💧💩 Mista</button>
+          <button class="btn-fralda-tipo" data-tipo="seca" onclick="selecionarTipoFralda(this)">✅ Seca</button>
+        </div>
+        <input type="hidden" id="fr-tipo" value="molhada">
+      </div>
+      <div class="form-group"><label>Observações</label><input type="text" id="fr-obs" placeholder="ex: coloração incomum..."></div>
+      <button class="btn btn-primary btn-full" onclick="salvarFralda()">🩲 Registrar Troca</button>
     </div>
-    <div class="form-group"><label>Observações</label><input type="text" id="fr-obs" placeholder="ex: coloração incomum..."></div>
-    <button class="btn btn-primary btn-full" onclick="salvarFralda()">🩲 Registrar Troca</button>
+    <div class="card" style="padding:12px">
+      <div class="section-title" style="margin-bottom:8px">📊 Fraldas Hoje</div>
+      <div id="fr-stats-hoje" style="display:flex;gap:8px;flex-wrap:wrap"></div>
+    </div>
+    <div id="lista-fraldas"></div>
+    <!-- [Sprint A] Botão encerrar uso de fraldas (mesma lógica das mamadas) -->
+    <div style="text-align:center;margin-top:14px;margin-bottom:6px">
+      <button onclick="window.abrirModalFimFraldas()" style="background:none;border:1px solid rgba(120,255,153,0.3);color:#78ff99;padding:9px 18px;border-radius:20px;font-family:'Orbitron',monospace;font-size:0.6rem;letter-spacing:0.08em;cursor:pointer">🎉 Registrar fim do uso de fraldas</button>
+      <div style="font-size:0.64rem;color:var(--text-dim);margin-top:6px;line-height:1.4">Quando a criança deixar de usar fraldas, celebre essa conquista!</div>
+    </div>
   </div>
-  <div class="card" style="padding:12px">
-    <div class="section-title" style="margin-bottom:8px">📊 Fraldas Hoje</div>
-    <div id="fr-stats-hoje" style="display:flex;gap:8px;flex-wrap:wrap"></div>
-  </div>
-  <div id="lista-fraldas"></div>
 </div>
 
 <!-- SONO -->
@@ -1791,11 +1879,27 @@ html.bf-tema-claro [style*="color: var(--white)"] { color: var(--white) !importa
       </div>
     </div>
     <div class="form-group"><label>Observações</label><input type="text" id="sint-obs" placeholder="ex: início após vacina, vômito único..."></div>
+    <!-- [Sprint D] Disclaimer IMPORTANTÍSSIMO -->
+    <div style="background:linear-gradient(135deg,rgba(255,200,80,0.14),rgba(255,150,50,0.1));border:2px solid rgba(255,200,80,0.5);border-radius:10px;padding:12px 14px;margin-bottom:14px">
+      <div style="display:flex;align-items:flex-start;gap:10px">
+        <div style="font-size:1.4rem;line-height:1">⚠️</div>
+        <div style="flex:1;font-size:0.74rem;line-height:1.5;color:#ffe066">
+          <strong style="color:#ffc94f;font-family:'Orbitron',monospace;font-size:0.7rem;letter-spacing:0.05em;display:block;margin-bottom:4px">IMPORTANTE</strong>
+          Este app <strong>NÃO substitui</strong> orientação médica. Toda medicação deve ser ministrada com <strong>prescrição e orientação de pediatra</strong>. Em caso de urgência, procure atendimento médico imediato.
+        </div>
+      </div>
+    </div>
     <div class="form-group">
       <label style="display:flex;align-items:center;gap:10px;padding:9px 12px;background:rgba(0,30,70,0.4);border:1px solid rgba(0,180,255,0.2);border-radius:10px;cursor:pointer;margin-bottom:0">
-        <input type="checkbox" id="sint-medicado" style="width:18px;height:18px;accent-color:#00d4ff;cursor:pointer">
+        <input type="checkbox" id="sint-medicado" style="width:18px;height:18px;accent-color:#00d4ff;cursor:pointer" onchange="document.getElementById('sint-medicamentos-wrap').style.display=this.checked?'block':'none'">
         <span style="font-size:0.76rem;color:var(--white)">💊 Já administrei medicamento</span>
       </label>
+    </div>
+    <!-- [Sprint D] Campo detalhado de medicamento ministrado -->
+    <div class="form-group" id="sint-medicamentos-wrap" style="display:none">
+      <label>💊 Medicamento(s) ministrado(s)</label>
+      <input type="text" id="sint-medicamentos" placeholder="ex: Paracetamol 12 gotas, Dipirona infantil 0,6ml" style="width:100%">
+      <div style="font-size:0.66rem;color:var(--text-dim);margin-top:6px;line-height:1.4">Informe o nome e a dose ministrada. Útil para o pediatra na próxima consulta.</div>
     </div>
     <button class="btn btn-primary btn-full" onclick="salvarSintoma()">⚡ Registrar Sintoma</button>
   </div>
@@ -2110,6 +2214,32 @@ html.bf-tema-claro [style*="color: var(--white)"] { color: var(--white) !importa
         </button>
       </div>
       <div style="font-size:0.58rem;color:var(--text-dim);margin-top:5px;font-style:italic">Permite personalizar a paleta de cores do app.</div>
+    </div>
+    <!-- [Sprint B] Semanas gestacionais -->
+    <div class="form-group">
+      <label>IDADE GESTACIONAL AO NASCER</label>
+      <select id="cfg-semanas-gest" style="width:100%;background:rgba(0,20,50,0.8);border:1px solid rgba(0,180,255,0.3);border-radius:8px;color:#fff;padding:10px 12px;font-size:14px;font-family:'Exo 2',sans-serif;outline:none">
+        <option value="40">40 semanas (termo — padrão)</option>
+        <option value="42">42 semanas (pós-termo)</option>
+        <option value="41">41 semanas</option>
+        <option value="39">39 semanas</option>
+        <option value="38">38 semanas</option>
+        <option value="37">37 semanas (termo precoce)</option>
+        <option value="36">36 semanas (prematuro tardio)</option>
+        <option value="35">35 semanas (prematuro tardio)</option>
+        <option value="34">34 semanas (prematuro moderado)</option>
+        <option value="33">33 semanas (prematuro moderado)</option>
+        <option value="32">32 semanas (prematuro moderado)</option>
+        <option value="31">31 semanas (muito prematuro)</option>
+        <option value="30">30 semanas (muito prematuro)</option>
+        <option value="29">29 semanas (muito prematuro)</option>
+        <option value="28">28 semanas (muito prematuro)</option>
+        <option value="27">27 semanas (extremo prematuro)</option>
+        <option value="26">26 semanas (extremo prematuro)</option>
+        <option value="25">25 semanas (extremo prematuro)</option>
+        <option value="24">24 semanas (extremo prematuro)</option>
+      </select>
+      <div style="font-size:0.58rem;color:var(--text-dim);margin-top:5px;line-height:1.4;font-style:italic">Para prematuros (&lt;37 sem), aplicamos idade corrigida na curva OMS até 2 anos.</div>
     </div>
     <div style="height:1px;background:rgba(0,180,255,0.12);margin:12px 0"></div>
     <div style="font-family:'Orbitron',monospace;font-size:0.62rem;color:var(--text-dim);margin-bottom:8px">ALTERAR PIN (opcional)</div>
@@ -2600,11 +2730,29 @@ window._definirSenhaGuardiao = _definirSenhaGuardiao;
  * Abre modal para o usuário entrar com senha (alternativa ao PIN)
  * Útil para: troca de device, recuperação, validação de ações sensíveis
  */
-window.abrirLoginComSenha = function(guardiaoId) {
+window.abrirLoginComSenha = async function(guardiaoId) {
   const g = GUARDIOES[guardiaoId];
-  if (!g) return alert('Guardião não encontrado');
+  if (!g) {
+    await (typeof BFModal !== 'undefined'
+      ? BFModal.alert({
+          title: 'Guardião não encontrado',
+          icon: '⚠️',
+          variant: 'warn',
+          message: 'Não foi possível localizar este guardião. Tente voltar à tela inicial.',
+        })
+      : Promise.resolve(alert('Guardião não encontrado')));
+    return;
+  }
   if (!g.senhaHash) {
-    return alert('Este guardião ainda não cadastrou senha. Use o PIN ou peça ao administrador para reenviar o convite.');
+    await (typeof BFModal !== 'undefined'
+      ? BFModal.alert({
+          title: 'Sem senha cadastrada',
+          icon: '🔒',
+          variant: 'info',
+          message: 'Este guardião ainda não cadastrou senha pessoal.\n\nOpções:\n• Entre usando o PIN da família\n• Ou peça ao administrador para reenviar o convite com link de cadastro',
+        })
+      : Promise.resolve(alert('Sem senha. Use PIN ou peça convite.')));
+    return;
   }
 
   const existente = document.getElementById('modal-login-senha');
@@ -8450,7 +8598,15 @@ window._verificarValidacaoEmailAtiva = async function() {
     const m = document.getElementById('modal-aguardando-validacao');
     if (m) m.remove();
 
-    alert('✓ E-mail validado com sucesso!\n\nSeu cadastro está completo. Defina agora seu PIN de 6 dígitos para acesso rápido ao app.');
+    await (typeof BFModal !== 'undefined'
+      ? BFModal.alert({
+          title: 'E-mail validado!',
+          icon: '✓',
+          variant: 'success',
+          message: 'Seu cadastro está completo.\n\nAgora defina seu PIN de 6 dígitos para acesso rápido ao app no dia a dia.',
+          okLabel: 'Definir PIN',
+        })
+      : Promise.resolve(alert('E-mail validado! Defina agora seu PIN.')));
     // Abre onboarding step 2 (PIN)
     const onb = document.getElementById('tela-onboarding');
     if (onb) onb.style.display='flex';
@@ -8462,7 +8618,14 @@ window._verificarValidacaoEmailAtiva = async function() {
   } catch (e) {
     console.warn('[_verificarValidacaoEmailAtiva]', e);
     if (e.code === 'auth/invalid-action-code') {
-      alert('Link expirado ou já utilizado.\n\nFaça login normalmente ou solicite novo link.');
+      await (typeof BFModal !== 'undefined'
+        ? BFModal.alert({
+            title: 'Link expirado',
+            icon: '⏰',
+            variant: 'warn',
+            message: 'Este link de validação expirou ou já foi utilizado.\n\nFaça login normalmente, ou solicite um novo link de validação.',
+          })
+        : Promise.resolve(alert('Link expirado.')));
     }
   }
 };
@@ -8695,19 +8858,53 @@ window._rebaixarAdmin = async function(id) {
 };
 
 // Remover guardião (admin remove outro)
-window._removerGuardiao = function(id) {
-  if (!window.ehAdmin()) { alert('⚠️ Apenas administradores podem remover'); return; }
+window._removerGuardiao = async function(id) {
+  if (!window.ehAdmin()) {
+    await (typeof BFModal !== 'undefined'
+      ? BFModal.alert({
+          title: 'Permissão negada',
+          icon: '🔒',
+          variant: 'warn',
+          message: 'Apenas administradores podem remover outros guardiões.',
+        })
+      : Promise.resolve(alert('Apenas admins.')));
+    return;
+  }
   if (!GUARDIOES[id]) return;
   if (usuarioAtual === id) {
-    alert('⚠️ Você não pode remover a si mesmo.\n\nPeça a outro admin ou transfira administração primeiro.');
+    await (typeof BFModal !== 'undefined'
+      ? BFModal.alert({
+          title: 'Não pode remover a si mesmo',
+          icon: '🔒',
+          variant: 'warn',
+          message: 'Você não pode remover seu próprio perfil.\n\nPeça a outro administrador para fazer isso, ou transfira a administração primeiro em "Gestão de Administradores".',
+        })
+      : Promise.resolve(alert('Não pode remover a si mesmo.')));
     return;
   }
   if (GUARDIOES[id].isAdmin && window.contarAdmins() <= 1) {
-    alert('⚠️ Não é possível remover o último administrador.\n\nPromova outro guardião a admin antes.');
+    await (typeof BFModal !== 'undefined'
+      ? BFModal.alert({
+          title: 'Último administrador',
+          icon: '👑',
+          variant: 'warn',
+          message: 'Este é o último admin do app.\n\nRevogue o admin primeiro OU promova outro guardião a admin antes de remover.',
+        })
+      : Promise.resolve(alert('Último admin — não pode remover.')));
     return;
   }
   const nome = GUARDIOES[id].nome;
-  if (!confirm(`Remover ${nome} da família?\n\nEle perderá acesso ao app imediatamente.\nEsta ação NÃO pode ser desfeita.`)) return;
+  const confirmado = await (typeof BFModal !== 'undefined'
+    ? BFModal.confirm({
+        title: 'Remover ' + nome + '?',
+        icon: '🗑',
+        variant: 'danger',
+        message: nome + ' perderá acesso ao app imediatamente.\n\n✓ Os registros das crianças (mamadas, sono, vacinas etc.) NÃO são apagados — ficam preservados.\n\n⚠️ Esta ação NÃO pode ser desfeita.',
+        okLabel: 'Sim, remover',
+        cancelLabel: 'Cancelar',
+      })
+    : Promise.resolve(confirm('Remover ' + nome + '?')));
+  if (!confirmado) return;
   delete GUARDIOES[id];
   saveGuardioes(GUARDIOES);
   if (typeof BFAudit !== 'undefined') BFAudit.log('guardiao_removido', { id, nome, por: usuarioAtual });
@@ -8717,8 +8914,18 @@ window._removerGuardiao = function(id) {
 };
 
 // Convidar novo guardião (abre o form de cadastro)
-window._convidarNovoGuardiao = function() {
-  if (!window.ehAdmin()) { alert('⚠️ Apenas administradores podem convidar'); return; }
+window._convidarNovoGuardiao = async function() {
+  if (!window.ehAdmin()) {
+    await (typeof BFModal !== 'undefined'
+      ? BFModal.alert({
+          title: 'Permissão negada',
+          icon: '🔒',
+          variant: 'warn',
+          message: 'Apenas administradores podem convidar novos guardiões.',
+        })
+      : Promise.resolve(alert('Apenas admins podem convidar.')));
+    return;
+  }
   // Fecha modal de gestão antes de abrir o de convite
   const modalGestao = document.getElementById('modal-gestao-familia');
   if (modalGestao) modalGestao.remove();
@@ -8728,7 +8935,14 @@ window._convidarNovoGuardiao = function() {
   } else if (typeof abrirConvidarGuardiao === 'function') {
     abrirConvidarGuardiao();
   } else {
-    alert('⚠️ Função de convite indisponível. Recarregue o app.');
+    await (typeof BFModal !== 'undefined'
+      ? BFModal.alert({
+          title: 'Função indisponível',
+          icon: '⚠️',
+          variant: 'warn',
+          message: 'A função de convite não está carregada no momento.\n\nTente recarregar o app (ou feche e abra novamente).',
+        })
+      : Promise.resolve(alert('Função indisponível. Recarregue.')));
   }
 };
 
@@ -9426,7 +9640,7 @@ const HUB_MAPA = {
       { id:'vacinas',     label:'🛡️ Escudos',     desc:'Vacinas PNI e SBIm' },
       { id:'sintomas',    label:'🤒 Sintomas',    desc:'Febre, tosse, dor' },
       { id:'mesversario', label:'📏 Medidas',     desc:'Peso, altura e curvas OMS', subAction:'_focarMedidas' },
-      { id:'agenda',      label:'⚗️ Elixires',    desc:'Medicamentos e febres',    subAction:() => { if(typeof showSubTabMissoes==='function') showSubTabMissoes('medicacao'); } },
+      { id:'agenda',      label:'💊 Medicação',    desc:'Medicamentos e febres',    subAction:() => { if(typeof showSubTabMissoes==='function') showSubTabMissoes('medicacao'); } },
     ],
     defaultTab: 'vacinas'
   },
@@ -9578,14 +9792,36 @@ initMamadaForm();
 function ordenarMamadas(arr){return[...arr].sort((a,b)=>{const da=(a.data||'0000-00-00')+'T'+(a.hora||'00:00');const db_=(b.data||'0000-00-00')+'T'+(b.hora||'00:00');return da<db_?1:da>db_?-1:0;});}
 function salvarMamada(){
   const data=document.getElementById('m-data').value,hora=document.getElementById('m-hora').value,tipo=document.getElementById('m-tipo').value,ml=document.getElementById('m-ml').value,obs=document.getElementById('m-obs').value;
-  if(!data||!hora){alert('⚠️ Defina data e hora!');return;}
-  const registro = {id:Date.now(),data,hora,tipo,ml:ml?parseInt(ml):null,obs,autor:usuarioAtual};
+  if(!data||!hora){if(typeof showToast==='function')showToast('⚠ Defina data e hora');return;}
+  // [Sprint 4] Validação de domínio: volume ml deve ser plausível (0-500ml por mamada)
+  const mlNum = ml ? parseInt(ml) : null;
+  if (mlNum !== null && (mlNum < 0 || mlNum > 500)) {
+    if(typeof showToast==='function')showToast('⚠ Volume inválido — deve ser entre 0 e 500ml');
+    return;
+  }
+  // [Sprint 4] Bloqueia data futura
+  try {
+    const dt = new Date(data + 'T' + hora);
+    if (!isNaN(dt.getTime()) && dt > new Date(Date.now() + 60000)) {
+      if(typeof showToast==='function')showToast('⚠ Data/hora não pode ser no futuro');
+      return;
+    }
+  } catch {}
+  const registro = {id:Date.now(),data,hora,tipo,ml:mlNum,obs,autor:usuarioAtual};
   // Para mistura: captura discriminação leite materno + fórmula
   if (tipo === 'misto') {
     const mlMaterno = document.getElementById('m-ml-materno')?.value;
     const mlFormula = document.getElementById('m-ml-formula')?.value;
-    if (mlMaterno) registro.ml_materno = parseInt(mlMaterno);
-    if (mlFormula) registro.ml_formula = parseInt(mlFormula);
+    const mlMatNum = mlMaterno ? parseInt(mlMaterno) : null;
+    const mlForNum = mlFormula ? parseInt(mlFormula) : null;
+    // Valida os subvolumes também
+    if ((mlMatNum !== null && (mlMatNum < 0 || mlMatNum > 500)) ||
+        (mlForNum !== null && (mlForNum < 0 || mlForNum > 500))) {
+      if(typeof showToast==='function')showToast('⚠ Volume inválido — use entre 0 e 500ml');
+      return;
+    }
+    if (mlMatNum !== null) registro.ml_materno = mlMatNum;
+    if (mlForNum !== null) registro.ml_formula = mlForNum;
     // Se usuário informou discriminação, calcula o total automaticamente
     if (registro.ml_materno || registro.ml_formula) {
       registro.ml = (registro.ml_materno || 0) + (registro.ml_formula || 0);
@@ -9866,15 +10102,145 @@ const CRESC_LABEL={peso:'Peso',altura:'Altura',pc:'Perímetro Cefálico'};
 const CRESC_COR_ARTHUR='#00d4ff';
 let _crescChartInstance=null;
 
-function initCrescForm(){const inp=document.getElementById('cresc-data');if(inp&&!inp.value){const hoje=new Date();const cy=hoje.getFullYear(),cm=String(hoje.getMonth()+1).padStart(2,'0'),cd=String(hoje.getDate()).padStart(2,'0');inp.value=`${cy}-${cm}-${cd}`;}const nasc=getBirthISO();if(nasc){const diff=Math.floor((new Date()-new Date(nasc+'T00:00:00'))/(1000*60*60*24*30.44));const sel=document.getElementById('cresc-mes');if(sel&&diff>=0&&diff<=12)sel.value=String(Math.min(diff,12));}}
+// ═══════════════════════════════════════════════════════════════
+// [Sprint B] IDADE CORRIGIDA PARA PREMATUROS (< 37 semanas gestacionais)
+// ═══════════════════════════════════════════════════════════════
+// OMS: para bebês prematuros, a curva de crescimento deve ser analisada
+// com idade corrigida até 2 anos (alguns estudos até 3 anos para PC).
+// Fórmula: idade_corrigida = idade_real - (40 - semanas_gestacionais) semanas
+// Retorna sempre em meses; não corrige para >= 37 semanas ou idade >= 24 meses.
+function idadeCorrigidaMeses(idadeRealMeses, semanasGestacionais) {
+  const sg = parseInt(semanasGestacionais || 40);
+  if (sg >= 37) return idadeRealMeses; // termo → sem correção
+  if (idadeRealMeses >= 24) return idadeRealMeses; // após 2 anos, correção não se aplica
+  // Subtrai (40 - semGest) semanas convertidas em meses (semana = 7 dias, mês = 30.44 dias)
+  const semanasPrematuro = 40 - sg;
+  const mesesCorrecao = (semanasPrematuro * 7) / 30.44;
+  const corrigido = idadeRealMeses - mesesCorrecao;
+  return corrigido < 0 ? 0 : corrigido;
+}
+
+// Helper: retorna se o bebê deve usar idade corrigida
+function _ehPrematuro() {
+  try {
+    const cfg = (typeof getBabyConfig === 'function') ? getBabyConfig() : null;
+    return cfg && cfg.semanasGestacionais && cfg.semanasGestacionais < 37;
+  } catch { return false; }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// [Sprint B] GERADOR DE OPÇÕES DE IDADE — até 11a11m29d
+// Regra: mês-a-mês 0-36m (37 opções), semestral 37-60m (4 opções),
+// anual 5-12a (6 opções). Total: ~47 opções.
+// ═══════════════════════════════════════════════════════════════
+function _gerarOpcoesIdadeSelector(incluirNascer) {
+  const opcoes = [];
+  if (incluirNascer) {
+    opcoes.push({ value: 0, label: '🌌 Ao Nascer' });
+  }
+  // Mês a mês: 1 até 36 meses
+  for (let m = 1; m <= 36; m++) {
+    let label;
+    if (m === 12) label = '✨ 1 Aninho';
+    else if (m === 24) label = '✨ 2 Anos';
+    else if (m === 36) label = '🎂 3 Anos';
+    else if (m < 12) label = `${m}º Mês`;
+    else if (m < 24) label = `${m} meses (${Math.floor(m/12)} ano${m>=24?'s':''} e ${m%12}m)`;
+    else label = `${m} meses (${Math.floor(m/12)} anos e ${m%12}m)`;
+    opcoes.push({ value: m, label });
+  }
+  // Semestral: 42, 48, 54, 60 meses (3a6m, 4a, 4a6m, 5a)
+  opcoes.push({ value: 42, label: '🎈 3 anos e 6 meses' });
+  opcoes.push({ value: 48, label: '🎂 4 Anos' });
+  opcoes.push({ value: 54, label: '🎈 4 anos e 6 meses' });
+  opcoes.push({ value: 60, label: '🎂 5 Anos' });
+  // Anual: 6, 7, 8, 9, 10, 11 anos (até 11a11m29d é cobertos pela idade 132m = 11a)
+  for (let ano = 6; ano <= 11; ano++) {
+    opcoes.push({ value: ano * 12, label: `🎂 ${ano} Anos` });
+  }
+  return opcoes;
+}
+
+// Popula um <select> com as opções de idade
+function _popularSeletorIdade(selectId, incluirNascer) {
+  const sel = document.getElementById(selectId);
+  if (!sel) return;
+  // Preserva valor atual se houver
+  const valorAtual = sel.value;
+  // Guarda opção "ao nascer" se existir como primeira option hardcoded
+  const firstOption = sel.querySelector('option');
+  const manterPrimeira = !incluirNascer && firstOption && firstOption.value === '0';
+  // Limpa e repopula
+  sel.innerHTML = '';
+  if (manterPrimeira) sel.appendChild(firstOption.cloneNode(true));
+  _gerarOpcoesIdadeSelector(incluirNascer || !manterPrimeira).forEach(opt => {
+    const o = document.createElement('option');
+    o.value = String(opt.value);
+    o.textContent = opt.label;
+    sel.appendChild(o);
+  });
+  // Restaura valor se ainda existe
+  if (valorAtual) {
+    const existe = Array.from(sel.options).some(o => o.value === valorAtual);
+    if (existe) sel.value = valorAtual;
+  }
+}
+
+// Popular os seletores no load
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => {
+    _popularSeletorIdade('cresc-mes', true);
+    _popularSeletorIdade('mv-mes', true);
+  }, 300);
+});
+
+function initCrescForm(){
+  const inp=document.getElementById('cresc-data');
+  if(inp&&!inp.value){
+    const hoje=new Date();
+    const cy=hoje.getFullYear(),cm=String(hoje.getMonth()+1).padStart(2,'0'),cd=String(hoje.getDate()).padStart(2,'0');
+    inp.value=`${cy}-${cm}-${cd}`;
+  }
+  const nasc=getBirthISO();
+  if(nasc){
+    const diffMeses=Math.floor((new Date()-new Date(nasc+'T00:00:00'))/(1000*60*60*24*30.44));
+    const sel=document.getElementById('cresc-mes');
+    if(sel && diffMeses>=0) {
+      // [Sprint B] Agora suporta até 132 meses (11 anos)
+      const valor = Math.min(diffMeses, 132);
+      // Procurar a opção mais próxima <= valor
+      const options = Array.from(sel.options).map(o => parseInt(o.value));
+      const melhor = options.filter(v => v <= valor).sort((a,b)=>b-a)[0] || 0;
+      sel.value = String(melhor);
+    }
+  }
+}
 
 function setCrescMetrica(m,btn){_crescMetrica=m;document.querySelectorAll('.cresc-mtab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderGraficoCrescimento();}
 
-function salvarCrescimento(){
+async function salvarCrescimento(){
   const data=document.getElementById('cresc-data').value,mes=parseInt(document.getElementById('cresc-mes').value);
   const pesoRaw=document.getElementById('cresc-peso').value,alturaRaw=document.getElementById('cresc-altura').value,pcRaw=document.getElementById('cresc-pc').value,obs=document.getElementById('cresc-obs').value.trim();
-  if(!data){alert('⚠️ Defina a data!');return;}if(!pesoRaw&&!alturaRaw&&!pcRaw){alert('⚠️ Registre ao menos uma medida!');return;}
-  if(pesoRaw&&parseFloat(pesoRaw)>30){if(!confirm(`Peso ${pesoRaw} kg parece alto. Confirmar?`))return;}
+  if(!data){if(typeof showToast==='function')showToast('⚠ Defina a data');return;}
+  if(!pesoRaw&&!alturaRaw&&!pcRaw){if(typeof showToast==='function')showToast('⚠ Registre ao menos uma medida');return;}
+  // [Sprint 4] Validações de domínio
+  if(typeof validarDataEvento==='function'&&!validarDataEvento(data)){if(typeof showToast==='function')showToast('⚠ Data não pode ser no futuro');return;}
+  if(pesoRaw){const p=parseFloat(pesoRaw);if(isNaN(p)||p<=0||p>50){if(typeof showToast==='function')showToast('⚠ Peso inválido — use entre 0 e 50 kg');return;}}
+  if(alturaRaw){const a=parseFloat(alturaRaw);if(isNaN(a)||a<=0||a>200){if(typeof showToast==='function')showToast('⚠ Altura inválida — use entre 0 e 200 cm');return;}}
+  if(pcRaw){const pc=parseFloat(pcRaw);if(isNaN(pc)||pc<=0||pc>100){if(typeof showToast==='function')showToast('⚠ PC inválido — use entre 0 e 100 cm');return;}}
+  if(pesoRaw&&parseFloat(pesoRaw)>30){
+    const c = await (typeof BFModal!=='undefined'
+      ? BFModal.confirm({
+          title: 'Peso acima do esperado',
+          icon: '⚖️',
+          variant: 'warn',
+          message: `O peso informado (${pesoRaw} kg) está acima do esperado para bebês/crianças pequenas.\n\nConfirmar este valor?`,
+          okLabel: 'Sim, confirmar',
+          cancelLabel: 'Rever',
+        })
+      : Promise.resolve(confirm(`Peso ${pesoRaw} kg parece alto. Confirmar?`)));
+    if(!c)return;
+  }
   crescData.push({id:Date.now(),data,mes,peso:pesoRaw?parseFloat(pesoRaw):null,altura:alturaRaw?parseFloat(alturaRaw):null,pc:pcRaw?parseFloat(pcRaw):null,obs});
   crescData.sort((a,b)=>a.mes-b.mes||a.id-b.id);saveCrescimentoLocal(crescData);
   try{EXTRAS_REF&&EXTRAS_REF.set({crescimento:crescData});}catch(e){}
@@ -9891,10 +10257,23 @@ function renderCrescimento(){
 function renderGraficoCrescimento(){
   const canvas=document.getElementById('cresc-chart');if(!canvas)return;
   const oms=OMS_MAP[_crescMetrica],unid=CRESC_UNIDADE[_crescMetrica],label=CRESC_LABEL[_crescMetrica];
-  const pontosArthur=crescData.filter(r=>r[_crescMetrica]!=null).map(r=>({x:r.mes,y:r[_crescMetrica]}));
+  // [Sprint B] Aplicar idade corrigida se bebê é prematuro (<37 sem) e idade real <24m
+  const cfg = (typeof getBabyConfig === 'function') ? getBabyConfig() : {};
+  const semGest = cfg.semanasGestacionais || 40;
+  const ehPrematuro = semGest < 37;
+  const pontosArthur = crescData
+    .filter(r => r[_crescMetrica] != null)
+    .map(r => {
+      const idadeCorr = ehPrematuro ? idadeCorrigidaMeses(r.mes, semGest) : r.mes;
+      return { x: idadeCorr, y: r[_crescMetrica], xReal: r.mes };
+    });
+  // [Sprint B] Aviso se tem pontos fora da faixa 0-12m
+  const temPontosForaFaixa = pontosArthur.some(p => p.x > 12);
   const W=canvas.parentElement.offsetWidth||320,H=Math.min(260,W*0.65);canvas.width=W;canvas.height=H;
   const ctx=canvas.getContext('2d'),ml=44,mr=12,mt=14,mb=32,pw=W-ml-mr,ph=H-mt-mb;
-  const allVals=[...Object.values(oms).flat(),...pontosArthur.map(p=>p.y)];
+  // Só plota pontos dentro da faixa OMS atual (0-12m)
+  const pontosPlot = pontosArthur.filter(p => p.x <= 12);
+  const allVals=[...Object.values(oms).flat(),...pontosPlot.map(p=>p.y)];
   let yMin=Math.min(...allVals)*0.97,yMax=Math.max(...allVals)*1.03;
   const scaleX=m=>ml+(m/12)*pw,scaleY=v=>mt+ph-((v-yMin)/(yMax-yMin))*ph;
   ctx.clearRect(0,0,W,H);
@@ -9903,12 +10282,31 @@ function renderGraficoCrescimento(){
   for(let i=0;i<=5;i++){const y=mt+(ph/5)*i;ctx.beginPath();ctx.moveTo(ml,y);ctx.lineTo(ml+pw,y);ctx.stroke();}
   ctx.beginPath();OMS_MESES.forEach((m,i)=>{const x=scaleX(m),y=scaleY(oms.p85[i]);i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});[...OMS_MESES].reverse().forEach((m,i)=>{const idx=OMS_MESES.length-1-i;ctx.lineTo(scaleX(m),scaleY(oms.p15[idx]));});ctx.closePath();ctx.fillStyle='rgba(0,180,255,0.06)';ctx.fill();
   [{key:'p3',cor:'rgba(255,100,100,0.5)',dash:[4,3]},{key:'p15',cor:'rgba(255,200,50,0.45)',dash:[3,2]},{key:'p50',cor:'rgba(57,255,20,0.7)',dash:[]},{key:'p85',cor:'rgba(255,200,50,0.45)',dash:[3,2]},{key:'p97',cor:'rgba(255,100,100,0.5)',dash:[4,3]}].forEach(({key,cor,dash})=>{ctx.beginPath();ctx.strokeStyle=cor;ctx.lineWidth=key==='p50'?1.8:1.2;ctx.setLineDash(dash);OMS_MESES.forEach((m,i)=>{const x=scaleX(m),y=scaleY(oms[key][i]);i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});ctx.stroke();ctx.setLineDash([]);});
-  if(pontosArthur.length>1){ctx.beginPath();ctx.strokeStyle=CRESC_COR_ARTHUR;ctx.lineWidth=2.5;ctx.shadowColor=CRESC_COR_ARTHUR;ctx.shadowBlur=6;pontosArthur.forEach((p,i)=>{const x=scaleX(p.x),y=scaleY(p.y);i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});ctx.stroke();ctx.shadowBlur=0;}
-  pontosArthur.forEach(p=>{const x=scaleX(p.x),y=scaleY(p.y);ctx.beginPath();ctx.arc(x,y,5,0,Math.PI*2);ctx.fillStyle=CRESC_COR_ARTHUR;ctx.shadowColor=CRESC_COR_ARTHUR;ctx.shadowBlur=10;ctx.fill();ctx.shadowBlur=0;ctx.fillStyle='#fff';ctx.font='bold 9px Arial';ctx.textAlign='center';ctx.fillText(p.y+unid,x,y-9);});
+  if(pontosPlot.length>1){ctx.beginPath();ctx.strokeStyle=CRESC_COR_ARTHUR;ctx.lineWidth=2.5;ctx.shadowColor=CRESC_COR_ARTHUR;ctx.shadowBlur=6;pontosPlot.forEach((p,i)=>{const x=scaleX(p.x),y=scaleY(p.y);i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});ctx.stroke();ctx.shadowBlur=0;}
+  pontosPlot.forEach(p=>{const x=scaleX(p.x),y=scaleY(p.y);ctx.beginPath();ctx.arc(x,y,5,0,Math.PI*2);ctx.fillStyle=CRESC_COR_ARTHUR;ctx.shadowColor=CRESC_COR_ARTHUR;ctx.shadowBlur=10;ctx.fill();ctx.shadowBlur=0;ctx.fillStyle='#fff';ctx.font='bold 9px Arial';ctx.textAlign='center';ctx.fillText(p.y+unid,x,y-9);});
   ctx.fillStyle='rgba(122,179,212,0.8)';ctx.font='9px Arial';ctx.textAlign='center';OMS_MESES.filter(m=>m%2===0).forEach(m=>{ctx.fillText(m===0?'Nasc':m+'m',scaleX(m),H-6);});
   ctx.textAlign='right';for(let i=0;i<=5;i++){const v=yMin+((yMax-yMin)/5)*(5-i);ctx.fillText(v.toFixed(1),ml-4,mt+(ph/5)*i+3);}
   ctx.fillStyle='rgba(0,212,255,0.9)';ctx.font='bold 10px Orbitron, Arial';ctx.textAlign='center';ctx.fillText(`${label.toUpperCase()} (${unid}) · OMS`,W/2,11);
-  const legEl=document.getElementById('cresc-legenda');if(legEl){legEl.innerHTML=[{cor:CRESC_COR_ARTHUR,label:'⚡ Bebê'},{cor:'rgba(57,255,20,0.8)',label:'P50 mediana'},{cor:'rgba(255,200,50,0.7)',label:'P15 / P85'},{cor:'rgba(255,100,100,0.7)',label:'P3 / P97'}].map(l=>`<div class="cresc-leg-item"><div class="cresc-leg-dot" style="background:${l.cor}"></div><span>${l.label}</span></div>`).join('');}
+  // [Sprint B] Legenda + avisos contextuais
+  const legEl=document.getElementById('cresc-legenda');
+  if(legEl){
+    const itens = [
+      {cor:CRESC_COR_ARTHUR,label:'⚡ Bebê'},
+      {cor:'rgba(57,255,20,0.8)',label:'P50 mediana'},
+      {cor:'rgba(255,200,50,0.7)',label:'P15 / P85'},
+      {cor:'rgba(255,100,100,0.7)',label:'P3 / P97'},
+    ];
+    let html = itens.map(l=>`<div class="cresc-leg-item"><div class="cresc-leg-dot" style="background:${l.cor}"></div><span>${l.label}</span></div>`).join('');
+    // Badge idade corrigida
+    if (ehPrematuro && pontosPlot.length > 0) {
+      html += `<div class="cresc-leg-item" style="margin-top:6px;padding:4px 8px;background:rgba(199,125,255,0.15);border:1px solid rgba(199,125,255,0.35);border-radius:6px;width:100%;font-size:0.68rem;color:#c77dff"><strong>ℹ️ Idade corrigida aplicada</strong> — bebê nasceu com ${semGest} sem. Correção ativa até os 2 anos.</div>`;
+    }
+    // Aviso se tem pontos fora da faixa OMS
+    if (temPontosForaFaixa) {
+      html += `<div class="cresc-leg-item" style="margin-top:6px;padding:4px 8px;background:rgba(255,200,80,0.12);border:1px solid rgba(255,200,80,0.3);border-radius:6px;width:100%;font-size:0.68rem;color:#ffc856"><strong>⚠️ Tabela OMS atual</strong> cobre 0-12m. Medidas acima de 12m ficam preservadas no histórico mas ainda não plotadas. (curvas 1-5a em desenvolvimento)</div>`;
+    }
+    legEl.innerHTML = html;
+  }
 }
 function _percentilArthur(valor,tabela,mes){if(valor==null||isNaN(valor))return null;const p3=tabela.p3[mes],p15=tabela.p15[mes],p50=tabela.p50[mes],p85=tabela.p85[mes],p97=tabela.p97[mes];if(valor<p3)return{faixa:'< P3',status:'⚠️ Abaixo do esperado',cor:'#ff6b6b',desc:'Abaixo de P3 — avalie com o pediatra'};if(valor<p15)return{faixa:'P3–P15',status:'🔵 Abaixo da mediana',cor:'#7ab3d4',desc:'Entre P3 e P15 — atenção'};if(valor<p50)return{faixa:'P15–P50',status:'✅ Normal',cor:'#39ff14',desc:'Crescimento adequado'};if(valor<p85)return{faixa:'P50–P85',status:'✅ Normal',cor:'#39ff14',desc:'Crescimento adequado'};if(valor<p97)return{faixa:'P85–P97',status:'🟡 Acima da mediana',cor:'#ffe066',desc:'Monitorar'};return{faixa:'> P97',status:'⚠️ Acima do esperado',cor:'#ffaa00',desc:'Acima de P97 — avalie com o pediatra'};}
 
@@ -10131,7 +10529,7 @@ window._abrirModalEditarVacina = function(id) {
 // coluna Vacina / Dose / Data / Lote / Assinatura (profissional).
 // Fonte: Programa Nacional de Imunizações (PNI) — Ministério da Saúde.
 
-window.exportarCaderneta = function() {
+window.exportarCaderneta = async function() {
   const hideLoading = (typeof window.bfLoading !== 'undefined')
     ? window.bfLoading.show('Preparando Caderneta de Vacinação SUS…')
     : null;
@@ -10311,7 +10709,14 @@ window.exportarCaderneta = function() {
     const w = window.open('', '_blank');
     if (!w) {
       if (hideLoading) hideLoading();
-      alert('⚠️ Pop-ups bloqueados. Permita pop-ups para gerar a caderneta.');
+      await (typeof BFModal !== 'undefined'
+        ? BFModal.alert({
+            title: 'Pop-ups bloqueados',
+            icon: '🚫',
+            variant: 'warn',
+            message: 'Seu navegador está bloqueando pop-ups.\n\nPara gerar a caderneta, permita pop-ups para este site nas configurações do navegador e tente novamente.',
+          })
+        : Promise.resolve(alert('Pop-ups bloqueados.')));
       return;
     }
     w.document.write(html);
@@ -10325,7 +10730,14 @@ window.exportarCaderneta = function() {
   } catch (e) {
     if (hideLoading) hideLoading();
     console.error('[Caderneta]', e);
-    alert('Erro ao gerar caderneta: ' + e.message);
+    await (typeof BFModal !== 'undefined'
+      ? BFModal.alert({
+          title: 'Erro ao gerar caderneta',
+          icon: '✗',
+          variant: 'danger',
+          message: 'Ocorreu um erro ao exportar a caderneta:\n\n' + (e.message || 'desconhecido') + '\n\nTente novamente em instantes.',
+        })
+      : Promise.resolve(alert('Erro: ' + e.message)));
   }
 };
 
@@ -10582,7 +10994,7 @@ const MEDICAMENTOS_DB=[
 {nome:'Piemonte Baby Sachê',generico:'Montelucaste',cat:'🫁 Antileucotrienico',ref:'ANVISA'},
 {nome:'Predsim Xarope',generico:'Prednisolona 3mg/ml',cat:'🫁 Corticoide oral',ref:'ANVISA'},
 {nome:'Prelone Xarope',generico:'Prednisolona',cat:'🫁 Corticoide oral',ref:'ANVISA'},
-{nome:'Decadron Elixir',generico:'Dexametasona',cat:'🫁 Corticoide oral',ref:'ANVISA'},
+{nome:'Decadron (solução oral)',generico:'Dexametasona',cat:'🫁 Corticoide oral',ref:'ANVISA'},
 {nome:'Celestamine Pediátrico',generico:'Betametasona + Dexclorfeniramina',cat:'🫁 Corticoide + Antialérgico',ref:'ANVISA'},
 {nome:'Mucosolvan Pediátrico',generico:'Ambroxol',cat:'🫁 Mucolítico',ref:'ANVISA'},
 {nome:'Fluidin Pediátrico',generico:'Carbocisteína',cat:'🫁 Mucolítico',ref:'ANVISA'},
@@ -10730,7 +11142,67 @@ const MEDICAMENTOS_DB=[
 {nome:'Clorexidina Aquosa',generico:'Clorexidina 0,12%',cat:'🧪 Antisséptico — coto umbilical',ref:'ANVISA/SBP'},
 {nome:'Banho Emoliente (Aveeno)',generico:'Aveia coloidal',cat:'🧪 Banho — eczema',ref:'ANVISA'}
 ];
-function buscarMedicamento(termo){const sug=document.getElementById('med-sugestoes');if(!termo||termo.length<2){sug.style.display='none';return;}const t=termo.toLowerCase();const resultados=MEDICAMENTOS_DB.filter(m=>m.nome.toLowerCase().includes(t)||m.generico.toLowerCase().includes(t)||(m.cat&&m.cat.toLowerCase().includes(t))).slice(0,10);if(!resultados.length){sug.style.display='none';return;}sug.style.display='block';sug.innerHTML=resultados.map(m=>`<div onclick="selecionarMedicamento('${m.nome.replace(/'/g,"\\'")}','${m.generico.replace(/'/g,"\\'")}','${m.cat}')" style="padding:10px 14px;cursor:pointer;border-bottom:1px solid rgba(0,180,255,0.1);transition:background 0.15s" onmousedown="this.style.background='rgba(0,80,160,0.3)'" ontouchstart="this.style.background='rgba(0,80,160,0.3)'" onmouseup="this.style.background=''" ontouchend="this.style.background=''"><div style="font-size:0.85rem;color:var(--white);font-weight:700">${m.nome}</div><div style="font-size:0.68rem;color:var(--text-dim)">${m.cat} · ${m.generico}</div></div>`).join('');}
+
+// ═══════════════════════════════════════════════════════════════
+// [Sprint C] MEDICAMENTOS HOMEOPÁTICOS (Farmacopeia Homeopática Brasileira)
+// Fontes: Anvisa, FHB 3ª ed., SBH (Sociedade Brasileira de Homeopatia)
+// ATENÇÃO: uso sempre com orientação de médico homeopata
+// ═══════════════════════════════════════════════════════════════
+const MEDICAMENTOS_HOMEOPATICOS = [
+  {nome:'Camilia (Boiron)',generico:'Chamomilla + Phytolacca + Rheum',cat:'🌿 Dentição',ref:'ANVISA/Boiron'},
+  {nome:'Stodal Xarope',generico:'Composto para tosse (Pulsatilla + Rumex + Coccus cacti)',cat:'🌿 Tosse',ref:'ANVISA/Boiron'},
+  {nome:'Oscillococcinum',generico:'Anas barbariae hepatis et cordis extractum',cat:'🌿 Estados gripais',ref:'ANVISA/Boiron'},
+  {nome:'Arnica Montana CH',generico:'Arnica Montana',cat:'🌿 Trauma/hematoma',ref:'FHB'},
+  {nome:'Chamomilla CH',generico:'Chamomilla',cat:'🌿 Irritabilidade/cólica',ref:'FHB'},
+  {nome:'Belladonna CH',generico:'Atropa belladonna',cat:'🌿 Febre súbita/vermelhidão',ref:'FHB'},
+  {nome:'Pulsatilla CH',generico:'Pulsatilla nigricans',cat:'🌿 Otite/coriza',ref:'FHB'},
+  {nome:'Nux Vomica CH',generico:'Strychnos nux-vomica',cat:'🌿 Digestivo/náusea',ref:'FHB'},
+  {nome:'Aconitum Napellus CH',generico:'Aconitum napellus',cat:'🌿 Início febril súbito',ref:'FHB'},
+  {nome:'Apis Mellifica CH',generico:'Apis mellifica',cat:'🌿 Edema/picadas',ref:'FHB'},
+  {nome:'Calcarea Carbonica CH',generico:'Calcarea carbonica',cat:'🌿 Constitucional',ref:'FHB'},
+  {nome:'Ipeca CH',generico:'Cephaelis ipecacuanha',cat:'🌿 Náusea/vômito',ref:'FHB'},
+  {nome:'Magnesia Phosphorica CH',generico:'Magnesia phosphorica',cat:'🌿 Cólicas abdominais',ref:'FHB'},
+  {nome:'Arsenicum Album CH',generico:'Arsenicum album',cat:'🌿 Inquietação/gastro',ref:'FHB'},
+].map(m => ({...m, tipo: 'homeopatica'}));
+
+// ═══════════════════════════════════════════════════════════════
+// [Sprint C] MEDICAMENTOS FITOTERÁPICOS (Anvisa / Memento Fitoterápico)
+// Fontes: Memento Fitoterápico da Farmacopeia Brasileira (Anvisa, 2016),
+// Formulário de Fitoterápicos da Farmacopeia Brasileira, SBP
+// ATENÇÃO: uso pediátrico sempre com orientação médica
+// ═══════════════════════════════════════════════════════════════
+const MEDICAMENTOS_FITOTERAPICOS = [
+  {nome:'Chá de Camomila (Matricaria recutita)',generico:'Camomila',cat:'🌱 Calmante/cólica',ref:'Anvisa/Memento Fito'},
+  {nome:'Erva-doce (Foeniculum vulgare)',generico:'Funcho/erva-doce',cat:'🌱 Cólica/digestivo',ref:'Anvisa'},
+  {nome:'Funcho — chá fraco',generico:'Foeniculum vulgare',cat:'🌱 Cólicas',ref:'Anvisa'},
+  {nome:'Hortelã-pimenta (Mentha piperita)',generico:'Mentha piperita',cat:'🌱 Digestivo — > 2a',ref:'Anvisa'},
+  {nome:'Calêndula — tópico (Calendula officinalis)',generico:'Calêndula',cat:'🌱 Tópico — peles sensíveis',ref:'Anvisa/SBP'},
+  {nome:'Melissa (Melissa officinalis)',generico:'Melissa',cat:'🌱 Calmante leve',ref:'Anvisa'},
+  {nome:'Gengibre (Zingiber officinale)',generico:'Zingiber officinale',cat:'🌱 Náusea — > 2a',ref:'Anvisa/Memento'},
+  {nome:'Própolis infantil',generico:'Propolis extrato aquoso',cat:'🌱 Imunomodulador',ref:'Anvisa'},
+  {nome:'Óleo de Girassol Ozonizado',generico:'Ozonizado',cat:'🌱 Tópico — dermatite',ref:'Anvisa'},
+  {nome:'Aloe Vera (Babosa) — tópico',generico:'Aloe vera',cat:'🌱 Tópico — queimadura leve',ref:'Anvisa'},
+].map(m => ({...m, tipo: 'fitoterapico'}));
+
+// [Sprint C] MEDICAMENTOS_DB total: alopáticos (tag retroativa) + homeop. + fitoterápicos
+// Migração retroativa: qualquer item sem 'tipo' é tratado como alopatica
+MEDICAMENTOS_DB.forEach(m => { if (!m.tipo) m.tipo = 'alopatica'; });
+MEDICAMENTOS_DB.push(...MEDICAMENTOS_HOMEOPATICOS, ...MEDICAMENTOS_FITOTERAPICOS);
+
+function buscarMedicamento(termo){
+  const sug=document.getElementById('med-sugestoes');
+  if(!termo||termo.length<2){sug.style.display='none';return;}
+  const t=termo.toLowerCase();
+  // [Sprint C] Filtra também por tipo ativo (alopatica/homeopatica/fitoterapico)
+  const tipoAtivo = document.getElementById('med-tipo')?.value || 'alopatica';
+  const resultados=MEDICAMENTOS_DB
+    .filter(m => (m.tipo || 'alopatica') === tipoAtivo)
+    .filter(m=>m.nome.toLowerCase().includes(t)||m.generico.toLowerCase().includes(t)||(m.cat&&m.cat.toLowerCase().includes(t)))
+    .slice(0,10);
+  if(!resultados.length){sug.style.display='none';return;}
+  sug.style.display='block';
+  sug.innerHTML=resultados.map(m=>`<div onclick="selecionarMedicamento('${m.nome.replace(/'/g,"\\'")}','${m.generico.replace(/'/g,"\\'")}','${m.cat}')" style="padding:10px 14px;cursor:pointer;border-bottom:1px solid rgba(0,180,255,0.1);transition:background 0.15s" onmousedown="this.style.background='rgba(0,80,160,0.3)'" ontouchstart="this.style.background='rgba(0,80,160,0.3)'" onmouseup="this.style.background=''" ontouchend="this.style.background=''"><div style="font-size:0.85rem;color:var(--white);font-weight:700">${m.nome}</div><div style="font-size:0.68rem;color:var(--text-dim)">${m.cat} · ${m.generico}</div></div>`).join('');
+}
 function selecionarMedicamento(nome,generico){document.getElementById('med-nome').value=nome;document.getElementById('med-generico').value=generico;document.getElementById('med-sugestoes').style.display='none';}
 document.addEventListener('click',e=>{if(!e.target.closest('#med-nome')&&!e.target.closest('#med-sugestoes')){const s=document.getElementById('med-sugestoes');if(s)s.style.display='none';}});
 let medicacoes=[];
@@ -10739,10 +11211,47 @@ function loadMedicacaoOuter(){loadMedicacao().then(d=>{medicacoes=d;if(MED_REF){
 async function saveMedicacao(lista){localStorage.setItem('babyforce_med_offline',JSON.stringify(lista));try{if(MED_REF)await MED_REF.set({lista});}catch(e){}}
 function initMedForm(){document.getElementById('med-inicio').value=todayISO();}
 function salvarMedicacao(){
-  const nome=document.getElementById('med-nome').value.trim();if(!nome){alert('⚠️ Nome do remédio obrigatório!');return;}
-  medicacoes.unshift({id:Date.now(),nome,generico:document.getElementById('med-generico').value.trim(),dose:document.getElementById('med-dose').value.trim(),freq:document.getElementById('med-freq').value,inicio:document.getElementById('med-inicio').value,fim:document.getElementById('med-fim').value,indicado:document.getElementById('med-indicado').value,obs:document.getElementById('med-obs').value.trim(),autor:usuarioAtual});
-  saveMedicacao(medicacoes);['med-nome','med-generico','med-dose','med-obs','med-fim'].forEach(id=>{document.getElementById(id).value='';});renderMedicacao();showToast('⚗️ Elixir registrado!');
+  const nome=document.getElementById('med-nome').value.trim();
+  if(!nome){if(typeof showToast==='function')showToast('⚠ Nome da medicação obrigatório');return;}
+  // [Sprint C] Categoria ativa (alopatica/homeopatica/fitoterapico)
+  const tipo = document.getElementById('med-tipo')?.value || 'alopatica';
+  medicacoes.unshift({
+    id:Date.now(),
+    nome,
+    tipo,
+    generico:document.getElementById('med-generico').value.trim(),
+    dose:document.getElementById('med-dose').value.trim(),
+    freq:document.getElementById('med-freq').value,
+    inicio:document.getElementById('med-inicio').value,
+    fim:document.getElementById('med-fim').value,
+    indicado:document.getElementById('med-indicado').value,
+    obs:document.getElementById('med-obs').value.trim(),
+    autor:usuarioAtual,
+  });
+  saveMedicacao(medicacoes);['med-nome','med-generico','med-dose','med-obs','med-fim'].forEach(id=>{document.getElementById(id).value='';});renderMedicacao();showToast('💊 Medicação registrada!');
 }
+
+// [Sprint C] Troca de categoria (alopatica/homeopatica/fitoterapico)
+window.showMedCat = function(cat) {
+  // Atualiza visual das sub-abas
+  document.querySelectorAll('#medcat-alopatica,#medcat-homeopatica,#medcat-fitoterapico').forEach(b => b.classList.remove('active'));
+  const btn = document.getElementById('medcat-' + cat);
+  if (btn) btn.classList.add('active');
+  // Atualiza input hidden
+  const hidden = document.getElementById('med-tipo');
+  if (hidden) hidden.value = cat;
+  // Atualiza indicador visual
+  const ind = document.getElementById('med-cat-indicator');
+  if (ind) {
+    const nomes = { alopatica: '💊 Alopática', homeopatica: '🌿 Homeopática', fitoterapico: '🌱 Fitoterápico' };
+    ind.innerHTML = 'Categoria ativa: <strong style="color:var(--white)">' + (nomes[cat] || cat) + '</strong>';
+  }
+  // Limpa form e refreshs
+  ['med-nome','med-generico','med-dose','med-obs','med-fim'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  const sug = document.getElementById('med-sugestoes');
+  if (sug) sug.style.display = 'none';
+  renderMedicacao();
+};
 
 // ═══════════════════════════════════════════
 // VITAMINAS PROFILÁTICAS — Referências SBP/MS/OMS
@@ -10903,8 +11412,22 @@ function deleteMedicacao(id){confirmarDelete('medicacao',id,'Remover este reméd
 const FREQ_LABEL={se_necessario:'Se necessário','4h':'A cada 4h','6h':'A cada 6h','8h':'A cada 8h','12h':'A cada 12h','24h':'1x ao dia',outro:'Outra'};
 function renderMedicacao(){
   const el=document.getElementById('lista-medicacao');if(!el)return;
-  if(!medicacoes.length){el.innerHTML='<div class="empty"><div class="empty-icon">💊</div><p>Nenhum remédio registrado</p></div>';return;}
-  el.innerHTML=medicacoes.map(m=>`<div class="card" style="margin-bottom:8px;padding:14px 16px"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px"><div><div style="font-weight:700;color:var(--white);font-size:0.95rem">⚗️ ${m.nome}</div>${m.generico?`<div style="font-size:0.7rem;color:var(--text-dim);margin-top:1px">${m.generico}</div>`:''}</div><button onclick="deleteMedicacao(${m.id})" style="background:none;border:none;color:rgba(255,100,100,0.5);cursor:pointer;font-size:1rem" aria-label="Remover">🗑</button></div><div style="display:flex;flex-wrap:wrap;gap:6px;font-size:0.72rem">${m.dose?`<span style="background:rgba(0,100,200,0.2);border:1px solid rgba(0,180,255,0.2);border-radius:6px;padding:2px 8px;color:var(--blue-neon)">💉 ${m.dose}</span>`:''} ${m.freq?`<span style="background:rgba(0,100,200,0.2);border:1px solid rgba(0,180,255,0.2);border-radius:6px;padding:2px 8px;color:var(--text-dim)">⏱ ${FREQ_LABEL[m.freq]||m.freq}</span>`:''} ${m.inicio?`<span style="background:rgba(0,100,200,0.2);border:1px solid rgba(0,180,255,0.2);border-radius:6px;padding:2px 8px;color:var(--text-dim)">📅 ${formatDate(m.inicio)}${m.fim?' → '+formatDate(m.fim):''}</span>`:''}</div>${m.obs?`<div style="font-size:0.72rem;color:var(--text-dim);margin-top:6px;font-style:italic">📝 ${m.obs}</div>`:''}</div>`).join('');
+  // [Sprint C] Filtra por categoria ativa (alopatica/homeopatica/fitoterapico)
+  const tipoAtivo = document.getElementById('med-tipo')?.value || 'alopatica';
+  // Migração retroativa: registros sem tipo são tratados como 'alopatica'
+  const listaFiltrada = medicacoes.filter(m => (m.tipo || 'alopatica') === tipoAtivo);
+  if(!listaFiltrada.length){
+    const nomesCat = { alopatica: 'alopática', homeopatica: 'homeopática', fitoterapico: 'fitoterápica' };
+    el.innerHTML = `<div class="empty"><div class="empty-icon">💊</div><p>Nenhuma medicação ${nomesCat[tipoAtivo]||''} registrada</p></div>`;
+    return;
+  }
+  const iconesCat = { alopatica: '💊', homeopatica: '🌿', fitoterapico: '🌱' };
+  const coresCat = { alopatica: 'var(--blue-neon)', homeopatica: '#78ff99', fitoterapico: '#c4ff78' };
+  el.innerHTML=listaFiltrada.map(m=>{
+    const icon = iconesCat[m.tipo || 'alopatica'] || '💊';
+    const cor = coresCat[m.tipo || 'alopatica'] || 'var(--blue-neon)';
+    return `<div class="card" style="margin-bottom:8px;padding:14px 16px;border-left:3px solid ${cor}"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px"><div><div style="font-weight:700;color:var(--white);font-size:0.95rem">${icon} ${m.nome}</div>${m.generico?`<div style="font-size:0.7rem;color:var(--text-dim);margin-top:1px">${m.generico}</div>`:''}</div><button onclick="deleteMedicacao(${m.id})" style="background:none;border:none;color:rgba(255,100,100,0.5);cursor:pointer;font-size:1rem" aria-label="Remover">🗑</button></div><div style="display:flex;flex-wrap:wrap;gap:6px;font-size:0.72rem">${m.dose?`<span style="background:rgba(0,100,200,0.2);border:1px solid rgba(0,180,255,0.2);border-radius:6px;padding:2px 8px;color:var(--blue-neon)">💉 ${m.dose}</span>`:''} ${m.freq?`<span style="background:rgba(0,100,200,0.2);border:1px solid rgba(0,180,255,0.2);border-radius:6px;padding:2px 8px;color:var(--text-dim)">⏱ ${FREQ_LABEL[m.freq]||m.freq}</span>`:''} ${m.inicio?`<span style="background:rgba(0,100,200,0.2);border:1px solid rgba(0,180,255,0.2);border-radius:6px;padding:2px 8px;color:var(--text-dim)">📅 ${formatDate(m.inicio)}${m.fim?' → '+formatDate(m.fim):''}</span>`:''}</div>${m.obs?`<div style="font-size:0.72rem;color:var(--text-dim);margin-top:6px;font-style:italic">📝 ${m.obs}</div>`:''}</div>`;
+  }).join('');
 }
 
 // ── TIMER AMAMENTAÇÃO ──
@@ -10918,7 +11441,7 @@ function loadFraldas(){try{const d=localStorage.getItem(FRALDAS_KEY);return d?JS
 let _tipoFraldaSel='molhada';
 function selecionarTipoFralda(btn){_tipoFraldaSel=btn.dataset.tipo;document.querySelectorAll('.btn-fralda-tipo').forEach(b=>b.classList.remove('ativo'));btn.classList.add('ativo');document.getElementById('fr-tipo').value=_tipoFraldaSel;}
 function initFraldaForm(){const hoje=new Date();const y=hoje.getFullYear(),m=String(hoje.getMonth()+1).padStart(2,'0'),d=String(hoje.getDate()).padStart(2,'0');const inp=document.getElementById('fr-data');if(inp&&!inp.value)inp.value=`${y}-${m}-${d}`;const hi=document.getElementById('fr-hora');if(hi&&!hi.value)hi.value=hoje.toTimeString().slice(0,5);}
-function salvarFralda(){const data=document.getElementById('fr-data').value,hora=document.getElementById('fr-hora').value,tipo=document.getElementById('fr-tipo').value||'molhada',obs=document.getElementById('fr-obs').value.trim();if(!data||!hora){alert('⚠️ Defina data e hora!');return;}db.fraldas.push({id:Date.now(),data,hora,tipo,obs});db.fraldas.sort((a,b)=>(b.data+b.hora).localeCompare(a.data+a.hora));saveFraldas(db.fraldas);document.getElementById('fr-obs').value='';document.getElementById('fr-hora').value=new Date().toTimeString().slice(0,5);renderFraldas();renderFraldaStats();showToast('🩲 Troca registrada!');}
+function salvarFralda(){const data=document.getElementById('fr-data').value,hora=document.getElementById('fr-hora').value,tipo=document.getElementById('fr-tipo').value||'molhada',obs=document.getElementById('fr-obs').value.trim();if(!data||!hora){if(typeof showToast==='function')showToast('⚠ Defina data e hora');return;}if(typeof validarDataEvento==='function'&&!validarDataEvento(data,hora)){if(typeof showToast==='function')showToast('⚠ Data/hora não pode ser no futuro');return;}db.fraldas.push({id:Date.now(),data,hora,tipo,obs});db.fraldas.sort((a,b)=>(b.data+b.hora).localeCompare(a.data+a.hora));saveFraldas(db.fraldas);document.getElementById('fr-obs').value='';document.getElementById('fr-hora').value=new Date().toTimeString().slice(0,5);renderFraldas();renderFraldaStats();showToast('🩲 Troca registrada!');}
 function deleteFralda(id){_pendingDelete={tipo:'fralda_custom',id};document.getElementById('modal-msg').textContent='Remover esta troca?';document.getElementById('modal-confirm-btn').onclick=()=>{db.fraldas=db.fraldas.filter(f=>f.id!==id);saveFraldas(db.fraldas);renderFraldas();renderFraldaStats();fecharModal();};document.getElementById('modal-confirm').style.display='flex';}
 function renderFraldas(){
   const el=document.getElementById('lista-fraldas');if(!el)return;const hoje=todayISO();const lista=db.fraldas||[];
@@ -10945,7 +11468,7 @@ function toggleSono(){
   else{clearInterval(_sonoTimerInterval);_sonoRodando=false;const fim=new Date();btn.textContent='😴 Iniciar Sono';btn.style.background='';if(statusEl){statusEl.textContent='AGUARDANDO';statusEl.className='sono-status-badge';}const y=_sonoInicio.getFullYear(),mo=String(_sonoInicio.getMonth()+1).padStart(2,'0'),d=String(_sonoInicio.getDate()).padStart(2,'0');const hi=_sonoInicio.toTimeString().slice(0,5),hf=fim.toTimeString().slice(0,5);const duracaoMin=Math.round(_sonoTimerSegundos/60);db.sono.push({id:Date.now(),data:`${y}-${mo}-${d}`,inicio:hi,fim:hf,duracao:duracaoMin,tipo:duracaoMin<=60?'cochilo':'noite',obs:''});saveSono(db.sono);renderSono();renderSonoStats();showToast(`😴 Sono de ${duracaoMin} min registrado!`);const el=document.getElementById('sono-timer-display');if(el)el.textContent='00:00:00';_sonoTimerSegundos=0;_sonoInicio=null;}
 }
 function cancelarSono(){if(!_sonoRodando)return;clearInterval(_sonoTimerInterval);_sonoRodando=false;_sonoTimerSegundos=0;_sonoInicio=null;const btn=document.getElementById('btn-sono-toggle'),statusEl=document.getElementById('sono-status-label');if(btn){btn.textContent='😴 Iniciar Sono';btn.style.background='';}if(statusEl){statusEl.textContent='AGUARDANDO';statusEl.className='sono-status-badge';}const el=document.getElementById('sono-timer-display');if(el)el.textContent='00:00:00';showToast('Sono cancelado');}
-function salvarSono(){const data=document.getElementById('so-data').value,inicio=document.getElementById('so-inicio').value,fim=document.getElementById('so-fim').value,tipo=document.getElementById('so-tipo').value,obs=document.getElementById('so-obs').value.trim();if(!data){alert('⚠️ Defina a data!');return;}if(!inicio||!fim){alert('⚠️ Defina início e fim!');return;}const[hi,mi]=inicio.split(':').map(Number),[hf,mf]=fim.split(':').map(Number);let dur=(hf*60+mf)-(hi*60+mi);if(dur<0)dur+=1440;const registroSono={id:Date.now(),data,inicio,fim,duracao:dur,tipo,obs};db.sono.push(registroSono);db.sono.sort((a,b)=>(b.data+b.inicio).localeCompare(a.data+a.inicio));saveSono(db.sono);
+function salvarSono(){const data=document.getElementById('so-data').value,inicio=document.getElementById('so-inicio').value,fim=document.getElementById('so-fim').value,tipo=document.getElementById('so-tipo').value,obs=document.getElementById('so-obs').value.trim();if(!data){if(typeof showToast==='function')showToast('⚠ Defina a data');return;}if(!inicio||!fim){if(typeof showToast==='function')showToast('⚠ Defina início e fim');return;}if(typeof validarDataEvento==='function'&&!validarDataEvento(data,inicio)){if(typeof showToast==='function')showToast('⚠ Data/hora não pode ser no futuro');return;}const[hi,mi]=inicio.split(':').map(Number),[hf,mf]=fim.split(':').map(Number);let dur=(hf*60+mf)-(hi*60+mi);if(dur<0)dur+=1440;if(dur>=1440){if(typeof showToast==='function')showToast('⚠ Duração inválida (>24h) — verifique horários');return;}const registroSono={id:Date.now(),data,inicio,fim,duracao:dur,tipo,obs};db.sono.push(registroSono);db.sono.sort((a,b)=>(b.data+b.inicio).localeCompare(a.data+a.inicio));saveSono(db.sono);
   // Captura bilhete opcional para próximo guardião
   try {
     const bilheteInput = document.getElementById('so-bilhete');
@@ -11113,7 +11636,7 @@ const GLOSS_DADOS=[
   {cat:'nav',sec:'🌌 Navegação',jedi:'🗺️ Missões',comum:'Agenda / Compromissos',obs:''},
   {cat:'nav',sec:'🌌 Navegação',jedi:'🌙 Órbitas',comum:'Mesversário / Meses de vida',obs:''},
   {cat:'nav',sec:'🌌 Navegação',jedi:'🛡️ Escudos',comum:'Vacinas / Carteira vacinal',obs:''},
-  {cat:'nav',sec:'🌌 Navegação',jedi:'⚗️ Elixires',comum:'Medicação / Remédios',obs:''},
+  {cat:'nav',sec:'🌌 Navegação',jedi:'💊 Medicação',comum:'Medicação / Remédios',obs:''},
   {cat:'form',sec:'📝 Campos',jedi:'🤱 Fonte Natural',comum:'Peito / Leite materno',obs:''},
   {cat:'form',sec:'📝 Campos',jedi:'🥛 Fórmula Alquímica',comum:'Fórmula infantil',obs:''},
   {cat:'form',sec:'📝 Campos',jedi:'✨ Combinação da Força',comum:'Misto — peito + fórmula',obs:''},
@@ -11123,7 +11646,7 @@ const GLOSS_DADOS=[
   {cat:'form',sec:'📝 Campos',jedi:'✨ 1 Aninho',comum:'Aniversário de 1 ano',obs:'12ª órbita'},
   {cat:'acao',sec:'⚡ Ações',jedi:'⚡ Registrar Recarga',comum:'Salvar alimentação',obs:''},
   {cat:'acao',sec:'⚡ Ações',jedi:'🚀 Registrar Missão',comum:'Agendar compromisso',obs:''},
-  {cat:'acao',sec:'⚡ Ações',jedi:'⚗️ Ativar Elixir',comum:'Registrar medicação',obs:''},
+  {cat:'acao',sec:'⚡ Ações',jedi:'💊 Registrar Medicação',comum:'Registrar medicação',obs:''},
   {cat:'acao',sec:'⚡ Ações',jedi:'🛡️ Gravar Escudo',comum:'Adicionar vacina',obs:''},
   {cat:'acao',sec:'⚡ Ações',jedi:'💫 Enviar Missiva',comum:'Enviar dúvida ao pediatra',obs:''},
   {cat:'pessoa',sec:'👤 Pessoas',jedi:'Guardião(ã) da Força',comum:'Pai, Mãe ou Responsável',obs:'Usuário do app'},
@@ -11943,8 +12466,16 @@ function obProximo(fromStep, skip) {
     if (!nome) { ob3Err('⚠ Informe o nome do bebê', 'ob-nome-bebe'); return; }
     if (!nasc) { ob3Err('⚠ Informe a data de nascimento', 'ob-nasc-bebe'); return; }
     if (!_obGeneroBebe) { ob3Err('⚠ Escolha o gênero do bebê'); return; }
+    // [Sprint B] Semanas gestacionais (default 40 se não selecionado)
+    const semGest = parseInt(document.getElementById('ob-semanas-gest')?.value || '40');
     // Salva no baby config
-    const babyCfg = { name: nome, birthDate: nasc, photo: _obFotoPendente, genero: _obGeneroBebe };
+    const babyCfg = {
+      name: nome,
+      birthDate: nasc,
+      photo: _obFotoPendente,
+      genero: _obGeneroBebe,
+      semanasGestacionais: (semGest >= 24 && semGest <= 42) ? semGest : 40,
+    };
     if (_obGeneroBebe === 'M' || _obGeneroBebe === 'F') babyCfg.sexo = _obGeneroBebe;
     saveBabyConfig(babyCfg);
     try { localStorage.setItem('babyforce_baby_genero_v1', _obGeneroBebe); } catch {}
@@ -12076,6 +12607,52 @@ function validarDataNascimento(d){
   if (idade < 12 || idade > 120) return false; // faixa plausível
   return true;
 }
+
+// [Sprint 4] Valida se a data informada é de evento válido (não futuro)
+// Usado em formulários de registro (mamada, sono, sintoma, etc)
+function validarDataEvento(d, hora) {
+  if (!d) return false;
+  const dt = hora ? new Date(d + 'T' + hora) : new Date(d + 'T23:59:59');
+  if (isNaN(dt.getTime())) return false;
+  // Aceita até 1 min no futuro (tolerância para relógios dessincronizados)
+  return dt <= new Date(Date.now() + 60000);
+}
+
+// [Sprint 4] Aplica atributo max="hoje" em todos os inputs de data de evento
+// para que o calendário nativo do browser bloqueie seleção de datas futuras.
+// Inputs de "data de nascimento" (ids começando com "ob-admin-nascimento",
+// "novo-guardiao-nascimento", etc.) são tratados por validarDataNascimento
+// e também aceitam só passado, mas a validação é feita em JS.
+(function aplicarMaxDataEventos() {
+  const IDS_EVENTOS = [
+    'm-data',       // mamada
+    'a-data',       // alimento/refeição
+    'med-inicio',   // medicamento/elixir início
+    'med-fim',      // medicamento/elixir fim
+    'cresc-data',   // crescimento
+    'fr-data',      // fralda
+    'so-data',      // sono
+    'sint-data',    // sintoma
+    'esp-data',     // esporte
+    'edit-m-data',  // editar mamada
+    'vac-reg-data', // vacina
+    'desm-data',    // desmame
+  ];
+  function aplicar() {
+    const hoje = new Date().toISOString().slice(0, 10);
+    IDS_EVENTOS.forEach(id => {
+      const el = document.getElementById(id);
+      if (el && !el.max) el.max = hoje;
+    });
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', aplicar);
+  } else {
+    aplicar();
+  }
+  // Atualiza a cada meia-noite (pra não prender usuário se o app ficar aberto à noite)
+  setInterval(aplicar, 60 * 60 * 1000); // a cada hora (bem conservador)
+})();
 function obConcluir(){
   const appCfg=getAppConfig();saveAppConfig({...appCfg,setupDone:true});
   const babyCfg=getBabyConfig();
@@ -12118,8 +12695,11 @@ function abrirConfiguracaoBebe(){
   const baby=getBabyConfig();
   const nomeEl=document.getElementById('cfg-nome-bebe');
   const nascEl=document.getElementById('cfg-nasc-bebe');
+  const semGestEl = document.getElementById('cfg-semanas-gest');
   if(nomeEl)nomeEl.value=baby.name||'';
   if(nascEl)nascEl.value=baby.birthDate||'';
+  // [Sprint B] Preencher semanas gestacionais (default 40)
+  if(semGestEl) semGestEl.value = String(baby.semanasGestacionais || 40);
   // Pré-selecionar gênero existente
   const generoAtual = (typeof getBabyGenero === 'function') ? getBabyGenero() : null;
   _cfgGeneroBebe = generoAtual;
@@ -12187,7 +12767,8 @@ async function salvarConfiguracaoBebe(){
     cfgErr('⚠ O PIN deve ter exatamente 6 dígitos','cfg-novo-pin');return;
   }
   const babyCfg=getBabyConfig();
-  const patch={...babyCfg,name:nome,birthDate:nasc,photo:cfgFotoPendente||babyCfg.photo,genero:_cfgGeneroBebe};
+  const semGest = parseInt(document.getElementById('cfg-semanas-gest')?.value || '40');
+  const patch={...babyCfg,name:nome,birthDate:nasc,photo:cfgFotoPendente||babyCfg.photo,genero:_cfgGeneroBebe,semanasGestacionais: (semGest>=24 && semGest<=42) ? semGest : 40};
   if (_cfgGeneroBebe === 'M' || _cfgGeneroBebe === 'F') patch.sexo = _cfgGeneroBebe;
   saveBabyConfig(patch);
   try { localStorage.setItem('babyforce_baby_genero_v1', _cfgGeneroBebe); } catch {}
@@ -17023,26 +17604,69 @@ function oraculoLocalizarPS() {
 }
 
 // ── VOICE INPUT (Web Speech API em PT-BR) ──
+// [Sprint A] Fix: máquina de estados separada da instância do SpeechRecognition
+// Motivo: rec.stop() no iOS/Safari às vezes falha silenciosamente se o SR
+// já iniciou encerramento interno. Usamos flag de estado + abort() como fallback
+// + reset visual IMEDIATO (não espera onend).
 let _oraculoVozRec = null;
-function oraculoToggleVoice() {
+let _oraculoVozEstado = 'idle'; // 'idle' | 'listening' | 'stopping'
+
+function _oraculoVozResetVisual() {
+  const btn = document.getElementById('oraculo-voice');
+  if (btn) {
+    btn.classList.remove('listening');
+    btn.textContent = '🎤';
+    btn.setAttribute('aria-label', 'Ativar entrada por voz');
+  }
+}
+
+function _oraculoVozPararForcado() {
+  // Reset imediato do estado e UI, mesmo antes do onend
+  _oraculoVozEstado = 'stopping';
+  _oraculoVozResetVisual();
+  if (_oraculoVozRec) {
+    try { _oraculoVozRec.stop(); } catch (e) { console.warn('[voz] stop falhou:', e); }
+    try { _oraculoVozRec.abort(); } catch (e) { console.warn('[voz] abort falhou:', e); }
+  }
+  // Força null após pequeno delay (dá chance do onend disparar naturalmente)
+  setTimeout(() => {
+    _oraculoVozRec = null;
+    _oraculoVozEstado = 'idle';
+  }, 200);
+}
+
+async function oraculoToggleVoice() {
   const btn = document.getElementById('oraculo-voice');
   if (!btn) return;
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SR) {
-    alert('Seu navegador não suporta entrada por voz. Tente Chrome, Edge ou Safari.');
+    await (typeof BFModal !== 'undefined'
+      ? BFModal.alert({
+          title: 'Entrada por voz indisponível',
+          icon: '🎤',
+          variant: 'info',
+          message: 'Seu navegador não suporta entrada por voz.\n\nTente abrir o app em Chrome, Edge ou Safari recente.',
+        })
+      : Promise.resolve(alert('Sem suporte a voz.')));
     return;
   }
-  if (_oraculoVozRec) {
-    _oraculoVozRec.stop();
+
+  // Se está gravando (ou em processo de parar), 2ª clique FORÇA parada
+  if (_oraculoVozEstado === 'listening' || _oraculoVozEstado === 'stopping') {
+    _oraculoVozPararForcado();
     return;
   }
+
+  // Estado idle → inicia gravação
   const rec = new SR();
   rec.lang = 'pt-BR';
   rec.continuous = false;
   rec.interimResults = true;
   _oraculoVozRec = rec;
+  _oraculoVozEstado = 'listening';
   btn.classList.add('listening');
   btn.textContent = '●';
+  btn.setAttribute('aria-label', 'Parar gravação de voz');
 
   let finalText = '';
   rec.onresult = (e) => {
@@ -17060,17 +17684,31 @@ function oraculoToggleVoice() {
   };
   rec.onerror = (e) => {
     console.warn('Voice error:', e.error);
-    btn.classList.remove('listening');
-    btn.textContent = '🎤';
+    _oraculoVozResetVisual();
     _oraculoVozRec = null;
-    if (e.error === 'not-allowed') alert('Permissão de microfone negada.');
+    _oraculoVozEstado = 'idle';
+    if (e.error === 'not-allowed') {
+      if (typeof showToast === 'function') showToast('🎤 Permissão de microfone negada');
+    }
   };
   rec.onend = () => {
-    btn.classList.remove('listening');
-    btn.textContent = '🎤';
+    _oraculoVozResetVisual();
     _oraculoVozRec = null;
+    _oraculoVozEstado = 'idle';
   };
-  try { rec.start(); } catch (err) { console.warn(err); }
+  // Timeout de segurança: se o SR não responder em 30s, força parada
+  setTimeout(() => {
+    if (_oraculoVozEstado === 'listening') {
+      console.warn('[voz] Timeout de segurança acionado (30s)');
+      _oraculoVozPararForcado();
+    }
+  }, 30000);
+  try { rec.start(); } catch (err) {
+    console.warn('[voz] start falhou:', err);
+    _oraculoVozResetVisual();
+    _oraculoVozRec = null;
+    _oraculoVozEstado = 'idle';
+  }
 }
 
 // ── STREAMING (SSE da Claude API) ──
@@ -17918,18 +18556,35 @@ if (typeof window.getBabyAgeInMonths !== 'function') {
 // Usa jsPDF (já disponível) + dados do HISTORICO_ATIV_KEY
 // ═══════════════════════════════════════════════════════════════
 
-function exportarRelatorioDesenvolvimento() {
+async function exportarRelatorioDesenvolvimento() {
   if (typeof window.jspdf === 'undefined' && typeof jsPDF === 'undefined') {
-    alert('⚠️ Aguarde o carregamento do módulo PDF.');
+    await (typeof BFModal !== 'undefined'
+      ? BFModal.alert({
+          title: 'Módulo PDF carregando',
+          icon: '⏳',
+          variant: 'info',
+          message: 'O módulo de geração de PDF ainda está sendo carregado.\n\nAguarde alguns segundos e tente novamente.',
+        })
+      : Promise.resolve(alert('Aguarde carregamento do PDF.')));
     return;
   }
   const hideLoading = (typeof window.bfLoading !== 'undefined')
     ? window.bfLoading.show('Gerando relatório de desenvolvimento…')
     : null;
   if (typeof showToast === 'function') showToast('📄 Gerando relatório de desenvolvimento...');
-  setTimeout(() => {
+  setTimeout(async () => {
     try { _gerarPDFDesenvolvimento(); }
-    catch (e) { console.warn('[relatorio]', e); alert('Erro ao gerar relatório: ' + e.message); }
+    catch (e) {
+      console.warn('[relatorio]', e);
+      await (typeof BFModal !== 'undefined'
+        ? BFModal.alert({
+            title: 'Erro ao gerar relatório',
+            icon: '✗',
+            variant: 'danger',
+            message: 'Ocorreu um erro ao gerar o PDF:\n\n' + (e.message || 'desconhecido') + '\n\nTente novamente em instantes.',
+          })
+        : Promise.resolve(alert('Erro: ' + e.message)));
+    }
     finally { if (hideLoading) hideLoading(); }
   }, 300);
 }
@@ -21418,6 +22073,197 @@ function _celebrarDesmame(duracaoMeses) {
 }
 
 // ═══════════════════════════════════════════════════════════════
+// [Sprint A] FIM DO USO DE FRALDAS (mesma lógica de desmame)
+// Permite encerrar a aba Fraldas quando a criança saiu das fraldas.
+// Histórico fica preservado, formulário de registro fica travado.
+// ═══════════════════════════════════════════════════════════════
+const FIM_FRALDAS_KEY = 'babyforce_fim_fraldas_v1';
+
+function getFimFraldasInfo() {
+  try { return JSON.parse(localStorage.getItem(FIM_FRALDAS_KEY)) || null; } catch { return null; }
+}
+function setFimFraldasInfo(info) {
+  try { localStorage.setItem(FIM_FRALDAS_KEY, info ? JSON.stringify(info) : null); } catch {}
+  if (!info) { try { localStorage.removeItem(FIM_FRALDAS_KEY); } catch {} }
+}
+
+function _aplicarLockFimFraldas() {
+  const info = getFimFraldasInfo();
+  const conteudo = document.getElementById('fraldas-panel-conteudo');
+  if (!conteudo) return;
+  // Remover lock anterior se existir
+  const existing = document.getElementById('fim-fraldas-lock-card');
+  if (existing) existing.remove();
+  // Re-exibir conteúdo original
+  Array.from(conteudo.children).forEach(c => {
+    if (c.id !== 'fim-fraldas-lock-card') c.style.display = '';
+  });
+  if (!info || !info.encerrado) return;
+  // Estado encerrado: esconder conteúdo, mostrar card de celebração
+  Array.from(conteudo.children).forEach(c => {
+    if (c.id !== 'fim-fraldas-lock-card') c.style.display = 'none';
+  });
+  const dataFmt = info.data ? new Date(info.data + 'T12:00').toLocaleDateString('pt-BR', { day:'2-digit', month:'long', year:'numeric' }) : '—';
+  const idade = info.idadeMeses ? `${info.idadeMeses} ${info.idadeMeses===1?'mês':'meses'}` : '—';
+  const nome = (typeof getBabyName === 'function') ? getBabyName() : 'Seu bebê';
+  const card = document.createElement('div');
+  card.id = 'fim-fraldas-lock-card';
+  card.innerHTML = `
+    <div class="card" style="background:linear-gradient(145deg,rgba(120,255,153,0.18),rgba(0,180,255,0.12));border:2px solid rgba(120,255,153,0.4);text-align:center;padding:28px 18px">
+      <div style="font-size:3.6rem;margin-bottom:8px;filter:drop-shadow(0 0 16px rgba(120,255,153,0.4))">🎉</div>
+      <div style="font-family:'Orbitron',monospace;font-size:0.62rem;color:#78ff99;letter-spacing:0.12em;margin-bottom:6px">DESFRALDE CONCLUÍDO</div>
+      <div style="font-family:'Orbitron',monospace;font-size:1.1rem;color:var(--white);font-weight:700;line-height:1.3;margin-bottom:14px">
+        ${nome} conquistou o penico! 🚽✨
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+        <div style="background:rgba(0,20,50,0.5);padding:10px;border-radius:10px">
+          <div style="font-size:0.54rem;color:var(--text-dim);font-family:'Orbitron',monospace;letter-spacing:0.08em">IDADE AO DESFRALDAR</div>
+          <div style="font-size:0.9rem;color:var(--gold);font-weight:700;margin-top:3px">${idade}</div>
+        </div>
+        <div style="background:rgba(0,20,50,0.5);padding:10px;border-radius:10px">
+          <div style="font-size:0.54rem;color:var(--text-dim);font-family:'Orbitron',monospace;letter-spacing:0.08em">ENCERRADO EM</div>
+          <div style="font-size:0.78rem;color:var(--blue-neon);font-weight:600;margin-top:3px">${dataFmt}</div>
+        </div>
+      </div>
+      <div style="font-size:0.74rem;color:var(--text-dim);line-height:1.55;margin-bottom:16px;padding:0 4px">
+        Esta aba foi <strong style="color:var(--white)">travada</strong> porque ${nome} conquistou o desfralde. Os registros anteriores ficam preservados no histórico.
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <button onclick="window._reverterFimFraldas()" style="padding:10px;background:rgba(0,60,120,0.5);border:1px solid rgba(0,180,255,0.3);border-radius:10px;color:var(--blue-neon);font-family:'Orbitron',monospace;font-size:0.64rem;letter-spacing:0.06em;cursor:pointer">↩ REGISTREI POR ENGANO — DESFAZER</button>
+      </div>
+    </div>
+  `;
+  conteudo.appendChild(card);
+}
+
+window.abrirModalFimFraldas = function() {
+  const existente = document.getElementById('modal-fim-fraldas');
+  if (existente) existente.remove();
+  const hoje = new Date();
+  const dataHoje = `${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2,'0')}-${String(hoje.getDate()).padStart(2,'0')}`;
+  const modal = document.createElement('div');
+  modal.id = 'modal-fim-fraldas';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,10,30,0.94);z-index:99998;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(8px);';
+  modal.innerHTML = `
+    <div style="max-width:420px;width:100%;background:linear-gradient(135deg,#031027,#0a1a3d);border:1px solid rgba(120,255,153,0.4);border-radius:14px;padding:22px;color:#fff;font-family:'Exo 2',sans-serif;max-height:92vh;overflow-y:auto">
+      <div style="text-align:center;font-size:2.6rem;margin-bottom:10px">🚽</div>
+      <div style="text-align:center;font-family:'Orbitron',monospace;font-size:0.78rem;color:#78ff99;letter-spacing:0.08em;font-weight:700;margin-bottom:6px">REGISTRAR DESFRALDE</div>
+      <div style="font-size:0.74rem;color:var(--text-dim);line-height:1.55;margin-bottom:16px;text-align:center">
+        Mais uma etapa conquistada! Vamos celebrar essa independência. 🌟
+      </div>
+      <label style="display:block;font-family:'Orbitron',monospace;font-size:0.58rem;color:#9eb0c8;letter-spacing:0.08em;margin-bottom:4px">DATA DO DESFRALDE</label>
+      <input type="date" id="ff-data" value="${dataHoje}" max="${dataHoje}" style="width:100%;background:rgba(0,20,50,0.8);border:1px solid rgba(0,180,255,0.3);border-radius:8px;color:#fff;padding:10px 12px;font-size:15px;font-family:'Exo 2',sans-serif;outline:none;margin-bottom:12px">
+      <label style="display:block;font-family:'Orbitron',monospace;font-size:0.58rem;color:#9eb0c8;letter-spacing:0.08em;margin-bottom:4px">OBSERVAÇÃO (opcional)</label>
+      <textarea id="ff-obs" placeholder="Como foi a conquista? Dia especial, desafios, aprendizados..." style="width:100%;background:rgba(0,20,50,0.8);border:1px solid rgba(0,180,255,0.3);border-radius:8px;color:#fff;padding:10px 12px;font-size:14px;font-family:'Exo 2',sans-serif;outline:none;margin-bottom:14px;min-height:64px;resize:vertical"></textarea>
+      <div style="background:rgba(255,200,80,0.08);border-left:3px solid rgba(255,200,80,0.4);padding:9px 11px;border-radius:6px;margin-bottom:16px;font-size:0.68rem;color:var(--text-dim);line-height:1.5">
+        ⚠ Ao confirmar, a aba <strong>Fraldas</strong> ficará travada. Os registros anteriores ficam preservados no histórico.
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button onclick="window._confirmarFimFraldas()" style="flex:1;min-width:140px;padding:12px;background:linear-gradient(135deg,#78ff99,#00d4ff,#c77dff);background-size:200% 200%;border:none;border-radius:8px;color:#fff;font-family:'Orbitron',monospace;font-size:0.66rem;letter-spacing:0.06em;cursor:pointer;font-weight:700">🎉 CELEBRAR E ENCERRAR</button>
+        <button onclick="document.getElementById('modal-fim-fraldas').remove()" style="flex:1;min-width:120px;padding:12px;background:rgba(0,60,120,0.6);border:1px solid rgba(0,180,255,0.4);border-radius:8px;color:#00d4ff;font-family:'Orbitron',monospace;font-size:0.66rem;letter-spacing:0.06em;cursor:pointer">Cancelar</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+};
+
+window._confirmarFimFraldas = async function() {
+  const data = document.getElementById('ff-data')?.value;
+  if (!data) {
+    if (typeof showToast === 'function') showToast('⚠ Escolha a data');
+    return;
+  }
+  const obs = document.getElementById('ff-obs')?.value || '';
+  // Calcular idade em meses desde nascimento
+  let idadeMeses = null;
+  try {
+    const birthISO = (typeof getBirthISO === 'function') ? getBirthISO() : null;
+    if (birthISO) {
+      const nasc = new Date(birthISO + 'T00:00');
+      const fim = new Date(data + 'T00:00');
+      idadeMeses = (fim.getFullYear()-nasc.getFullYear())*12 + (fim.getMonth()-nasc.getMonth());
+      if (fim.getDate() < nasc.getDate()) idadeMeses--;
+    }
+  } catch {}
+  setFimFraldasInfo({
+    encerrado: true,
+    data,
+    obs,
+    idadeMeses,
+    registradoEm: Date.now(),
+    registradoPor: (typeof usuarioAtual !== 'undefined') ? usuarioAtual : null,
+  });
+  document.getElementById('modal-fim-fraldas')?.remove();
+  // Adicionar como marco de memória
+  if (typeof db !== 'undefined' && db.mesversario) {
+    db.mesversario.push({
+      id: Date.now(),
+      titulo: '🚽 Desfralde conquistado',
+      mes: idadeMeses || 0,
+      cat: 'memoria',
+      obs: obs || `Desfralde concluído aos ${idadeMeses || '?'} meses`,
+    });
+    if (typeof saveData === 'function') saveData(db);
+  }
+  // Aplicar lock e celebrar
+  _aplicarLockFimFraldas();
+  _celebrarFimFraldas(idadeMeses);
+  if (typeof BFAudit !== 'undefined') BFAudit.log('fim_fraldas_registrado', { data, idadeMeses });
+};
+
+window._reverterFimFraldas = async function() {
+  const confirmar = await (typeof BFModal !== 'undefined'
+    ? BFModal.confirm({
+        title: 'Desfazer registro?',
+        icon: '↩',
+        variant: 'warn',
+        message: 'A aba de Fraldas voltará a ficar ativa para novos registros.\n\nO registro de memória permanece no histórico.',
+        okLabel: 'Sim, desfazer',
+        cancelLabel: 'Manter',
+      })
+    : Promise.resolve(confirm('Desfazer fim do uso de fraldas?')));
+  if (!confirmar) return;
+  setFimFraldasInfo(null);
+  _aplicarLockFimFraldas();
+  if (typeof showToast === 'function') showToast('↩ Registro de desfralde desfeito');
+};
+
+function _celebrarFimFraldas(idadeMeses) {
+  const nome = (typeof getBabyName === 'function') ? getBabyName() : 'seu bebê';
+  const overlay = document.createElement('div');
+  overlay.className = 'alim-celebracao-overlay';
+  const idadeText = idadeMeses
+    ? (idadeMeses < 24 ? `${idadeMeses} meses` : `${Math.floor(idadeMeses/12)} ${Math.floor(idadeMeses/12)===1?'ano':'anos'}${idadeMeses%12 ? ' e '+(idadeMeses%12)+' meses' : ''}`)
+    : 'essa idade especial';
+  overlay.innerHTML = `
+    <div class="alim-celebracao-modal">
+      <div class="alim-emoji-big">🚽</div>
+      <div class="alim-celeb-title">Que conquista incrível!</div>
+      <div style="color:var(--white);font-size:0.92rem;margin-top:16px;line-height:1.5;font-weight:500">
+        <strong style="color:#78ff99">${nome}</strong> deixou as fraldas aos <strong style="color:var(--gold)">${idadeText}</strong>! 🌟
+      </div>
+      <div style="color:var(--text-dim);font-size:0.74rem;margin-top:10px;line-height:1.6;padding:0 6px">
+        O desfralde é um marco enorme de autonomia e autoconhecimento corporal. Celebrar a conquista fortalece a confiança da criança.
+      </div>
+      <div style="margin-top:16px;padding:10px 12px;background:rgba(0,20,50,0.45);border-radius:10px;font-size:0.7rem;color:var(--text-dim);line-height:1.55">
+        <strong style="color:#FAC775">💡 Dica SBP</strong> — pequenos regressos nos primeiros meses são normais, principalmente à noite. Paciência e acolhimento são essenciais.
+      </div>
+      <button class="alim-celeb-btn" onclick="document.querySelector('.alim-celebracao-overlay')?.remove()">🎉 CELEBRAR ESTA FASE</button>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  if (typeof _dispararConfetes === 'function') _dispararConfetes(overlay);
+  if (typeof _tocarCelebracaoSound === 'function') _tocarCelebracaoSound();
+}
+
+// Aplicar lock ao carregar e ao trocar de aba
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => {
+    if (typeof _aplicarLockFimFraldas === 'function') _aplicarLockFimFraldas();
+  }, 800);
+});
+
+// ═══════════════════════════════════════════════════════════════
 // CELEBRAÇÃO A CADA 10 ALIMENTOS "AMOU"
 // Contador incrementa quando aceitacao === 'amou' é salvo
 // A cada múltiplo de 10, dispara modal de fogos com frase motivacional
@@ -21516,14 +22362,25 @@ window.salvarSintoma = function() {
   const temp = document.getElementById('sint-temp')?.value;
   const obs = document.getElementById('sint-obs')?.value?.trim() || '';
   const medicado = document.getElementById('sint-medicado')?.checked || false;
-  if (!data || !hora) { alert('⚠️ Defina data e hora'); return; }
-  if (!tipo) { alert('⚠️ Escolha o tipo de sintoma'); return; }
+  // [Sprint D] Medicamentos ministrados (string livre)
+  const medicamentos = medicado ? (document.getElementById('sint-medicamentos')?.value?.trim() || '') : '';
+  if (!data || !hora) { if (typeof showToast === 'function') showToast('⚠ Defina data e hora'); return; }
+  if (!tipo) { if (typeof showToast === 'function') showToast('⚠ Escolha o tipo de sintoma'); return; }
+  if (typeof validarDataEvento === 'function' && !validarDataEvento(data, hora)) {
+    if (typeof showToast === 'function') showToast('⚠ Data/hora não pode ser no futuro');
+    return;
+  }
+  // Valida temperatura se informada
+  if (temp && (parseFloat(temp) < 30 || parseFloat(temp) > 45)) {
+    if (typeof showToast === 'function') showToast('⚠ Temperatura fora da faixa plausível (30–45°C)');
+    return;
+  }
   // Grava no mesmo storage do QL_KEYS.sintoma (sincronização total)
   const registro = {
     id: Date.now(),
     data, hora, tipo, intensidade,
     temperatura: temp ? parseFloat(temp) : null,
-    obs, medicado,
+    obs, medicado, medicamentos,
     autor: (typeof usuarioAtual !== 'undefined') ? usuarioAtual : null,
   };
   try {
@@ -21536,12 +22393,26 @@ window.salvarSintoma = function() {
   document.getElementById('sint-temp').value = '';
   document.getElementById('sint-obs').value = '';
   document.getElementById('sint-medicado').checked = false;
+  const medWrap = document.getElementById('sint-medicamentos-wrap');
+  if (medWrap) medWrap.style.display = 'none';
+  const medInput = document.getElementById('sint-medicamentos');
+  if (medInput) medInput.value = '';
   renderSintomas();
   if (typeof showToast === 'function') showToast('🤒 Sintoma registrado');
   // Alerta se febre alta
   if (tipo === 'febre' && temp && parseFloat(temp) >= 39) {
-    setTimeout(() => {
-      if (confirm('🌡️ Febre alta (≥39°C). Quer consultar o Oráculo sobre sinais de alerta?')) {
+    setTimeout(async () => {
+      const consultar = await (typeof BFModal !== 'undefined'
+        ? BFModal.confirm({
+            title: 'Febre alta detectada (' + temp + '°C)',
+            icon: '🌡️',
+            variant: 'warn',
+            message: 'Febre ≥39°C merece atenção.\n\nQuer consultar o Oráculo sobre sinais de alerta e quando procurar pronto-socorro?',
+            okLabel: 'Consultar Oráculo',
+            cancelLabel: 'Depois',
+          })
+        : Promise.resolve(confirm('Febre alta. Consultar Oráculo?')));
+      if (consultar) {
         if (typeof showTab === 'function') showTab('agenda');
         setTimeout(() => {
           if (typeof showSubTabMissoes === 'function') showSubTabMissoes('oraculo');
@@ -21584,15 +22455,25 @@ function renderSintomas() {
         </div>
         <div style="font-size:0.66rem;color:var(--text-dim)">${dataFmt} · ${s.hora||''}</div>
         ${s.obs?`<div style="font-size:0.7rem;color:#9eb0c8;margin-top:4px;line-height:1.4">${_rcEsc(s.obs)}</div>`:''}
-        ${s.medicado?`<div style="font-size:0.6rem;color:var(--blue-neon);margin-top:3px">💊 Medicado</div>`:''}
+        ${s.medicado?`<div style="font-size:0.6rem;color:var(--blue-neon);margin-top:3px">💊 Medicado${s.medicamentos?` · <span style="color:var(--white)">${_rcEsc(s.medicamentos)}</span>`:''}</div>`:''}
       </div>
       <button onclick="window._removerSintoma(${s.id})" style="background:none;border:1px solid rgba(255,100,100,0.25);color:rgba(255,120,120,0.7);padding:5px 8px;border-radius:6px;font-size:0.7rem;cursor:pointer;flex-shrink:0" aria-label="Remover">🗑</button>
     </div>`;
   }).join('');
 }
 
-window._removerSintoma = function(id) {
-  if (!confirm('Remover este registro de sintoma?')) return;
+window._removerSintoma = async function(id) {
+  const confirmar = await (typeof BFModal !== 'undefined'
+    ? BFModal.confirm({
+        title: 'Remover registro?',
+        icon: '🗑',
+        variant: 'warn',
+        message: 'Este registro de sintoma será apagado permanentemente.',
+        okLabel: 'Sim, remover',
+        cancelLabel: 'Cancelar',
+      })
+    : Promise.resolve(confirm('Remover este registro de sintoma?')));
+  if (!confirmar) return;
   try {
     let arr = JSON.parse(localStorage.getItem(QL_KEYS.sintoma) || '[]');
     arr = arr.filter(s => s.id !== id);
@@ -21658,8 +22539,12 @@ window.salvarEsporte = function() {
   const intensidade = document.getElementById('esp-intensidade')?.value;
   const regular = document.getElementById('esp-regular')?.checked || false;
   const obs = document.getElementById('esp-obs')?.value?.trim() || '';
-  if (!data || !hora) { alert('⚠️ Defina data e hora'); return; }
-  if (!modalidade) { alert('⚠️ Informe a modalidade esportiva'); return; }
+  if (!data || !hora) { if (typeof showToast === 'function') showToast('⚠ Defina data e hora'); return; }
+  if (!modalidade) { if (typeof showToast === 'function') showToast('⚠ Informe a modalidade esportiva'); return; }
+  if (typeof validarDataEvento === 'function' && !validarDataEvento(data, hora)) {
+    if (typeof showToast === 'function') showToast('⚠ Data/hora não pode ser no futuro');
+    return;
+  }
   const registro = {
     id: Date.now(),
     data, hora, modalidade, duracao, intensidade,
@@ -22569,12 +23454,27 @@ window._verificarMagicLinkAtivo = async function() {
 
     if (typeof BFAudit !== 'undefined') BFAudit.log('magic_link_validado');
     // Abrir direto o modal de novo PIN
-    alert('✓ Email confirmado!\n\nDefina seu novo PIN de 6 dígitos.');
+    await (typeof BFModal !== 'undefined'
+      ? BFModal.alert({
+          title: 'E-mail confirmado!',
+          icon: '✓',
+          variant: 'success',
+          message: 'Sua identidade foi verificada.\n\nAgora defina seu novo PIN de 6 dígitos para acessar o app.',
+          okLabel: 'Definir PIN',
+        })
+      : Promise.resolve(alert('Email confirmado. Defina novo PIN.')));
     setTimeout(() => window._abrirDefinicaoNovoPin(), 200);
   } catch (e) {
     console.warn('[magic link verify]', e);
     if (e && e.code === 'auth/invalid-action-code') {
-      alert('Link expirado ou já utilizado.\n\nUse a recuperação OFFLINE ou solicite novo link.');
+      await (typeof BFModal !== 'undefined'
+        ? BFModal.alert({
+            title: 'Link expirado',
+            icon: '⏰',
+            variant: 'warn',
+            message: 'Este link de recuperação expirou ou já foi utilizado.\n\nVolte à tela de login e use a opção "Esqueci minha senha" para gerar um novo link.\n\nVocê também pode usar a recuperação offline (pergunta secreta).',
+          })
+        : Promise.resolve(alert('Link expirado.')));
     }
     if (typeof BFAudit !== 'undefined') BFAudit.log('magic_link_validacao_falha', { erro: e.code || 'unknown' });
   }
@@ -23078,8 +23978,12 @@ function salvarRefeicao() {
   const textura = document.getElementById('alim-textura').value;
   const aceitacao = document.getElementById('alim-aceitacao').value;
   const obs = document.getElementById('alim-obs').value.trim();
-  if (!data || !hora) { alert('⚠️ Defina data e hora'); return; }
-  if (!comida) { alert('⚠️ Informe o alimento'); return; }
+  if (!data || !hora) { if (typeof showToast === 'function') showToast('⚠ Defina data e hora'); return; }
+  if (!comida) { if (typeof showToast === 'function') showToast('⚠ Informe o alimento'); return; }
+  if (typeof validarDataEvento === 'function' && !validarDataEvento(data, hora)) {
+    if (typeof showToast === 'function') showToast('⚠ Data/hora não pode ser no futuro');
+    return;
+  }
 
   const refs = _alimCarregarRefeicoes();
   refs.push({ id: Date.now(), data, hora, comida, textura, aceitacao, obs });
@@ -26362,8 +27266,8 @@ function salvarProfissional() {
   const crm  = document.getElementById('prof-crm').value.trim();
   const email= document.getElementById('prof-email').value.trim();
   const whats= document.getElementById('prof-whats').value.trim();
-  if (!nome) { alert('⚠ Informe o nome do profissional'); return; }
-  if (!email && !whats) { alert('⚠ Informe ao menos um contato (email ou WhatsApp)'); return; }
+  if (!nome) { if (typeof showToast === 'function') showToast('⚠ Informe o nome do profissional'); return; }
+  if (!email && !whats) { if (typeof showToast === 'function') showToast('⚠ Informe ao menos um contato (email ou WhatsApp)'); return; }
   const arr = rcCarregarProfissionais().filter(p => !p._default);
   arr.push({ id:'prof_'+Date.now(), nome, especialidade:esp, crm, email, whatsapp:whats });
   rcSalvarProfissionais(arr);
@@ -28707,11 +29611,18 @@ window.abrirCadastroCriancaFromLogin = async function() {
 (function patchLimiteCriancas() {
   if (typeof window.abrirCadastroCrianca !== 'function') return;
   const _orig = window.abrirCadastroCrianca;
-  window.abrirCadastroCrianca = function() {
+  window.abrirCadastroCrianca = async function() {
     const lista = getBabies();
     // Só bloqueia se for cadastro NOVO (não edição — edição já tem _criEditandoId)
     if (lista.length >= LIMITE_CRIANCAS && typeof _criEditandoId !== 'undefined' && !_criEditandoId) {
-      alert(`⚠️ Limite atingido: máximo de ${LIMITE_CRIANCAS} crianças por conta.\n\nRemova um perfil existente para liberar espaço.`);
+      await (typeof BFModal !== 'undefined'
+        ? BFModal.alert({
+            title: 'Limite atingido',
+            icon: '👶',
+            variant: 'warn',
+            message: 'Máximo de ' + LIMITE_CRIANCAS + ' crianças por conta.\n\nPara cadastrar outra, remova um perfil existente em "Crianças cadastradas" dentro do menu.',
+          })
+        : Promise.resolve(alert('Limite atingido.')));
       return;
     }
     return _orig.apply(this, arguments);
@@ -28722,11 +29633,18 @@ window.abrirCadastroCriancaFromLogin = async function() {
 (function patchSalvarLimite() {
   if (typeof window.salvarCriancaForm !== 'function') return;
   const _orig = window.salvarCriancaForm;
-  window.salvarCriancaForm = function() {
+  window.salvarCriancaForm = async function() {
     const lista = getBabies();
     // Se é cadastro novo (não edição) e bateu limite, bloqueia
     if (typeof _criEditandoId !== 'undefined' && !_criEditandoId && lista.length >= LIMITE_CRIANCAS) {
-      alert(`⚠️ Limite atingido: máximo de ${LIMITE_CRIANCAS} crianças por conta.`);
+      await (typeof BFModal !== 'undefined'
+        ? BFModal.alert({
+            title: 'Limite atingido',
+            icon: '👶',
+            variant: 'warn',
+            message: 'Máximo de ' + LIMITE_CRIANCAS + ' crianças por conta.',
+          })
+        : Promise.resolve(alert('Limite atingido.')));
       return;
     }
     return _orig.apply(this, arguments);
@@ -29718,9 +30636,23 @@ window.abrirPrivacidade = function() {
 window._verificarIntegridadeAudit = async function() {
   const r = await BFAudit.verificarIntegridade();
   if (r.integro) {
-    alert(`✓ Audit trail íntegro.\n\n${r.total} eventos registrados.\nNenhuma adulteração detectada.`);
+    await (typeof BFModal !== 'undefined'
+      ? BFModal.alert({
+          title: 'Audit trail íntegro',
+          icon: '✓',
+          variant: 'success',
+          message: r.total + ' eventos registrados.\n\nNenhuma adulteração detectada — seu histórico está íntegro.',
+        })
+      : Promise.resolve(alert('Audit íntegro.')));
   } else {
-    alert(`⚠ ALERTA: integridade comprometida.\n\n${r.inconsistencias.length} inconsistências em ${r.total} eventos.\n\nVerifique se o app foi manipulado externamente.`);
+    await (typeof BFModal !== 'undefined'
+      ? BFModal.alert({
+          title: 'Integridade comprometida',
+          icon: '⚠️',
+          variant: 'danger',
+          message: r.inconsistencias.length + ' inconsistência(s) detectada(s) em ' + r.total + ' eventos.\n\nIsso pode indicar que o app foi manipulado externamente, ou que o localStorage foi editado por outra ferramenta.\n\nSe você não fez isso, pode ser tentativa de adulteração. Considere fazer backup e reinstalar o app.',
+        })
+      : Promise.resolve(alert('ALERTA: integridade comprometida.')));
   }
 };
 
@@ -29785,6 +30717,505 @@ window._confirmarDeletarTudo = async function() {
       : Promise.resolve(alert('Erro: ' + e.message)));
   }
 };
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// [Sprint E] MÓDULO JORNADA ENCERRADA — 12 ANOS
+// ═══════════════════════════════════════════════════════════════════════════════
+// Quando a criança completa 12a0m0d, mostra modal full-screen épico comemorando
+// a conclusão da jornada infantil. 5 telas navegáveis, animação de partículas,
+// confete, relatório do Oráculo, e depois bloqueia todos os registros novos.
+// Histórico permanece acessível.
+// ═══════════════════════════════════════════════════════════════════════════════
+
+const JORNADA_ENCERRADA_KEY = 'babyforce_jornada_encerrada_v1';
+
+function getJornadaEncerrada() {
+  try { return JSON.parse(localStorage.getItem(JORNADA_ENCERRADA_KEY)) || null; } catch { return null; }
+}
+function setJornadaEncerrada(info) {
+  try { localStorage.setItem(JORNADA_ENCERRADA_KEY, info ? JSON.stringify(info) : null); } catch {}
+  if (!info) { try { localStorage.removeItem(JORNADA_ENCERRADA_KEY); } catch {} }
+}
+
+// Verifica se o bebê já tem 12 anos completos (12a0m0d)
+function _verificarMaioridadeInfantil() {
+  try {
+    const birthISO = (typeof getBirthISO === 'function') ? getBirthISO() : null;
+    if (!birthISO) return false;
+    const nasc = new Date(birthISO + 'T00:00:00');
+    if (isNaN(nasc.getTime())) return false;
+    const hoje = new Date();
+    // 12 anos completos
+    const aniv12 = new Date(nasc.getFullYear() + 12, nasc.getMonth(), nasc.getDate());
+    return hoje >= aniv12;
+  } catch { return false; }
+}
+
+// Coleta estatísticas finais da jornada
+function _coletarEstatisticasJornada() {
+  const stats = {
+    mamadas: 0, sonos: 0, sintomas: 0, marcos: 0, vacinas: 0,
+    fraldas: 0, esportes: 0, medicacoes: 0, alimentacao: 0, missoes: 0,
+  };
+  try {
+    if (typeof db !== 'undefined') {
+      stats.mamadas = (db.mamadas || []).length;
+      stats.sonos = (db.sono || []).length;
+      stats.fraldas = (db.fraldas || []).length;
+      stats.marcos = (db.mesversario || []).length;
+      stats.missoes = (db.agenda || []).length;
+    }
+    if (typeof medicacoes !== 'undefined') stats.medicacoes = (medicacoes || []).length;
+    stats.sintomas = JSON.parse(localStorage.getItem((typeof QL_KEYS !== 'undefined' && QL_KEYS?.sintoma) || 'babyforce_sintomas_v1') || '[]').length;
+    stats.alimentacao = JSON.parse(localStorage.getItem((typeof QL_KEYS !== 'undefined' && QL_KEYS?.alimentacao) || 'babyforce_alimentacao_v1') || '[]').length;
+    stats.esportes = JSON.parse(localStorage.getItem((typeof QL_KEYS !== 'undefined' && QL_KEYS?.esporte) || 'babyforce_esporte_v1') || '[]').length;
+    const vacStatus = JSON.parse(localStorage.getItem('babyforce_vacinas_v1') || '{}');
+    stats.vacinas = Object.values(vacStatus).filter(v => v && v.aplicada).length;
+  } catch (e) { console.warn('[jornada] stats:', e); }
+  return stats;
+}
+
+function _idadeExata(nascISO) {
+  try {
+    const nasc = new Date(nascISO + 'T00:00:00');
+    const hoje = new Date();
+    let anos = hoje.getFullYear() - nasc.getFullYear();
+    let meses = hoje.getMonth() - nasc.getMonth();
+    let dias = hoje.getDate() - nasc.getDate();
+    if (dias < 0) {
+      meses--;
+      const diasMesAnt = new Date(hoje.getFullYear(), hoje.getMonth(), 0).getDate();
+      dias += diasMesAnt;
+    }
+    if (meses < 0) { anos--; meses += 12; }
+    return { anos, meses, dias };
+  } catch { return { anos: 12, meses: 0, dias: 0 }; }
+}
+
+window.abrirModalJornadaEncerrada = function(forceOpen) {
+  const jornada = getJornadaEncerrada();
+  if (jornada && jornada.encerrada && !forceOpen) return;
+  const existente = document.getElementById('modal-jornada-encerrada');
+  if (existente) existente.remove();
+
+  const nome = (typeof getBabyName === 'function') ? getBabyName() : 'Seu bebê';
+  const birthISO = (typeof getBirthISO === 'function') ? getBirthISO() : null;
+  const idade = birthISO ? _idadeExata(birthISO) : { anos: 12, meses: 0, dias: 0 };
+  const stats = _coletarEstatisticasJornada();
+  const dataNasc = birthISO ? new Date(birthISO + 'T12:00').toLocaleDateString('pt-BR', { day:'2-digit', month:'long', year:'numeric' }) : '—';
+
+  const modal = document.createElement('div');
+  modal.id = 'modal-jornada-encerrada';
+  modal.setAttribute('role', 'dialog');
+  modal.setAttribute('aria-modal', 'true');
+  modal.style.cssText = 'position:fixed;inset:0;background:radial-gradient(ellipse at center, #0a1a3d 0%, #020514 70%, #000 100%);z-index:99999;display:flex;flex-direction:column;overflow:hidden;';
+
+  modal.innerHTML = `<style>
+    @keyframes je-particle-float { 0% { transform: translateY(100vh) translateX(0) rotate(0deg); opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { transform: translateY(-100vh) translateX(var(--drift,0px)) rotate(360deg); opacity: 0; } }
+    @keyframes je-nebula-pulse { 0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.35; } 50% { transform: scale(1.15) rotate(180deg); opacity: 0.55; } }
+    @keyframes je-wordmark-shine { 0% { background-position: 0% 50%; } 100% { background-position: 200% 50%; } }
+    @keyframes je-emoji-pulse { 0%, 100% { transform: scale(1); filter: drop-shadow(0 0 20px rgba(255,224,102,0.6)); } 50% { transform: scale(1.12); filter: drop-shadow(0 0 40px rgba(255,224,102,0.9)); } }
+    @keyframes je-counter-up { 0% { transform: translateY(20px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
+    @keyframes je-slide-in { 0% { transform: translateX(40px); opacity: 0; } 100% { transform: translateX(0); opacity: 1; } }
+    @keyframes je-confete-fall { 0% { transform: translateY(-20px) rotate(0deg); opacity: 1; } 100% { transform: translateY(120vh) rotate(720deg); opacity: 0; } }
+    .je-particle { position: absolute; width: 6px; height: 6px; border-radius: 50%; background: radial-gradient(circle, #ffe066 20%, #c77dff 70%, transparent 100%); pointer-events: none; animation: je-particle-float linear infinite; }
+    .je-nebula { position: absolute; inset: -20%; pointer-events: none; background: radial-gradient(ellipse 60% 50% at 30% 40%, rgba(199,125,255,0.35), transparent 50%), radial-gradient(ellipse 50% 60% at 70% 60%, rgba(0,180,255,0.3), transparent 50%), radial-gradient(ellipse 40% 40% at 50% 20%, rgba(255,200,80,0.25), transparent 60%); animation: je-nebula-pulse 18s ease-in-out infinite; }
+    .je-screen { display: none; flex-direction: column; flex: 1; padding: 24px 20px; overflow-y: auto; position: relative; z-index: 10; }
+    .je-screen.active { display: flex; animation: je-slide-in 0.5s ease-out both; }
+    .je-wordmark { font-family: 'Orbitron', monospace; font-weight: 900; letter-spacing: 0.15em; background: linear-gradient(90deg, #ffe066 0%, #c77dff 25%, #00d4ff 50%, #c77dff 75%, #ffe066 100%); background-size: 200% 100%; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; animation: je-wordmark-shine 4s linear infinite; }
+    .je-emoji-grand { animation: je-emoji-pulse 2.5s ease-in-out infinite; display:inline-block; }
+    .je-stat-card { background: rgba(0, 30, 70, 0.55); border: 1px solid rgba(0, 180, 255, 0.28); border-radius: 14px; padding: 14px 12px; text-align: center; animation: je-counter-up 0.6s ease-out both; }
+    .je-stat-number { font-family: 'Orbitron', monospace; font-size: 2rem; font-weight: 800; background: linear-gradient(135deg, #ffe066, #c77dff); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+    .je-stat-label { font-size: 0.62rem; color: var(--text-dim); font-family: 'Orbitron', monospace; letter-spacing: 0.08em; margin-top: 4px; }
+    .je-btn-primary { padding: 14px 22px; background: linear-gradient(135deg, #ffe066 0%, #c77dff 50%, #00d4ff 100%); background-size: 200% 200%; border: none; border-radius: 12px; color: #020514; font-weight: 900; font-family: 'Orbitron', monospace; font-size: 0.76rem; letter-spacing: 0.1em; cursor: pointer; box-shadow: 0 8px 24px rgba(199, 125, 255, 0.4); transition: transform 0.2s ease; }
+    .je-btn-primary:hover { transform: translateY(-2px); }
+    .je-btn-secondary { padding: 12px 18px; background: rgba(0, 60, 120, 0.5); border: 1px solid rgba(0, 180, 255, 0.35); border-radius: 10px; color: var(--blue-neon); font-family: 'Orbitron', monospace; font-size: 0.7rem; letter-spacing: 0.06em; cursor: pointer; }
+    .je-confete { position: absolute; top: -20px; width: 10px; height: 14px; pointer-events: none; animation: je-confete-fall linear forwards; }
+    .je-dots { display: flex; gap: 8px; justify-content: center; padding: 10px 0; }
+    .je-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(0, 180, 255, 0.25); transition: all 0.3s; }
+    .je-dot.active { background: #ffe066; width: 24px; border-radius: 4px; box-shadow: 0 0 12px rgba(255,224,102,0.6); }
+    .je-music-toggle { position: absolute; top: 16px; right: 16px; width: 40px; height: 40px; border-radius: 50%; background: rgba(0, 30, 70, 0.7); border: 1px solid rgba(0, 180, 255, 0.4); color: var(--blue-neon); font-size: 1.1rem; cursor: pointer; z-index: 20; }
+  </style>
+
+  <div class="je-nebula"></div>
+  <div id="je-particles-container" style="position:absolute;inset:0;overflow:hidden;pointer-events:none"></div>
+  <div id="je-confete-container" style="position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:15"></div>
+  <button class="je-music-toggle" id="je-music-btn" onclick="window._toggleJornadaMusica()" aria-label="Ligar música">🔇</button>
+
+  <div class="je-screen active" data-screen="1">
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:20px;min-height:50vh">
+      <div class="je-emoji-grand" style="font-size:5.5rem;line-height:1">🎓</div>
+      <div class="je-wordmark" style="font-size:1.3rem;line-height:1.3">BABYFORCE<br>JORNADA COMPLETA</div>
+      <div style="font-size:0.85rem;color:var(--blue-neon);font-family:'Orbitron',monospace;letter-spacing:0.12em">✨ ${idade.anos} ANOS · ${idade.meses}M · ${idade.dias}D ✨</div>
+      <div style="font-family:'Orbitron',monospace;font-size:1.4rem;color:var(--white);font-weight:700;line-height:1.3;margin-top:8px">${_rcEsc(nome)}</div>
+      <div style="font-size:0.78rem;color:var(--text-dim);max-width:300px;line-height:1.6;margin-top:8px">
+        Uma jornada extraordinária começou em <strong style="color:var(--gold)">${dataNasc}</strong>.<br>
+        Hoje celebramos a conclusão da fase infantil.
+      </div>
+    </div>
+    <div class="je-dots"><div class="je-dot active"></div><div class="je-dot"></div><div class="je-dot"></div><div class="je-dot"></div><div class="je-dot"></div></div>
+    <div style="display:flex;gap:10px;justify-content:center">
+      <button class="je-btn-primary" onclick="window._jornadaProximaTela(2)">EMBARCAR NA RETROSPECTIVA →</button>
+    </div>
+  </div>
+
+  <div class="je-screen" data-screen="2">
+    <div style="text-align:center;margin-bottom:18px">
+      <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--gold);letter-spacing:0.12em;margin-bottom:6px">📊 CONQUISTAS DA JORNADA</div>
+      <div style="font-family:'Orbitron',monospace;font-size:1.1rem;color:var(--white);font-weight:700">Números que contam a história</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px">
+      <div class="je-stat-card" style="animation-delay:0.05s"><div class="je-stat-number">${stats.mamadas.toLocaleString('pt-BR')}</div><div class="je-stat-label">🍼 MAMADAS</div></div>
+      <div class="je-stat-card" style="animation-delay:0.1s"><div class="je-stat-number">${stats.sonos.toLocaleString('pt-BR')}</div><div class="je-stat-label">😴 SONOS</div></div>
+      <div class="je-stat-card" style="animation-delay:0.15s"><div class="je-stat-number">${stats.fraldas.toLocaleString('pt-BR')}</div><div class="je-stat-label">🩲 FRALDAS</div></div>
+      <div class="je-stat-card" style="animation-delay:0.2s"><div class="je-stat-number">${stats.marcos.toLocaleString('pt-BR')}</div><div class="je-stat-label">🌟 MARCOS</div></div>
+      <div class="je-stat-card" style="animation-delay:0.25s"><div class="je-stat-number">${stats.vacinas.toLocaleString('pt-BR')}</div><div class="je-stat-label">🛡️ VACINAS</div></div>
+      <div class="je-stat-card" style="animation-delay:0.3s"><div class="je-stat-number">${stats.missoes.toLocaleString('pt-BR')}</div><div class="je-stat-label">🗺️ MISSÕES</div></div>
+      <div class="je-stat-card" style="animation-delay:0.35s"><div class="je-stat-number">${stats.alimentacao.toLocaleString('pt-BR')}</div><div class="je-stat-label">🥣 REFEIÇÕES</div></div>
+      <div class="je-stat-card" style="animation-delay:0.4s"><div class="je-stat-number">${stats.sintomas.toLocaleString('pt-BR')}</div><div class="je-stat-label">🤒 SINTOMAS</div></div>
+    </div>
+    <div style="text-align:center;font-size:0.72rem;color:var(--text-dim);margin-bottom:18px;line-height:1.6;font-style:italic">Cada registro foi um gesto de cuidado.<br>Cada número, uma memória.</div>
+    <div class="je-dots"><div class="je-dot"></div><div class="je-dot active"></div><div class="je-dot"></div><div class="je-dot"></div><div class="je-dot"></div></div>
+    <div style="display:flex;gap:10px;justify-content:center">
+      <button class="je-btn-secondary" onclick="window._jornadaProximaTela(1)">← Voltar</button>
+      <button class="je-btn-primary" onclick="window._jornadaProximaTela(3)">LINHA DO TEMPO →</button>
+    </div>
+  </div>
+
+  <div class="je-screen" data-screen="3">
+    <div style="text-align:center;margin-bottom:14px">
+      <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--gold);letter-spacing:0.12em;margin-bottom:6px">🌙 LINHA DO TEMPO</div>
+      <div style="font-family:'Orbitron',monospace;font-size:1.1rem;color:var(--white);font-weight:700">Principais marcos da jornada</div>
+    </div>
+    <div id="je-timeline-body" style="flex:1;overflow-y:auto;padding:10px 0"></div>
+    <div class="je-dots"><div class="je-dot"></div><div class="je-dot"></div><div class="je-dot active"></div><div class="je-dot"></div><div class="je-dot"></div></div>
+    <div style="display:flex;gap:10px;justify-content:center">
+      <button class="je-btn-secondary" onclick="window._jornadaProximaTela(2)">← Voltar</button>
+      <button class="je-btn-primary" onclick="window._jornadaProximaTela(4)">RELATÓRIO DO ORÁCULO →</button>
+    </div>
+  </div>
+
+  <div class="je-screen" data-screen="4">
+    <div style="text-align:center;margin-bottom:14px">
+      <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--purple-glow);letter-spacing:0.12em;margin-bottom:6px">🔮 ANÁLISE DO ORÁCULO</div>
+      <div style="font-family:'Orbitron',monospace;font-size:1.1rem;color:var(--white);font-weight:700">Retrospectiva de 12 anos</div>
+    </div>
+    <div id="je-oraculo-body" style="flex:1;overflow-y:auto;padding:14px;background:rgba(199,125,255,0.06);border:1px solid rgba(199,125,255,0.25);border-radius:12px;line-height:1.7;font-size:0.82rem;color:var(--white);margin-bottom:14px">
+      <div style="text-align:center;color:var(--text-dim);padding:20px">
+        <div style="font-size:2rem;margin-bottom:10px">🔮</div>
+        <div style="font-size:0.8rem">Gerando análise retrospectiva personalizada...</div>
+      </div>
+    </div>
+    <div class="je-dots"><div class="je-dot"></div><div class="je-dot"></div><div class="je-dot"></div><div class="je-dot active"></div><div class="je-dot"></div></div>
+    <div style="display:flex;gap:10px;justify-content:center">
+      <button class="je-btn-secondary" onclick="window._jornadaProximaTela(3)">← Voltar</button>
+      <button class="je-btn-primary" onclick="window._jornadaProximaTela(5)">ENCERRAMENTO →</button>
+    </div>
+  </div>
+
+  <div class="je-screen" data-screen="5">
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:20px;padding:20px 12px">
+      <div class="je-emoji-grand" style="font-size:4rem;line-height:1">🌟</div>
+      <div class="je-wordmark" style="font-size:1.1rem;line-height:1.3">A FASE INFANTIL<br>CHEGOU AO FIM</div>
+      <div style="font-size:0.82rem;color:var(--white);line-height:1.7;max-width:340px">
+        <strong style="color:var(--gold)">${_rcEsc(nome)}</strong> viveu 12 anos intensos de descobertas, crescimento e cuidado compartilhado.<br><br>
+        A partir de agora, esta jornada fica <strong style="color:var(--blue-neon)">preservada como memória</strong>. Todos os registros continuarão acessíveis para consulta, mas novos registros ficam bloqueados.
+      </div>
+      <div style="padding:14px 18px;background:linear-gradient(135deg,rgba(199,125,255,0.14),rgba(0,180,255,0.1));border:1px solid rgba(199,125,255,0.3);border-radius:12px;max-width:340px">
+        <div style="font-family:'Orbitron',monospace;font-size:0.66rem;color:var(--purple-glow);letter-spacing:0.1em;margin-bottom:6px">✨ PRÓXIMA JORNADA</div>
+        <div style="font-size:0.78rem;color:var(--white);line-height:1.5"><strong style="color:var(--purple-glow)">BabyForce Teen</strong> (12-18 anos) está em desenvolvimento. Fique atento às atualizações.</div>
+      </div>
+    </div>
+    <div class="je-dots"><div class="je-dot"></div><div class="je-dot"></div><div class="je-dot"></div><div class="je-dot"></div><div class="je-dot active"></div></div>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+      <button class="je-btn-secondary" onclick="window._jornadaProximaTela(4)">← Voltar</button>
+      <button class="je-btn-secondary" onclick="window._jornadaBaixarTudo()">💾 Baixar histórico</button>
+      <button class="je-btn-primary" onclick="window._jornadaConfirmarEncerramento()">🔒 CONFIRMAR E ENCERRAR</button>
+    </div>
+  </div>`;
+
+  document.body.appendChild(modal);
+  _iniciarParticulasJornada();
+  _iniciarConfeteJornada();
+  _jornadaTelaAtual = 1;
+  setTimeout(() => _renderJornadaTimeline(), 200);
+};
+
+let _jornadaTelaAtual = 1;
+let _jornadaAudioCtx = null;
+let _jornadaMusicaAtiva = false;
+
+window._jornadaProximaTela = function(n) {
+  document.querySelectorAll('.je-screen').forEach(s => s.classList.remove('active'));
+  const tela = document.querySelector('.je-screen[data-screen="' + n + '"]');
+  if (tela) tela.classList.add('active');
+  _jornadaTelaAtual = n;
+  if (n === 4) _jornadaGerarRelatorioOraculo();
+};
+
+function _iniciarParticulasJornada() {
+  const container = document.getElementById('je-particles-container');
+  if (!container) return;
+  const criar = () => {
+    if (!document.getElementById('modal-jornada-encerrada')) return;
+    const p = document.createElement('div');
+    p.className = 'je-particle';
+    const size = 4 + Math.random() * 6;
+    p.style.width = size + 'px'; p.style.height = size + 'px';
+    p.style.left = Math.random() * 100 + '%';
+    p.style.setProperty('--drift', (Math.random() * 100 - 50) + 'px');
+    p.style.animationDuration = (5 + Math.random() * 10) + 's';
+    container.appendChild(p);
+    setTimeout(() => p.remove(), 16000);
+  };
+  for (let i = 0; i < 30; i++) setTimeout(criar, i * 100);
+  const interval = setInterval(() => {
+    if (!document.getElementById('modal-jornada-encerrada')) { clearInterval(interval); return; }
+    for (let i = 0; i < 3; i++) criar();
+  }, 800);
+}
+
+function _iniciarConfeteJornada() {
+  const container = document.getElementById('je-confete-container');
+  if (!container) return;
+  const cores = ['#ffe066', '#c77dff', '#00d4ff', '#78ff99', '#ff78b4'];
+  for (let i = 0; i < 60; i++) {
+    setTimeout(() => {
+      if (!document.getElementById('modal-jornada-encerrada')) return;
+      const c = document.createElement('div');
+      c.className = 'je-confete';
+      c.style.left = Math.random() * 100 + '%';
+      c.style.background = cores[Math.floor(Math.random() * cores.length)];
+      c.style.animationDuration = (3 + Math.random() * 3) + 's';
+      c.style.animationDelay = (Math.random() * 0.5) + 's';
+      container.appendChild(c);
+      setTimeout(() => c.remove(), 7000);
+    }, i * 80);
+  }
+}
+
+window._toggleJornadaMusica = function() {
+  const btn = document.getElementById('je-music-btn');
+  if (!btn) return;
+  if (_jornadaMusicaAtiva) {
+    if (_jornadaAudioCtx) { try { _jornadaAudioCtx.close(); } catch {} _jornadaAudioCtx = null; }
+    _jornadaMusicaAtiva = false;
+    btn.textContent = '🔇'; btn.setAttribute('aria-label', 'Ligar música');
+    return;
+  }
+  try {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return;
+    _jornadaAudioCtx = new AC();
+    const ctx = _jornadaAudioCtx;
+    const notas = [261.63, 329.63, 392.00, 523.25];
+    const tocarNota = (freq, start, dur) => {
+      const osc = ctx.createOscillator(); const gain = ctx.createGain();
+      osc.type = 'sine'; osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0, ctx.currentTime + start);
+      gain.gain.linearRampToValueAtTime(0.15, ctx.currentTime + start + 0.05);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + start + dur);
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.start(ctx.currentTime + start); osc.stop(ctx.currentTime + start + dur);
+    };
+    const tocarLoop = () => {
+      if (!_jornadaMusicaAtiva) return;
+      notas.forEach((f, i) => tocarNota(f, i * 0.4, 1.2));
+      setTimeout(tocarLoop, 2000);
+    };
+    _jornadaMusicaAtiva = true; tocarLoop();
+    btn.textContent = '🔊'; btn.setAttribute('aria-label', 'Pausar música');
+  } catch (e) { console.warn('[jornada musica]', e); }
+};
+
+function _renderJornadaTimeline() {
+  const body = document.getElementById('je-timeline-body');
+  if (!body) return;
+  let marcos = [];
+  try { marcos = (typeof db !== 'undefined' ? (db.mesversario || []) : []).slice().sort((a, b) => (a.mes || 0) - (b.mes || 0)); } catch {}
+  if (!marcos.length) {
+    body.innerHTML = '<div style="text-align:center;color:var(--text-dim);padding:40px 20px;font-size:0.82rem;line-height:1.6">Nenhum marco foi registrado durante a jornada.<br><span style="font-size:0.7rem;opacity:0.7">Dica: para celebrar próximas crianças, use a aba 🌙 Marcos com frequência!</span></div>';
+    return;
+  }
+  const sample = marcos.length <= 10 ? marcos : (() => {
+    const step = marcos.length / 10;
+    const out = [];
+    for (let i = 0; i < 10; i++) out.push(marcos[Math.floor(i * step)]);
+    return out;
+  })();
+  body.innerHTML = sample.map(m => {
+    const idade = m.mes || 0;
+    const idadeLabel = idade === 0 ? 'Ao nascer' : idade < 12 ? `${idade}m` : `${Math.floor(idade/12)}a${idade%12?' '+(idade%12)+'m':''}`;
+    const titulo = m.titulo || '(sem título)';
+    const obs = m.obs || '';
+    return `<div style="display:flex;gap:12px;margin-bottom:14px;padding:10px 12px;background:rgba(0,30,70,0.5);border-left:3px solid var(--gold);border-radius:8px">
+      <div style="font-family:'Orbitron',monospace;font-size:0.66rem;color:var(--gold);font-weight:700;min-width:56px;padding-top:2px">${idadeLabel}</div>
+      <div style="flex:1;font-size:0.78rem;color:var(--white);line-height:1.5">
+        <div style="font-weight:700">${_rcEsc(titulo)}</div>
+        ${obs ? `<div style="font-size:0.7rem;color:var(--text-dim);margin-top:3px;font-style:italic">${_rcEsc(obs)}</div>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function _jornadaGerarRelatorioOraculo() {
+  const body = document.getElementById('je-oraculo-body');
+  if (!body) return;
+  if (body.dataset.gerado === '1') return;
+  const nome = (typeof getBabyName === 'function') ? getBabyName() : 'seu bebê';
+  const stats = _coletarEstatisticasJornada();
+  const apiKey = (typeof getEffectiveApiKey === 'function') ? getEffectiveApiKey() : null;
+  if (!apiKey) {
+    body.innerHTML = `<div style="text-align:center;margin-bottom:14px"><div style="font-size:2rem">🔮</div></div>
+      <p style="margin-bottom:10px">Uma jornada extraordinária de 12 anos se encerra. Durante este tempo, ${_rcEsc(nome)} acumulou um histórico rico de cuidado, afeto e descobertas.</p>
+      <p style="margin-bottom:10px"><strong style="color:var(--gold)">Principais números</strong>: ${stats.mamadas} mamadas registradas, ${stats.sonos} sonos documentados, ${stats.marcos} marcos celebrados, ${stats.vacinas} vacinas aplicadas.</p>
+      <p style="margin-bottom:10px">Cada um desses registros representa um gesto de atenção de guardiões amorosos. Mais do que dados, são memórias preservadas de uma infância cuidadosamente acompanhada.</p>
+      <p style="margin-bottom:10px">O que vem a seguir — a adolescência — traz desafios diferentes: autonomia crescente, identidade em formação, descoberta do mundo além do ninho. O BabyForce cumpriu seu papel nesta fase. Agora é hora de novos instrumentos, novas conversas, e uma relação cada vez mais horizontal com ${_rcEsc(nome)}.</p>
+      <p><strong style="color:var(--purple-glow)">Parabéns pela jornada.</strong> Guarde este app com carinho — ele é um álbum da infância.</p>
+      <div style="font-size:0.66rem;color:var(--text-dim);margin-top:14px;font-style:italic;text-align:center">Configure a API do Oráculo em "Configurar Oráculo (AI)" para um relatório personalizado baseado nos dados.</div>`;
+    body.dataset.gerado = '1';
+    return;
+  }
+  try {
+    const resumo = `- Nome: ${nome}\n- Mamadas: ${stats.mamadas}\n- Sonos: ${stats.sonos}\n- Marcos: ${stats.marcos}\n- Vacinas: ${stats.vacinas}\n- Fraldas: ${stats.fraldas}\n- Sintomas: ${stats.sintomas}\n- Medicações: ${stats.medicacoes}\n- Refeições: ${stats.alimentacao}\n- Missões: ${stats.missoes}\n- Esportes: ${stats.esportes}`;
+    const prompt = `Gere um relatório retrospectivo de 4 parágrafos em PT-BR sobre os 12 anos de jornada da criança ${nome} no app BabyForce. Tom afetivo e cerimonioso (está encerrando a jornada infantil). Estrutura: 1) abertura celebrando a jornada; 2) destaques dos números; 3) reflexão sobre cuidado e memórias; 4) transição para adolescência. Não invente dados além dos fornecidos. Use no máximo 400 palavras total.\n\nDados:\n${resumo}`;
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+      body: JSON.stringify({ model: 'claude-haiku-4-5-20251001', max_tokens: 800, messages: [{ role: 'user', content: prompt }] }),
+    });
+    if (!res.ok) throw new Error('api status ' + res.status);
+    const data = await res.json();
+    const texto = data?.content?.[0]?.text || '';
+    if (!texto) throw new Error('resposta vazia');
+    body.innerHTML = '<div style="text-align:center;margin-bottom:14px"><div style="font-size:2rem">🔮</div></div>' +
+      texto.split(/\n\n+/).map(p => `<p style="margin-bottom:10px">${_rcEsc(p)}</p>`).join('');
+    body.dataset.gerado = '1';
+  } catch (e) {
+    console.warn('[jornada oraculo]', e);
+    body.innerHTML = `<div style="text-align:center;padding:20px;color:var(--text-dim)">
+      <div style="font-size:2rem;margin-bottom:10px">⚠️</div>
+      Não foi possível gerar o relatório personalizado agora.<br><br>
+      ${_rcEsc(nome)} completou esta jornada com ${stats.mamadas} mamadas, ${stats.sonos} sonos, ${stats.marcos} marcos e ${stats.vacinas} vacinas registrados. Uma história rica de cuidado foi preservada aqui.
+    </div>`;
+    body.dataset.gerado = '1';
+  }
+}
+
+window._jornadaBaixarTudo = async function() {
+  try {
+    const backup = {
+      exportadoEm: new Date().toISOString(),
+      motivo: 'jornada_encerrada_12a',
+      babyConfig: (typeof getBabyConfig === 'function') ? getBabyConfig() : null,
+      db: typeof db !== 'undefined' ? db : null,
+      medicacoes: typeof medicacoes !== 'undefined' ? medicacoes : null,
+      crescimento: typeof crescData !== 'undefined' ? crescData : null,
+      vacinas: JSON.parse(localStorage.getItem('babyforce_vacinas_v1') || '{}'),
+    };
+    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    const nome = (typeof getBabyName === 'function') ? getBabyName() : 'bebe';
+    link.href = url;
+    link.download = `BabyForce_JornadaCompleta_${nome.replace(/[^\w]+/g, '_')}_${new Date().toISOString().slice(0,10)}.json`;
+    link.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    if (typeof showToast === 'function') showToast('💾 Histórico completo baixado');
+  } catch (e) {
+    console.warn('[jornada baixar]', e);
+    if (typeof showToast === 'function') showToast('⚠ Erro ao baixar histórico');
+  }
+};
+
+window._jornadaConfirmarEncerramento = async function() {
+  const confirmar = await (typeof BFModal !== 'undefined'
+    ? BFModal.confirm({
+        title: 'Encerrar a jornada?',
+        icon: '🔒',
+        variant: 'warn',
+        message: 'Ao confirmar, todos os botões de registro (mamada, sono, sintoma, etc) serão bloqueados.\n\n✓ Todo o histórico continua acessível\n✓ Relatórios e gráficos continuam funcionando\n✓ Você pode baixar tudo a qualquer momento\n\n⚠️ Não é possível desfazer esta ação pelo app. Para reativar, será necessário intervenção manual nos dados.',
+        okLabel: 'Sim, encerrar',
+        cancelLabel: 'Cancelar',
+      })
+    : Promise.resolve(confirm('Encerrar a jornada?')));
+  if (!confirmar) return;
+  setJornadaEncerrada({ encerrada: true, encerradaEm: new Date().toISOString(), confirmadaPor: (typeof usuarioAtual !== 'undefined') ? usuarioAtual : null });
+  _aplicarBloqueioJornada();
+  document.getElementById('modal-jornada-encerrada')?.remove();
+  if (_jornadaMusicaAtiva && _jornadaAudioCtx) { try { _jornadaAudioCtx.close(); } catch {} _jornadaAudioCtx = null; _jornadaMusicaAtiva = false; }
+  if (typeof showToast === 'function') showToast('🌟 Jornada encerrada com amor');
+  if (typeof BFAudit !== 'undefined') BFAudit.log('jornada_encerrada', { idade: '12a' });
+};
+
+function _aplicarBloqueioJornada() {
+  const info = getJornadaEncerrada();
+  if (!info || !info.encerrada) return;
+  const seletores = [
+    '[onclick*="salvarMamada"]','[onclick*="salvarSono"]','[onclick*="salvarFralda"]',
+    '[onclick*="salvarSintoma"]','[onclick*="salvarEsporte"]','[onclick*="salvarRefeicao"]',
+    '[onclick*="salvarCrescimento"]','[onclick*="salvarMedicacao"]','[onclick*="salvarEvento"]',
+    '[onclick*="salvarMesversario"]','[onclick*="salvarNovaPergunta"]','[onclick*="toggleSono"]',
+    '[onclick*="salvarVacina"]','[onclick*="salvarVacinaExtra"]','[onclick*="abrirModalDesmame"]',
+    '[onclick*="abrirModalFimFraldas"]',
+  ];
+  document.querySelectorAll(seletores.join(',')).forEach(btn => {
+    if (btn.dataset.jornadaBlocked === '1') return;
+    btn.dataset.jornadaBlocked = '1';
+    btn.disabled = true;
+    btn.style.opacity = '0.4';
+    btn.style.cursor = 'not-allowed';
+    btn.setAttribute('aria-disabled', 'true');
+    btn.setAttribute('title', 'Jornada encerrada — apenas histórico disponível');
+    btn.addEventListener('click', (e) => {
+      e.preventDefault(); e.stopPropagation();
+      if (typeof showToast === 'function') showToast('🔒 Jornada encerrada — apenas histórico disponível');
+    }, true);
+  });
+  if (!document.getElementById('je-header-badge')) {
+    const badge = document.createElement('div');
+    badge.id = 'je-header-badge';
+    badge.style.cssText = 'position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:9500;background:linear-gradient(135deg,rgba(199,125,255,0.15),rgba(0,180,255,0.1));border:1px solid rgba(199,125,255,0.4);border-radius:20px;padding:5px 14px;font-family:Orbitron,monospace;font-size:0.6rem;color:var(--purple-glow);letter-spacing:0.08em;cursor:pointer;backdrop-filter:blur(8px)';
+    badge.textContent = '🌟 JORNADA ENCERRADA';
+    badge.setAttribute('role', 'status');
+    badge.setAttribute('aria-label', 'Jornada infantil encerrada — apenas histórico disponível');
+    badge.onclick = () => window.abrirModalJornadaEncerrada(true);
+    document.body.appendChild(badge);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => {
+    const info = getJornadaEncerrada();
+    if (info && info.encerrada) { _aplicarBloqueioJornada(); return; }
+    if (_verificarMaioridadeInfantil()) {
+      setTimeout(() => {
+        if (!document.getElementById('tela-onboarding') || document.getElementById('tela-onboarding').style.display === 'none') {
+          window.abrirModalJornadaEncerrada();
+        }
+      }, 2500);
+    }
+  }, 1500);
+});
+
+(function hookBloqueioJornada() {
+  const _origShowHub = window.showHub;
+  if (typeof _origShowHub === 'function') {
+    window.showHub = function(...args) {
+      const r = _origShowHub.apply(this, args);
+      setTimeout(() => { if (typeof _aplicarBloqueioJornada === 'function') _aplicarBloqueioJornada(); }, 50);
+      return r;
+    };
+  }
+  const _origShowTab = window.showTab;
+  if (typeof _origShowTab === 'function') {
+    window.showTab = function(...args) {
+      const r = _origShowTab.apply(this, args);
+      setTimeout(() => { if (typeof _aplicarBloqueioJornada === 'function') _aplicarBloqueioJornada(); }, 50);
+      return r;
+    };
+  }
+})();
 
 </script>
 </body>
