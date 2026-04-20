@@ -1102,6 +1102,7 @@ html.bf-tema-claro [style*="color: var(--white)"] { color: var(--white) !importa
     <div style="font-family:'Orbitron',monospace;font-size:0.58rem;color:var(--text-dim);letter-spacing:0.1em;padding:8px 12px 4px;opacity:0.6">SAÚDE & RELATÓRIOS</div>
     <button onclick="abrirRelatoriosClinicos()" data-je-allow="true" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:none;border:none;color:var(--purple-neon);cursor:pointer;border-radius:8px;font-family:'Exo 2',sans-serif;font-size:0.88rem">📊 Relatórios Clínicos</button>
     <button onclick="abrirProfissionais()" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:none;border:none;color:var(--white);cursor:pointer;border-radius:8px;font-family:'Exo 2',sans-serif;font-size:0.88rem">👨‍⚕️ Profissionais de saúde</button>
+    <button onclick="window._premiumVerPlanos && window._premiumVerPlanos()" data-je-allow="true" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:linear-gradient(135deg,rgba(255,224,102,0.08),rgba(199,125,255,0.08));border:none;color:var(--gold);cursor:pointer;border-radius:8px;font-family:'Exo 2',sans-serif;font-size:0.88rem">✨ BabyForce Premium</button>
 
     <div style="height:1px;background:rgba(0,180,255,0.12);margin:6px 8px"></div>
 
@@ -30622,13 +30623,23 @@ window.BFPrivacy = BFPrivacy;
 // ═══════════════════════════════════════════
 const POLITICA_TEXTO = `BABYFORCE — POLÍTICA DE PRIVACIDADE
 
-Versão 1.0 · Vigente a partir de 18 de abril de 2026
-Conforme a Lei Geral de Proteção de Dados (LGPD, Lei 13.709/2018) do Brasil e o General Data Protection Regulation (GDPR, Regulamento 2016/679/UE) da União Europeia.
+Versão 2.0 · ${new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'})}
+Conforme Lei Geral de Proteção de Dados (LGPD, Lei 13.709/2018) e General Data Protection Regulation (GDPR, Regulamento UE 2016/679).
 
-1. CONTROLADOR DOS DADOS
-João Campos, responsável pelo desenvolvimento do BabyForce, atuando como pessoa física / microempresa (em processo de formalização).
-Contato DPO: privacidade@babyforce.app
-Representante na UE (quando aplicável): a ser nomeado antes do lançamento europeu (conforme GDPR art. 27).
+═══ RESUMO EM LINGUAGEM SIMPLES ═══
+• Seus dados ficam POR PADRÃO no seu dispositivo. Nada sai sem você ativar.
+• Não vendemos, compartilhamos ou monetizamos dados. Não temos anúncios.
+• Apague tudo quando quiser: Minha Conta → Zona de Perigo → Apagar Tudo.
+• IA (Oráculo) é opcional e usa SUA chave de API.
+• DPO responde em até 15 dias: privacidade@babyforce.com.br
+• Você pode reclamar à ANPD (gov.br/anpd).
+
+1. CONTROLADOR E DPO
+Controlador: publicado como pessoa física nas lojas oficiais.
+Encarregado/DPO (LGPD art. 41): privacidade@babyforce.com.br
+Prazo de resposta: 15 dias úteis (LGPD art. 19)
+Formulário: babyforce.com.br/privacidade/solicitacao
+Autoridade (ANPD): gov.br/anpd
 
 2. DADOS TRATADOS
 Tratamos os seguintes dados, todos fornecidos diretamente por você:
@@ -30655,13 +30666,35 @@ Tratamos os seguintes dados, todos fornecidos diretamente por você:
 • Execução de contrato (LGPD art. 7, V / GDPR art. 6(1)(b)): tracking básico, perfis, autenticação
 • Legítimo interesse (LGPD art. 7, IX / GDPR art. 6(1)(f)): segurança, prevenção a fraude
 
-4. COMPARTILHAMENTO COM TERCEIROS
-Apenas com seu consentimento explícito:
-• Google Firebase (Google LLC — EUA) — armazenamento em nuvem com criptografia em trânsito e em repouso
-• Anthropic PBC (EUA) — para a funcionalidade de IA do Oráculo. Usa modo Zero Data Retention (ZDR): nenhum dado é retido pela Anthropic além do período de processamento
-• Google Maps (Google LLC — EUA) — apenas quando você busca endereços
+4. SUB-OPERADORES E COMPARTILHAMENTO COM TERCEIROS
+Apenas com seu consentimento explícito. Lista COMPLETA de sub-operadores:
 
-Transferência internacional de dados (GDPR art. 44-50): baseada em Cláusulas Contratuais Padrão (SCCs) aprovadas pela Comissão Europeia.
+• Google LLC / Firebase (EUA + BR southamerica-east1)
+  └ Autenticação, sincronização opcional, hosting
+  └ firebase.google.com/support/privacy
+
+• Anthropic PBC (EUA)
+  └ API Claude para IA — apenas com SUA chave de API configurada
+  └ Modo Zero Data Retention (ZDR) — nenhum dado retido além do processamento
+  └ anthropic.com/legal/privacy
+
+• Apple Inc. (EUA + regionais)
+  └ Distribuição App Store + pagamentos iOS (quando ativado)
+  └ apple.com/legal/privacy
+
+• Google LLC / Play Store (EUA + regionais)
+  └ Distribuição Android + pagamentos (quando ativado)
+  └ policies.google.com/privacy
+
+• RevenueCat Inc. (EUA) — somente quando monetização estiver ativa
+  └ Gerenciamento de assinaturas
+  └ revenuecat.com/privacy
+
+• Cloudflare Inc. (global edge) — CDN para fontes/bibliotecas públicas
+
+Transferência internacional de dados (LGPD art. 33 / GDPR art. 44-50): baseada em Cláusulas Contratuais Padrão (SCCs) aprovadas.
+
+COMPROMISSO EXPLÍCITO: não vendemos, alugamos, trocamos ou monetizamos seus dados de NENHUMA FORMA.
 
 5. RETENÇÃO
 • Dados locais: enquanto você mantém o app instalado
@@ -30680,7 +30713,7 @@ Conforme LGPD art. 18 e GDPR art. 15-22, você tem direito a:
 • Oposição a tratamento
 • Revisão de decisões automatizadas
 
-Exercício dos direitos: dentro do app em Configurações → Privacidade, ou por e-mail a privacidade@babyforce.app (resposta em até 15 dias corridos).
+Exercício dos direitos: dentro do app em Configurações → Privacidade, ou por e-mail a privacidade@babyforce.com.br (resposta em até 15 dias corridos).
 
 Você tem direito de apresentar reclamação:
 • Brasil: Autoridade Nacional de Proteção de Dados (ANPD) — www.gov.br/anpd
@@ -30697,8 +30730,16 @@ Camada 5: Este framework completo LGPD/GDPR
 Dados em trânsito: TLS 1.3
 Dados em repouso (Firebase): AES-256 lado servidor
 
-8. CRIANÇAS
-O BabyForce é usado POR responsáveis ADULTOS a respeito de crianças. Não coletamos dados diretamente de crianças menores de 13 anos (COPPA/EUA) ou 16 anos (GDPR default). O responsável legal é o titular do tratamento em relação aos dados do menor.
+8. CRIANÇAS E ADOLESCENTES (LGPD art. 14 + ECA)
+O BabyForce é usado POR responsáveis ADULTOS para registrar dados de crianças sob sua guarda legal. Seguimos o padrão MÁXIMO do art. 14 da LGPD:
+
+• Melhor interesse da criança (ECA art. 4º) — princípio orientador
+• Consentimento específico e em destaque dado pelos guardiões legais (LGPD art. 14 §1º)
+• Coleta estritamente necessária — não pedimos dados além do requerido (art. 14 §4º)
+• NÃO condicionamos uso a fornecimento de informações extras
+• App NÃO é usado diretamente por crianças
+
+DIFERENCIAL ÚNICO: aos 12 anos (critério ECA), a "jornada infantil" encerra automaticamente. O app entra em modo read-only, respeitando a autonomia crescente do adolescente. Histórico continua disponível; novos registros são bloqueados.
 
 9. COOKIES E TECNOLOGIAS SIMILARES
 O BabyForce usa apenas armazenamento local (localStorage, IndexedDB) no seu dispositivo. Não usa cookies de terceiros para rastreamento. Não usa ads.
@@ -30708,13 +30749,21 @@ Mudanças materiais a esta política resultam em novo pedido de consentimento. V
 
 11. CONTATO
 Para qualquer questão sobre privacidade:
-• E-mail: privacidade@babyforce.app
-• DPO: privacidade@babyforce.app
+• E-mail: privacidade@babyforce.com.br
+• DPO: privacidade@babyforce.com.br
 • Prazo de resposta: 15 dias corridos (LGPD) ou 30 dias (GDPR), podendo ser estendido para 60 dias em casos complexos.`;
 
 const TERMOS_TEXTO = `BABYFORCE — TERMOS DE USO
 
-Versão 1.0 · Vigente a partir de 18 de abril de 2026
+Versão 2.0 · ${new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'})}
+
+═══ RESUMO EM LINGUAGEM SIMPLES ═══
+• Ferramenta de REGISTRO, não diagnóstico médico.
+• Em emergência: 192 (SAMU), nunca o app.
+• Seus dados são seus. Não vendemos, não monetizamos.
+• Cancelamento: 1 clique, a qualquer momento, sem retenção.
+• Reembolso: 14 dias integralmente (CDC art. 49).
+• Foro: seu domicílio (CDC art. 101, I).
 
 1. ACEITE
 Ao usar o BabyForce, você concorda com estes Termos e com a Política de Privacidade. Se não concorda, não use o aplicativo.
@@ -30763,18 +30812,55 @@ O serviço é fornecido "como está". Na máxima extensão permitida em lei, nã
 • Decisões médicas tomadas com base em sugestões do app
 • Uso inadequado por terceiros com acesso autorizado por você
 
-10. MODIFICAÇÕES
-Podemos atualizar estes Termos. Mudanças materiais serão notificadas com 30 dias de antecedência. Continuar usando o app após a atualização implica aceitação.
+10. ASSINATURAS E CANCELAMENTO (quando ativo — hoje tudo grátis)
+Quando oferecermos planos pagos:
 
-11. RESCISÃO
-Você pode deletar sua conta a qualquer momento (Configurações → Privacidade → Deletar tudo). Nós podemos suspender contas que violem estes Termos.
+Como cancelar:
+• iOS: Configurações → Apple ID → Assinaturas → BabyForce → Cancelar
+• Android: Google Play → Pagamentos e assinaturas → BabyForce → Cancelar
+• Web: Menu Guardião → ✨ Premium → Gerenciar → Cancelar
 
-12. LEGISLAÇÃO APLICÁVEL
-Brasil: regido pelas leis brasileiras, foro da comarca de São Paulo/SP
-UE: regido por GDPR e pelas leis do país de residência do usuário
+Um clique, sem perguntas, sem ofertas de retenção.
 
-13. CONTATO
-contato@babyforce.app`;
+Política de reembolso:
+• Primeiros 14 dias (CDC art. 49): reembolso integral sem questionamento
+• Após 14 dias — mensal: acesso até fim do ciclo, depois volta ao free
+• Após 14 dias — anual: reembolso pro-rata excepcional
+• Vício grave (CDC art. 18): reembolso integral
+• Motivos humanitários (saúde, perda de criança): reembolso integral em qualquer momento
+
+Cancelar NÃO apaga seus dados. Você volta ao plano free e pode reativar depois. Para apagar dados: Menu → Apagar Tudo (separado).
+
+11. ATUALIZAÇÕES DO APP
+• Suporte garantido aos últimos 24 meses de versões
+• Remoção de funcionalidade: aviso com 30 dias
+• Descontinuação do app: aviso com 90 dias para exportar dados
+
+12. MODIFICAÇÕES DESTES TERMOS
+Mudanças materiais: aviso com 30 dias. Mudanças menores: aviso in-app. Rejeitar mudanças = cancelar sem custo, com reembolso pro-rata.
+
+13. RESCISÃO
+Você pode deletar sua conta a qualquer momento (Menu Guardião → Minha Conta → Apagar Tudo). Dados apagados em até 30 dias. Nós podemos suspender contas que violem estes Termos, com aviso prévio de 7 dias (exceto casos graves).
+
+14. LEGISLAÇÃO APLICÁVEL E FORO
+Bases legais: CF art. 5º X (privacidade), CDC (Lei 8.078/1990), ECA (Lei 8.069/1990), LGPD (Lei 13.709/2018), Marco Civil (Lei 12.965/2014).
+
+FORO: conforme CDC art. 101, I, fica eleito o foro da COMARCA DE DOMICÍLIO DO USUÁRIO. Você não precisa processar em outra cidade.
+
+15. RESOLUÇÃO DE CONFLITOS
+Tentativas amigáveis antes de ação judicial:
+1. contato@babyforce.com.br — resposta em 5 dias úteis
+2. privacidade@babyforce.com.br — mediação pelo DPO
+3. Procon local — grátis
+4. consumidor.gov.br — plataforma oficial gratuita
+
+Seu direito de acessar o Judiciário é mantido integralmente (CF art. 5º, XXXV).
+
+16. CONTATO
+• Suporte: contato@babyforce.com.br
+• Privacidade (DPO): privacidade@babyforce.com.br
+• Suporte in-app: Menu Guardião → Apoio
+• Site: babyforce.com.br`;
 
 
 // ═══════════════════════════════════════════
@@ -30892,7 +30978,7 @@ window.abrirPrivacidade = function() {
       <!-- CONTATO DPO -->
       <div style="font-size:0.64rem;color:var(--text-dim);text-align:center;line-height:1.6;margin-top:10px">
         Dúvidas de privacidade?<br>
-        <a href="mailto:privacidade@babyforce.app" style="color:#00d4ff;text-decoration:underline">privacidade@babyforce.app</a>
+        <a href="mailto:privacidade@babyforce.com.br" style="color:#00d4ff;text-decoration:underline">privacidade@babyforce.com.br</a>
         <br><br>
         Resposta em até 15 dias (LGPD) / 30 dias (GDPR)
       </div>
@@ -32339,6 +32425,1330 @@ window._jornadaTeste = function() {
     };
   }
 })();
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// [EIXO 4] IA PROATIVA — Alertas inteligentes + Resumo semanal + Predições
+// Filosofia: zero ansiedade, comparar só com dados próprios, opt-in em marcos
+// ═══════════════════════════════════════════════════════════════════════════════
+
+const IA_PROATIVA_KEY = 'babyforce_ia_proativa_config_v1';
+const IA_ALERTAS_VISTOS_KEY = 'babyforce_ia_alertas_vistos_v1';
+const IA_RESUMO_SEMANAL_KEY = 'babyforce_ia_resumo_semanal_v1';
+
+if (typeof PER_CHILD_KEYS !== 'undefined' && PER_CHILD_KEYS.add) {
+  PER_CHILD_KEYS.add(IA_PROATIVA_KEY);
+  PER_CHILD_KEYS.add(IA_ALERTAS_VISTOS_KEY);
+  PER_CHILD_KEYS.add(IA_RESUMO_SEMANAL_KEY);
+}
+
+function _iaConfig() {
+  const key = (typeof _bfKey === 'function') ? _bfKey(IA_PROATIVA_KEY) : IA_PROATIVA_KEY;
+  try {
+    return JSON.parse(localStorage.getItem(key)) || {
+      habilitado: true,
+      alertas: { padrao_sono: true, padrao_febre: true, marcos_atrasados: false, padrao_alimentacao: true },
+      resumoSemanal: true,
+      predicoes: true,
+    };
+  } catch { return { habilitado: true, alertas: {}, resumoSemanal: true, predicoes: true }; }
+}
+
+function _iaSalvarConfigInterno(cfg) {
+  const key = (typeof _bfKey === 'function') ? _bfKey(IA_PROATIVA_KEY) : IA_PROATIVA_KEY;
+  try { localStorage.setItem(key, JSON.stringify(cfg)); } catch {}
+}
+
+function _iaAlertasVistos() {
+  const key = (typeof _bfKey === 'function') ? _bfKey(IA_ALERTAS_VISTOS_KEY) : IA_ALERTAS_VISTOS_KEY;
+  try { return JSON.parse(localStorage.getItem(key)) || {}; } catch { return {}; }
+}
+
+function _iaMarcarVisto(alertaId) {
+  const key = (typeof _bfKey === 'function') ? _bfKey(IA_ALERTAS_VISTOS_KEY) : IA_ALERTAS_VISTOS_KEY;
+  const vistos = _iaAlertasVistos();
+  vistos[alertaId] = { visto: true, vistoEm: new Date().toISOString() };
+  try { localStorage.setItem(key, JSON.stringify(vistos)); } catch {}
+}
+
+// Detector 1: Mudança significativa no padrão de sono
+function _detectarMudancaSono() {
+  try {
+    if (typeof db === 'undefined' || !db.sono) return null;
+    const hoje = new Date();
+    const ha7 = new Date(hoje.getTime() - 7 * 86400000);
+    const ha14 = new Date(hoje.getTime() - 14 * 86400000);
+    const semanaAtual = db.sono.filter(s => {
+      const d = new Date(s.data + 'T00:00');
+      return d >= ha7 && d <= hoje;
+    });
+    const semanaAnt = db.sono.filter(s => {
+      const d = new Date(s.data + 'T00:00');
+      return d >= ha14 && d < ha7;
+    });
+    if (semanaAtual.length < 3 || semanaAnt.length < 3) return null;
+    const totalAtual = semanaAtual.reduce((sum, s) => sum + (s.duracao || 0), 0);
+    const totalAnt = semanaAnt.reduce((sum, s) => sum + (s.duracao || 0), 0);
+    const variacao = ((totalAtual - totalAnt) / totalAnt) * 100;
+    if (Math.abs(variacao) < 30) return null;
+    const direcao = variacao > 0 ? 'aumentou' : 'diminuiu';
+    const percent = Math.abs(Math.round(variacao));
+    return {
+      id: 'sono_var_' + new Date().toISOString().slice(0, 10),
+      severidade: percent > 50 ? 'alta' : 'media',
+      emoji: '🌙',
+      titulo: `Padrão de sono ${direcao} ${percent}%`,
+      msg: `O total de sono nesta semana ${direcao} ${percent}% vs. semana anterior. Variações são normais — vale observar se há gatilho (marco, dentes, rotina).`,
+      acao: 'Consultar Oráculo',
+      acaoFn: 'window._iaConsultarOraculo("sono")',
+    };
+  } catch (e) { console.warn('[ia sono]', e); return null; }
+}
+
+// Detector 2: Febre recorrente
+function _detectarFebreRecorrente() {
+  try {
+    const QL = typeof QL_KEYS !== 'undefined' ? QL_KEYS : {};
+    const key = (typeof _bfKey === 'function' && QL.sintoma) ? _bfKey(QL.sintoma) : QL.sintoma || 'babyforce_sintomas_v1';
+    const sintomas = JSON.parse(localStorage.getItem(key) || '[]');
+    const ha7 = new Date(Date.now() - 7 * 86400000);
+    const febres = sintomas.filter(s => {
+      if (s.tipo !== 'febre') return false;
+      const d = new Date(s.data + 'T' + (s.hora || '12:00'));
+      return d >= ha7;
+    });
+    if (!febres.length) return null;
+    const altaTemp = febres.find(f => f.temperatura && parseFloat(f.temperatura) >= 39.5);
+    if (febres.length < 2 && !altaTemp) return null;
+    const msg = altaTemp
+      ? `Febre de ${altaTemp.temperatura}°C registrada. Febre ≥39.5°C merece acompanhamento médico se persistir.`
+      : `${febres.length} episódios de febre nesta semana. Vale acompanhar com pediatra.`;
+    return {
+      id: 'febre_' + new Date().toISOString().slice(0, 10),
+      severidade: altaTemp ? 'alta' : 'media',
+      emoji: '🌡️',
+      titulo: altaTemp ? `Febre alta registrada (${altaTemp.temperatura}°C)` : `${febres.length} febres em 7 dias`,
+      msg,
+      acao: 'Ver sintomas',
+      acaoFn: "window.showHub && window.showHub('saude'); setTimeout(function(){window.showTab && window.showTab('sintomas')},300)",
+    };
+  } catch (e) { console.warn('[ia febre]', e); return null; }
+}
+
+// Detector 3: Marcos atrasados (opt-in)
+const _MARCOS_ESPERADOS = [
+  { meses: 2, categoria: 'social', descricao: 'sorriso social' },
+  { meses: 4, categoria: 'motor', descricao: 'sustentar a cabeça' },
+  { meses: 6, categoria: 'motor', descricao: 'rolar' },
+  { meses: 8, categoria: 'motor', descricao: 'sentar sem apoio' },
+  { meses: 12, categoria: 'motor', descricao: 'primeiros passos' },
+  { meses: 12, categoria: 'fala', descricao: 'primeira palavra' },
+  { meses: 18, categoria: 'fala', descricao: 'algumas palavras isoladas' },
+  { meses: 24, categoria: 'fala', descricao: 'frases de 2 palavras' },
+];
+
+function _detectarMarcosAtrasados() {
+  try {
+    const cfg = _iaConfig();
+    if (!cfg.alertas || !cfg.alertas.marcos_atrasados) return null;
+    const birthISO = typeof getBirthISO === 'function' ? getBirthISO() : null;
+    if (!birthISO) return null;
+    const nasc = new Date(birthISO + 'T00:00');
+    const hoje = new Date();
+    const idadeMeses = Math.floor((hoje - nasc) / (30.44 * 86400000));
+    if (typeof db === 'undefined' || !db.mesversario) return null;
+    const marcosRegistrados = db.mesversario.map(m => ({ cat: m.cat, titulo: (m.titulo || '').toLowerCase() }));
+    const atrasados = [];
+    for (const marco of _MARCOS_ESPERADOS) {
+      const limite = Math.ceil(marco.meses * 1.2);
+      if (idadeMeses < limite) continue;
+      const encontrou = marcosRegistrados.some(r =>
+        r.cat === marco.categoria &&
+        (r.titulo.includes(marco.descricao.split(' ')[0]) || r.titulo.includes(marco.descricao))
+      );
+      if (!encontrou) atrasados.push(marco);
+    }
+    if (!atrasados.length) return null;
+    const primeiro = atrasados[0];
+    return {
+      id: 'marco_atrasado_' + primeiro.descricao.replace(/\s/g, '_'),
+      severidade: 'media',
+      emoji: '🌙',
+      titulo: `Lembrete: marco de "${primeiro.descricao}"`,
+      msg: `Segundo referências, "${primeiro.descricao}" costuma aparecer até ${primeiro.meses} meses (janela até ${Math.ceil(primeiro.meses * 1.2)}m). Cada criança tem seu ritmo — se houver dúvidas, converse com o pediatra.`,
+      acao: 'Ver marcos',
+      acaoFn: "window.showHub && window.showHub('desenvolvimento');setTimeout(function(){window.showOrbitasTab && window.showOrbitasTab('marcos')},300)",
+    };
+  } catch (e) { console.warn('[ia marcos]', e); return null; }
+}
+
+// Detector 4: Queda na alimentação
+function _detectarQuedaAlimentacao() {
+  try {
+    const QL = typeof QL_KEYS !== 'undefined' ? QL_KEYS : {};
+    const key = (typeof _bfKey === 'function' && QL.alimentacao) ? _bfKey(QL.alimentacao) : QL.alimentacao || 'babyforce_alimentacao_v1';
+    const refs = JSON.parse(localStorage.getItem(key) || '[]');
+    const hoje = new Date();
+    const ha7 = new Date(hoje.getTime() - 7 * 86400000);
+    const ha14 = new Date(hoje.getTime() - 14 * 86400000);
+    const atual = refs.filter(r => {
+      const d = new Date((r.data || '') + 'T' + (r.hora || '00:00'));
+      return d >= ha7 && d <= hoje;
+    }).length;
+    const anterior = refs.filter(r => {
+      const d = new Date((r.data || '') + 'T' + (r.hora || '00:00'));
+      return d >= ha14 && d < ha7;
+    }).length;
+    if (anterior < 5 || atual >= anterior * 0.7) return null;
+    const percentQueda = Math.round((1 - atual / anterior) * 100);
+    return {
+      id: 'alim_queda_' + new Date().toISOString().slice(0, 10),
+      severidade: percentQueda > 50 ? 'alta' : 'media',
+      emoji: '🍼',
+      titulo: `Refeições diminuíram ${percentQueda}%`,
+      msg: `Nesta semana: ${atual} refeições, contra ${anterior} na anterior. Pode ser fase passageira — se persistir, converse com a pediatra.`,
+      acao: 'Ver histórico',
+      acaoFn: "window.showHub && window.showHub('cuidado');setTimeout(function(){window.showTab && window.showTab('alimentacao')},300)",
+    };
+  } catch (e) { console.warn('[ia alim]', e); return null; }
+}
+
+function _iaAnalisarTodos() {
+  const cfg = _iaConfig();
+  if (!cfg.habilitado) return [];
+  const alertas = [];
+  if (cfg.alertas.padrao_sono) { const a = _detectarMudancaSono(); if (a) alertas.push(a); }
+  if (cfg.alertas.padrao_febre) { const a = _detectarFebreRecorrente(); if (a) alertas.push(a); }
+  if (cfg.alertas.marcos_atrasados) { const a = _detectarMarcosAtrasados(); if (a) alertas.push(a); }
+  if (cfg.alertas.padrao_alimentacao) { const a = _detectarQuedaAlimentacao(); if (a) alertas.push(a); }
+  const vistos = _iaAlertasVistos();
+  return alertas.filter(a => !vistos[a.id]);
+}
+
+// Predições
+function _iaProximaMamada() {
+  try {
+    if (typeof db === 'undefined' || !db.mamadas || db.mamadas.length < 5) return null;
+    const ultimas = db.mamadas.slice(-10);
+    const intervalos = [];
+    for (let i = 1; i < ultimas.length; i++) {
+      const d1 = new Date(ultimas[i - 1].data + 'T' + (ultimas[i - 1].hora || '12:00'));
+      const d2 = new Date(ultimas[i].data + 'T' + (ultimas[i].hora || '12:00'));
+      const diff = Math.abs(d2 - d1) / 60000;
+      if (diff > 30 && diff < 480) intervalos.push(diff);
+    }
+    if (!intervalos.length) return null;
+    const mediaMin = intervalos.reduce((s, v) => s + v, 0) / intervalos.length;
+    const ult = db.mamadas[db.mamadas.length - 1];
+    const ultimaData = new Date(ult.data + 'T' + (ult.hora || '12:00'));
+    const proxima = new Date(ultimaData.getTime() + mediaMin * 60000);
+    return { proxima, mediaMin: Math.round(mediaMin), ultimaData };
+  } catch (e) { console.warn('[ia pred mamada]', e); return null; }
+}
+
+// Resumo semanal
+function _iaGerarResumoSemanal() {
+  try {
+    const nome = typeof getBabyName === 'function' ? getBabyName() : 'Seu bebê';
+    const hoje = new Date();
+    const ha7 = new Date(hoje.getTime() - 7 * 86400000);
+    const entreSemana = (arr, dateField = 'data', timeField = 'hora') => arr.filter(r => {
+      const d = new Date((r[dateField] || '') + 'T' + (r[timeField] || '00:00'));
+      return d >= ha7 && d <= hoje;
+    });
+    const mamadas = (db.mamadas || []).length ? entreSemana(db.mamadas) : [];
+    const sonos = (db.sono || []).length ? entreSemana(db.sono) : [];
+    const fraldas = (db.fraldas || []).length ? entreSemana(db.fraldas) : [];
+    const marcos = (db.mesversario || []).filter(m => {
+      if (!m.createdAt) return false;
+      const d = new Date(m.createdAt);
+      return d >= ha7;
+    });
+    const totalSonoMin = sonos.reduce((s, r) => s + (r.duracao || 0), 0);
+    const horasSono = (totalSonoMin / 60).toFixed(1);
+    const totalMl = mamadas.reduce((s, m) => s + (parseFloat(m.ml) || 0), 0);
+    return {
+      nome, periodo: `${ha7.toLocaleDateString('pt-BR')} a ${hoje.toLocaleDateString('pt-BR')}`,
+      mamadas: mamadas.length, totalMl: Math.round(totalMl),
+      sonos: sonos.length, horasSono,
+      fraldas: fraldas.length, marcosNovos: marcos.length,
+      marcos: marcos.map(m => m.titulo || '(sem título)'),
+    };
+  } catch (e) { console.warn('[ia resumo]', e); return null; }
+}
+
+window._iaMostrarResumoSemanal = function() {
+  const r = _iaGerarResumoSemanal();
+  if (!r) { if (typeof showToast === 'function') showToast('Dados insuficientes para resumo'); return; }
+  const existente = document.getElementById('modal-resumo-semanal');
+  if (existente) existente.remove();
+  const modal = document.createElement('div');
+  modal.id = 'modal-resumo-semanal';
+  modal.setAttribute('role', 'dialog');
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,10,30,0.88);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(10px)';
+  modal.innerHTML = `
+    <div style="max-width:420px;width:100%;background:linear-gradient(135deg,#0a1a3d,#031027);border:1px solid rgba(0,180,255,0.4);border-radius:16px;padding:22px;box-shadow:0 20px 60px rgba(0,0,0,0.8);max-height:90vh;overflow-y:auto">
+      <div style="text-align:center;margin-bottom:16px">
+        <div style="font-size:2.2rem;margin-bottom:6px">📊</div>
+        <div style="font-family:'Orbitron',monospace;font-size:0.82rem;color:var(--blue-neon);letter-spacing:0.08em;font-weight:700">RESUMO SEMANAL</div>
+        <div style="font-size:0.76rem;color:var(--white);margin-top:4px">${_rcEsc(r.nome)}</div>
+        <div style="font-size:0.64rem;color:var(--text-dim);margin-top:2px">${r.periodo}</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+        <div style="background:rgba(0,30,70,0.5);border:1px solid rgba(0,180,255,0.25);border-radius:10px;padding:12px;text-align:center">
+          <div style="font-family:'Orbitron',monospace;font-size:1.5rem;font-weight:800;color:var(--blue-neon)">${r.mamadas}</div>
+          <div style="font-size:0.6rem;color:var(--text-dim);letter-spacing:0.06em;margin-top:3px">🍼 MAMADAS</div>
+          ${r.totalMl > 0 ? `<div style="font-size:0.62rem;color:var(--text-dim);margin-top:2px">${r.totalMl}ml</div>` : ''}
+        </div>
+        <div style="background:rgba(0,30,70,0.5);border:1px solid rgba(0,180,255,0.25);border-radius:10px;padding:12px;text-align:center">
+          <div style="font-family:'Orbitron',monospace;font-size:1.5rem;font-weight:800;color:#c77dff">${r.sonos}</div>
+          <div style="font-size:0.6rem;color:var(--text-dim);letter-spacing:0.06em;margin-top:3px">😴 SONOS</div>
+          <div style="font-size:0.62rem;color:var(--text-dim);margin-top:2px">${r.horasSono}h total</div>
+        </div>
+        <div style="background:rgba(0,30,70,0.5);border:1px solid rgba(0,180,255,0.25);border-radius:10px;padding:12px;text-align:center">
+          <div style="font-family:'Orbitron',monospace;font-size:1.5rem;font-weight:800;color:#ffe066">${r.fraldas}</div>
+          <div style="font-size:0.6rem;color:var(--text-dim);letter-spacing:0.06em;margin-top:3px">🩲 FRALDAS</div>
+        </div>
+        <div style="background:rgba(0,30,70,0.5);border:1px solid rgba(0,180,255,0.25);border-radius:10px;padding:12px;text-align:center">
+          <div style="font-family:'Orbitron',monospace;font-size:1.5rem;font-weight:800;color:#78ff99">${r.marcosNovos}</div>
+          <div style="font-size:0.6rem;color:var(--text-dim);letter-spacing:0.06em;margin-top:3px">🌙 MARCOS NOVOS</div>
+        </div>
+      </div>
+      ${r.marcosNovos > 0 ? `
+        <div style="background:rgba(120,255,153,0.08);border-left:3px solid #78ff99;border-radius:6px;padding:10px 12px;margin-bottom:14px">
+          <div style="font-family:'Orbitron',monospace;font-size:0.6rem;color:#78ff99;letter-spacing:0.06em;font-weight:600;margin-bottom:4px">🌟 NOVOS MARCOS</div>
+          ${r.marcos.map(m => `<div style="font-size:0.72rem;color:var(--white);margin:3px 0">• ${_rcEsc(m)}</div>`).join('')}
+        </div>
+      ` : ''}
+      <div style="font-size:0.7rem;color:var(--text-dim);line-height:1.5;text-align:center;font-style:italic;margin-bottom:16px">Uma semana de cuidado bem registrada. ✨</div>
+      <div style="display:flex;gap:10px">
+        <button onclick="document.getElementById('modal-resumo-semanal')?.remove()" style="flex:1;padding:11px;background:rgba(0,60,120,0.6);border:1px solid rgba(0,180,255,0.4);border-radius:8px;color:var(--blue-neon);font-family:'Orbitron',monospace;font-size:0.66rem;letter-spacing:0.06em;cursor:pointer">Fechar</button>
+        <button onclick="window._iaBaixarResumoPDF()" style="flex:1;padding:11px;background:linear-gradient(135deg,#00d4ff,#78ff99);border:none;border-radius:8px;color:#020514;font-family:'Orbitron',monospace;font-size:0.66rem;letter-spacing:0.06em;cursor:pointer;font-weight:700">📄 Baixar PDF</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+};
+
+window._iaBaixarResumoPDF = function() {
+  try {
+    const { jsPDF } = window.jspdf || {};
+    if (!jsPDF) return;
+    const r = _iaGerarResumoSemanal();
+    if (!r) return;
+    const doc = new jsPDF();
+    doc.setFillColor(10, 26, 61); doc.rect(0, 0, 210, 40, 'F');
+    doc.setTextColor(255, 224, 102); doc.setFontSize(18); doc.setFont('helvetica', 'bold');
+    doc.text('RESUMO SEMANAL', 105, 18, { align: 'center' });
+    doc.setFontSize(11); doc.setTextColor(200, 220, 240);
+    doc.text(r.nome + ' - ' + r.periodo, 105, 30, { align: 'center' });
+    let y = 55;
+    doc.setTextColor(40); doc.setFontSize(12); doc.setFont('helvetica', 'normal');
+    const linhas = [
+      ['Mamadas', r.mamadas + (r.totalMl ? ' (' + r.totalMl + 'ml)' : '')],
+      ['Sonos', r.sonos + ' - ' + r.horasSono + 'h'],
+      ['Fraldas', r.fraldas],
+      ['Marcos novos', r.marcosNovos],
+    ];
+    linhas.forEach(([k, v]) => {
+      doc.setFont('helvetica', 'normal'); doc.text(k, 25, y);
+      doc.setFont('helvetica', 'bold'); doc.text(String(v), 185, y, { align: 'right' });
+      y += 8;
+    });
+    if (r.marcosNovos) {
+      y += 5;
+      doc.setFont('helvetica', 'bold'); doc.setTextColor(120, 160, 40);
+      doc.text('Novos marcos celebrados:', 25, y); y += 8;
+      doc.setTextColor(60); doc.setFont('helvetica', 'normal');
+      r.marcos.forEach(m => { doc.text('  - ' + (m || '').substring(0, 70), 25, y); y += 6; });
+    }
+    doc.save('BabyForce_ResumoSemanal_' + r.nome.replace(/[^\w]+/g, '_') + '_' + new Date().toISOString().slice(0, 10) + '.pdf');
+    if (typeof showToast === 'function') showToast('📄 PDF baixado');
+  } catch (e) { console.warn('[ia pdf]', e); }
+};
+
+window._iaConsultarOraculo = async function(contexto) {
+  const apiKey = typeof getEffectiveApiKey === 'function' ? getEffectiveApiKey() : null;
+  if (!apiKey) {
+    if (typeof showToast === 'function') showToast('⚠ Configure o Oráculo em Apoio > Oráculo (AI)');
+    return;
+  }
+  if (typeof showToast === 'function') showToast('🔮 Consultando Oráculo...');
+  if (typeof window.showHub === 'function') {
+    window.showHub('apoio');
+    setTimeout(() => { if (typeof window.showSubTabMissoes === 'function') window.showSubTabMissoes('oraculo'); }, 300);
+  }
+};
+
+window._iaRenderizarAlertasDashboard = function() {
+  try {
+    const container = document.getElementById('ia-alertas-container');
+    if (!container) return;
+    const cfg = _iaConfig();
+    if (!cfg.habilitado) { container.innerHTML = ''; return; }
+    const alertas = _iaAnalisarTodos();
+    if (!alertas.length) { container.innerHTML = ''; return; }
+    const cores = { alta: '#ff6666', media: '#ffc94f', baixa: '#78ff99' };
+    const labels = { alta: 'IMPORTANTE', media: 'ATENÇÃO', baixa: 'INFO' };
+    container.innerHTML = `
+      <div style="background:linear-gradient(135deg,rgba(199,125,255,0.12),rgba(0,180,255,0.08));border:1px solid rgba(199,125,255,0.3);border-radius:12px;padding:14px;margin:12px 0">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+          <div style="font-size:1.6rem">🔮</div>
+          <div style="flex:1">
+            <div style="font-family:'Orbitron',monospace;font-size:0.7rem;color:var(--purple-glow);letter-spacing:0.08em;font-weight:700">ALERTAS INTELIGENTES</div>
+            <div style="font-size:0.62rem;color:var(--text-dim);margin-top:2px">${alertas.length} insight${alertas.length > 1 ? 's' : ''}</div>
+          </div>
+          <button onclick="window._iaAbrirConfig()" style="background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:1rem" title="Configurar">⚙</button>
+        </div>
+        ${alertas.map(a => `
+          <div style="background:rgba(0,20,50,0.5);border-left:3px solid ${cores[a.severidade] || '#9eb0c8'};border-radius:8px;padding:10px 12px;margin-bottom:8px">
+            <div style="display:flex;align-items:flex-start;gap:10px">
+              <div style="font-size:1.4rem;line-height:1">${a.emoji}</div>
+              <div style="flex:1;min-width:0">
+                <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;flex-wrap:wrap">
+                  <strong style="color:var(--white);font-size:0.78rem">${_rcEsc(a.titulo)}</strong>
+                  <span style="font-size:0.52rem;color:${cores[a.severidade]};background:${cores[a.severidade]}22;padding:1px 5px;border-radius:5px;font-family:'Orbitron',monospace;letter-spacing:0.05em;font-weight:600">${labels[a.severidade]}</span>
+                </div>
+                <div style="font-size:0.72rem;color:var(--text-dim);line-height:1.5;margin-bottom:6px">${_rcEsc(a.msg)}</div>
+                <div style="display:flex;gap:6px;flex-wrap:wrap">
+                  ${a.acao ? `<button onclick="${a.acaoFn}" style="padding:4px 10px;background:rgba(0,180,255,0.15);border:1px solid rgba(0,180,255,0.4);border-radius:6px;color:var(--blue-neon);font-family:'Orbitron',monospace;font-size:0.56rem;letter-spacing:0.04em;cursor:pointer">${a.acao} →</button>` : ''}
+                  <button onclick="window._iaDispensarAlerta('${a.id}')" style="padding:4px 10px;background:none;border:1px solid rgba(158,176,200,0.25);border-radius:6px;color:var(--text-dim);font-family:'Orbitron',monospace;font-size:0.56rem;letter-spacing:0.04em;cursor:pointer">Dispensar</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  } catch (e) { console.warn('[ia render]', e); }
+};
+
+window._iaDispensarAlerta = function(alertaId) {
+  _iaMarcarVisto(alertaId);
+  window._iaRenderizarAlertasDashboard();
+};
+
+window._iaAbrirConfig = function() {
+  const cfg = _iaConfig();
+  const existente = document.getElementById('modal-ia-config');
+  if (existente) existente.remove();
+  const modal = document.createElement('div');
+  modal.id = 'modal-ia-config';
+  modal.setAttribute('role', 'dialog');
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,10,30,0.88);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(10px)';
+  const checks = [
+    { id: 'padrao_sono', titulo: '🌙 Mudanças no padrão de sono', desc: 'Alerta quando total de sono varia ±30%' },
+    { id: 'padrao_febre', titulo: '🌡️ Febre recorrente', desc: 'Alerta em ≥2 febres em 7 dias ou ≥39.5°C' },
+    { id: 'padrao_alimentacao', titulo: '🍼 Queda na alimentação', desc: 'Alerta quando refeições caem >30%' },
+    { id: 'marcos_atrasados', titulo: '🌙 Lembretes de marcos', desc: 'Lembra marcos esperados por idade (opt-in)', warning: true },
+  ];
+  modal.innerHTML = `
+    <div style="max-width:420px;width:100%;background:linear-gradient(135deg,#0a1a3d,#031027);border:1px solid rgba(199,125,255,0.4);border-radius:16px;padding:22px;box-shadow:0 20px 60px rgba(0,0,0,0.8);max-height:90vh;overflow-y:auto">
+      <div style="text-align:center;margin-bottom:16px">
+        <div style="font-size:2.2rem;margin-bottom:6px">🔮</div>
+        <div style="font-family:'Orbitron',monospace;font-size:0.78rem;color:var(--purple-glow);letter-spacing:0.08em;font-weight:700">IA PROATIVA</div>
+        <div style="font-size:0.68rem;color:var(--text-dim);margin-top:4px">Alertas inteligentes privados</div>
+      </div>
+      <label style="display:flex;align-items:flex-start;gap:10px;padding:10px;background:rgba(0,30,70,0.4);border-radius:8px;margin-bottom:12px;cursor:pointer">
+        <input type="checkbox" id="ia-habilitado" ${cfg.habilitado ? 'checked' : ''} style="margin-top:2px;accent-color:#c77dff">
+        <span style="flex:1;font-size:0.76rem;color:var(--white);line-height:1.5">
+          <strong>Ativar IA Proativa</strong>
+          <div style="font-size:0.66rem;color:var(--text-dim);margin-top:2px">Análise 100% local (nada sai do dispositivo)</div>
+        </span>
+      </label>
+      <div style="font-family:'Orbitron',monospace;font-size:0.6rem;color:var(--text-dim);letter-spacing:0.08em;margin:14px 0 8px">ALERTAS DISPONÍVEIS</div>
+      ${checks.map(c => `
+        <label style="display:flex;align-items:flex-start;gap:10px;padding:10px;background:${c.warning ? 'rgba(255,200,80,0.08)' : 'rgba(0,30,70,0.3)'};border${c.warning ? ':1px solid rgba(255,200,80,0.3)' : ''};border-radius:8px;margin-bottom:8px;cursor:pointer">
+          <input type="checkbox" id="ia-alerta-${c.id}" ${cfg.alertas && cfg.alertas[c.id] ? 'checked' : ''} style="margin-top:2px;accent-color:#c77dff">
+          <span style="flex:1;font-size:0.72rem;color:var(--white);line-height:1.4">
+            <strong>${c.titulo}</strong>
+            <div style="font-size:0.64rem;color:var(--text-dim);margin-top:2px">${c.desc}</div>
+          </span>
+        </label>
+      `).join('')}
+      <div style="font-size:0.66rem;color:var(--text-dim);line-height:1.5;margin:16px 0;padding:10px 12px;background:rgba(199,125,255,0.08);border-left:2px solid rgba(199,125,255,0.4);border-radius:6px;font-style:italic">
+        ✨ Todos os alertas são informativos. Em caso de dúvida, sempre consulte o pediatra.
+      </div>
+      <div style="display:flex;gap:10px">
+        <button onclick="document.getElementById('modal-ia-config')?.remove()" style="flex:1;padding:11px;background:rgba(0,60,120,0.6);border:1px solid rgba(0,180,255,0.4);border-radius:8px;color:var(--blue-neon);font-family:'Orbitron',monospace;font-size:0.66rem;letter-spacing:0.06em;cursor:pointer">Cancelar</button>
+        <button onclick="window._iaSalvarConfigUI()" style="flex:1;padding:11px;background:linear-gradient(135deg,#c77dff,#00d4ff);border:none;border-radius:8px;color:#020514;font-family:'Orbitron',monospace;font-size:0.66rem;letter-spacing:0.06em;cursor:pointer;font-weight:700">Salvar</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+};
+
+window._iaSalvarConfigUI = function() {
+  const cfg = {
+    habilitado: document.getElementById('ia-habilitado')?.checked !== false,
+    alertas: {
+      padrao_sono: document.getElementById('ia-alerta-padrao_sono')?.checked !== false,
+      padrao_febre: document.getElementById('ia-alerta-padrao_febre')?.checked !== false,
+      marcos_atrasados: document.getElementById('ia-alerta-marcos_atrasados')?.checked === true,
+      padrao_alimentacao: document.getElementById('ia-alerta-padrao_alimentacao')?.checked !== false,
+    },
+    resumoSemanal: true,
+    predicoes: true,
+  };
+  _iaSalvarConfigInterno(cfg);
+  document.getElementById('modal-ia-config')?.remove();
+  window._iaRenderizarAlertasDashboard();
+  if (typeof showToast === 'function') showToast('✓ Configurações salvas');
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => {
+    const dashboard = document.querySelector('#tab-hoje, .dashboard-container, #dashboard');
+    if (dashboard && !document.getElementById('ia-alertas-container')) {
+      const cont = document.createElement('div');
+      cont.id = 'ia-alertas-container';
+      dashboard.insertBefore(cont, dashboard.firstChild);
+    }
+    window._iaRenderizarAlertasDashboard();
+  }, 2000);
+});
+
+// Badge resumo semanal automático (a cada 7+ dias)
+(function () {
+  function verificarResumoSemanal() {
+    try {
+      const cfg = _iaConfig();
+      if (!cfg.resumoSemanal) return;
+      const key = (typeof _bfKey === 'function') ? _bfKey(IA_RESUMO_SEMANAL_KEY) : IA_RESUMO_SEMANAL_KEY;
+      const ultimo = localStorage.getItem(key);
+      const agora = Date.now();
+      if (!ultimo || (agora - parseInt(ultimo, 10)) > 7 * 86400000) {
+        setTimeout(() => {
+          if (document.getElementById('modal-resumo-semanal')) return;
+          const toast = document.createElement('div');
+          toast.id = 'ia-toast-resumo';
+          toast.style.cssText = 'position:fixed;bottom:96px;left:50%;transform:translateX(-50%);z-index:9000;background:linear-gradient(135deg,#c77dff,#00d4ff);color:#020514;padding:12px 18px;border-radius:20px;font-family:Orbitron,monospace;font-size:0.72rem;letter-spacing:0.06em;font-weight:700;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,0.4)';
+          toast.innerHTML = '📊 Resumo semanal disponível';
+          toast.onclick = () => {
+            window._iaMostrarResumoSemanal();
+            toast.remove();
+            try { localStorage.setItem(key, String(agora)); } catch {}
+          };
+          document.body.appendChild(toast);
+          setTimeout(() => { toast.remove(); }, 12000);
+        }, 3000);
+      }
+    } catch (e) { console.warn('[ia resumo auto]', e); }
+  }
+  document.addEventListener('DOMContentLoaded', () => setTimeout(verificarResumoSemanal, 4000));
+})();
+
+// API pública
+window._iaAnalisarTodos = _iaAnalisarTodos;
+window._iaGerarResumoSemanal = _iaGerarResumoSemanal;
+window._iaProximaMamada = _iaProximaMamada;
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// [EIXO 5 — Parte 1] SISTEMA DE FEATURE FLAGS + TELEMETRIA DE USO
+// ═══════════════════════════════════════════════════════════════════════════════
+// Prepara infraestrutura completa de monetização SEM ATIVAR nenhuma restrição.
+// Filosofia:
+// - Tudo grátis hoje (flag BF_MONETIZATION_ENABLED = false)
+// - Ao ativar um dia, recursos premium são gated com Premium.podeUsar('feature')
+// - Telemetria roda desde o início pra saber quais features são mais usadas
+//   e decidir preço/plano com base em métricas REAIS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// 🔑 FLAG GLOBAL DE MONETIZAÇÃO
+// Mude para true quando quiser ativar o gate de recursos premium.
+// Quando false: TODOS os recursos liberados (comportamento atual).
+window.BF_MONETIZATION_ENABLED = false;
+
+// 🎯 DEFINIÇÃO DE FEATURES E PLANOS
+// Isso é o "catálogo" — quais features existem e quais planos as contêm.
+// No futuro você configura isso no RevenueCat + espelha aqui.
+window.BF_FEATURES = {
+  // Feature ID → descrição + requer plano
+  // Se BF_MONETIZATION_ENABLED=false, TUDO é free
+  multiplas_criancas: { label: 'Múltiplas crianças (até 5)', plano: 'premium' },
+  oraculo_ilimitado: { label: 'Oráculo IA ilimitado', plano: 'premium' },
+  relatorio_clinico_completo: { label: 'Relatório clínico completo (IA + gráficos)', plano: 'premium' },
+  comparacao_irmaos: { label: 'Comparação entre irmãos', plano: 'premium' },
+  backup_automatico: { label: 'Backup automático em nuvem', plano: 'premium' },
+  conquistas_no_pdf: { label: 'Conquistas no PDF clínico', plano: 'premium' },
+  predicoes_avancadas: { label: 'Predições avançadas (próxima mamada, sono)', plano: 'premium' },
+  historico_ilimitado: { label: 'Histórico ilimitado (free: 90 dias)', plano: 'premium' },
+  exportacao_pdf: { label: 'Exportação em PDF', plano: 'free' },
+  relatorio_semanal: { label: 'Resumo semanal', plano: 'free' },
+};
+
+// 📦 PLANOS DISPONÍVEIS
+window.BF_PLANOS = {
+  free: {
+    nome: 'Free',
+    preco: 0,
+    ciclo: null,
+    cor: '#9eb0c8',
+    features: ['exportacao_pdf', 'relatorio_semanal'],
+  },
+  premium_mensal: {
+    nome: 'Premium Mensal',
+    preco: 9.90,
+    ciclo: 'mensal',
+    cor: '#c77dff',
+    features: 'all', // todas
+  },
+  premium_anual: {
+    nome: 'Premium Anual',
+    preco: 79.90,
+    ciclo: 'anual',
+    cor: '#ffe066',
+    desconto: '32% OFF',
+    features: 'all',
+  },
+  familia: {
+    nome: 'Família',
+    preco: 19.90,
+    ciclo: 'mensal',
+    cor: '#78ff99',
+    features: 'all',
+    extras: 'Até 6 guardiões',
+  },
+};
+
+// ═══════════════════════════════════════════════════════════════
+// OBJETO GLOBAL Premium
+// ═══════════════════════════════════════════════════════════════
+window.Premium = {
+  // Estado (preparado para integração com RevenueCat + Firebase Custom Claims)
+  _cache: null,
+  _cacheKey: 'babyforce_premium_cache_v1',
+  _cacheExpiraMs: 24 * 60 * 60 * 1000, // 24h
+
+  // Retorna o status atual (cached ou fresh)
+  async status() {
+    // Se monetização desativada globalmente, todo mundo é premium (comportamento atual)
+    if (!window.BF_MONETIZATION_ENABLED) {
+      return {
+        ativo: true,
+        plano: 'dev_mode',
+        fonte: 'monetization_disabled',
+        expira: null,
+      };
+    }
+
+    // Carrega cache local
+    const cached = this._loadCache();
+    if (cached && Date.now() < cached.validoAte) {
+      return cached.status;
+    }
+
+    // Aqui entraria a chamada ao RevenueCat/Firebase Custom Claims
+    // Por ora, retorna status cached ou free como fallback
+    return cached?.status || { ativo: false, plano: 'free', fonte: 'default', expira: null };
+  },
+
+  // Verifica se pode usar uma feature específica
+  async podeUsar(featureId) {
+    // Registra tentativa de uso (telemetria — decide preços depois)
+    this._registrarUso(featureId);
+
+    // Monetização desligada? Libera tudo
+    if (!window.BF_MONETIZATION_ENABLED) return true;
+
+    const feature = window.BF_FEATURES[featureId];
+    if (!feature) {
+      console.warn('[Premium] Feature desconhecida:', featureId);
+      return true; // fail-open: feature não mapeada = libera
+    }
+
+    if (feature.plano === 'free') return true;
+
+    const status = await this.status();
+    return status.ativo;
+  },
+
+  // Verifica síncrono (menos seguro, mas útil para renderização inicial)
+  podeUsarSync(featureId) {
+    this._registrarUso(featureId);
+    if (!window.BF_MONETIZATION_ENABLED) return true;
+    const feature = window.BF_FEATURES[featureId];
+    if (!feature) return true;
+    if (feature.plano === 'free') return true;
+    const cached = this._loadCache();
+    return cached?.status?.ativo || false;
+  },
+
+  // Exibe paywall quando usuário tenta usar feature premium sem acesso
+  async mostrarPaywall(featureId) {
+    const feature = window.BF_FEATURES[featureId];
+    const existente = document.getElementById('modal-paywall');
+    if (existente) existente.remove();
+
+    const modal = document.createElement('div');
+    modal.id = 'modal-paywall';
+    modal.setAttribute('role', 'dialog');
+    modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,10,30,0.92);z-index:99990;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(12px)';
+
+    modal.innerHTML = `
+      <div style="max-width:420px;width:100%;background:linear-gradient(135deg,#0a1a3d,#031027);border:1px solid rgba(255,200,80,0.4);border-radius:16px;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,0.8);max-height:92vh;overflow-y:auto">
+        <div style="text-align:center;margin-bottom:18px">
+          <div style="font-size:2.6rem;margin-bottom:8px">✨</div>
+          <div style="font-family:'Orbitron',monospace;font-size:0.82rem;color:var(--gold);letter-spacing:0.1em;font-weight:700">RECURSO PREMIUM</div>
+          <div style="font-size:0.8rem;color:var(--white);margin-top:6px;line-height:1.5">${_rcEsc(feature?.label || featureId)}</div>
+        </div>
+
+        <div style="font-size:0.78rem;color:var(--text-dim);line-height:1.6;margin-bottom:18px;text-align:center">
+          Assine o <strong style="color:var(--gold)">BabyForce Premium</strong> para desbloquear este e outros recursos exclusivos.
+        </div>
+
+        <div style="background:rgba(255,200,80,0.08);border:1px solid rgba(255,200,80,0.3);border-radius:10px;padding:14px;margin-bottom:16px">
+          <div style="font-family:'Orbitron',monospace;font-size:0.62rem;color:var(--gold);letter-spacing:0.08em;margin-bottom:10px;text-align:center">✨ PREMIUM INCLUI</div>
+          <div style="font-size:0.74rem;color:var(--white);line-height:1.7">
+            • Oráculo IA ilimitado<br>
+            • Múltiplas crianças (até 5)<br>
+            • Relatórios clínicos completos<br>
+            • Comparação entre irmãos<br>
+            • Backup automático<br>
+            • Predições avançadas<br>
+            • Histórico ilimitado
+          </div>
+        </div>
+
+        <div style="font-size:0.7rem;color:var(--text-dim);line-height:1.5;text-align:center;font-style:italic;margin-bottom:16px">
+          ⚠️ Em breve. Monetização ainda não ativada nesta versão.
+        </div>
+
+        <div style="display:flex;gap:10px">
+          <button onclick="document.getElementById('modal-paywall')?.remove()" style="flex:1;padding:12px;background:rgba(0,60,120,0.6);border:1px solid rgba(0,180,255,0.4);border-radius:10px;color:var(--blue-neon);font-family:'Orbitron',monospace;font-size:0.68rem;letter-spacing:0.06em;cursor:pointer">Talvez depois</button>
+          <button onclick="window.Premium.mostrarInteresse('${featureId}');document.getElementById('modal-paywall')?.remove()" style="flex:1;padding:12px;background:linear-gradient(135deg,#ffe066,#c77dff);border:none;border-radius:10px;color:#020514;font-family:'Orbitron',monospace;font-size:0.68rem;letter-spacing:0.06em;cursor:pointer;font-weight:700">💛 Quero saber</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+  },
+
+  // Registra interesse do usuário (telemetria pra validar pricing)
+  mostrarInteresse(featureId) {
+    try {
+      const key = (typeof _bfKey === 'function') ? _bfKey('babyforce_premium_interesse_v1') : 'babyforce_premium_interesse_v1';
+      const atual = JSON.parse(localStorage.getItem(key) || '[]');
+      atual.push({ featureId, timestamp: Date.now() });
+      localStorage.setItem(key, JSON.stringify(atual.slice(-100))); // mantém últimos 100
+    } catch {}
+    if (typeof showToast === 'function') showToast('💛 Obrigado! Seu interesse foi registrado');
+    if (typeof BFAudit !== 'undefined') BFAudit.log('premium_interesse', { featureId });
+  },
+
+  // ═══════════════════════════════════════════════════
+  // TELEMETRIA DE USO
+  // Grava o uso de CADA feature para saber no futuro:
+  // - Quais features são mais usadas (valor percebido)
+  // - Frequência média por usuário
+  // - Se vale gating esta feature ou deixar free
+  // ═══════════════════════════════════════════════════
+
+  _registrarUso(featureId) {
+    try {
+      const key = (typeof _bfKey === 'function') ? _bfKey('babyforce_feature_uso_v1') : 'babyforce_feature_uso_v1';
+      const uso = JSON.parse(localStorage.getItem(key) || '{}');
+      if (!uso[featureId]) uso[featureId] = { count: 0, primeiroUso: Date.now(), ultimoUso: null };
+      uso[featureId].count++;
+      uso[featureId].ultimoUso = Date.now();
+      localStorage.setItem(key, JSON.stringify(uso));
+    } catch {}
+  },
+
+  // Retorna relatório de uso de features
+  relatorioUso() {
+    try {
+      const key = (typeof _bfKey === 'function') ? _bfKey('babyforce_feature_uso_v1') : 'babyforce_feature_uso_v1';
+      const uso = JSON.parse(localStorage.getItem(key) || '{}');
+      const items = Object.entries(uso).map(([id, data]) => ({
+        feature: id,
+        label: window.BF_FEATURES[id]?.label || id,
+        plano: window.BF_FEATURES[id]?.plano || 'desconhecido',
+        usos: data.count,
+        primeiroUso: new Date(data.primeiroUso).toLocaleDateString('pt-BR'),
+        ultimoUso: data.ultimoUso ? new Date(data.ultimoUso).toLocaleDateString('pt-BR') : '-',
+      }));
+      return items.sort((a, b) => b.usos - a.usos);
+    } catch { return []; }
+  },
+
+  // Relatório de interesses (quantas vezes cada paywall foi aberto)
+  relatorioInteresses() {
+    try {
+      const key = (typeof _bfKey === 'function') ? _bfKey('babyforce_premium_interesse_v1') : 'babyforce_premium_interesse_v1';
+      const interesses = JSON.parse(localStorage.getItem(key) || '[]');
+      const porFeature = {};
+      interesses.forEach(i => {
+        porFeature[i.featureId] = (porFeature[i.featureId] || 0) + 1;
+      });
+      return Object.entries(porFeature).sort((a, b) => b[1] - a[1]);
+    } catch { return []; }
+  },
+
+  // ═══════════════════════════════════════════════════
+  // CACHE HELPERS (preparando infra de Opção C híbrida)
+  // ═══════════════════════════════════════════════════
+  _loadCache() {
+    try {
+      return JSON.parse(localStorage.getItem(this._cacheKey) || 'null');
+    } catch { return null; }
+  },
+
+  _saveCache(status) {
+    try {
+      const entry = {
+        status,
+        validoAte: Date.now() + this._cacheExpiraMs,
+      };
+      localStorage.setItem(this._cacheKey, JSON.stringify(entry));
+    } catch {}
+  },
+
+  // Para dev: forçar status premium localmente (útil para testes)
+  _forceDev(plano = 'premium_mensal') {
+    const status = {
+      ativo: true,
+      plano,
+      fonte: 'dev_force',
+      expira: Date.now() + 30 * 86400000,
+    };
+    this._saveCache(status);
+    console.log('[Premium] DEV: forçado plano', plano);
+    return status;
+  },
+
+  _forceFree() {
+    this._saveCache({ ativo: false, plano: 'free', fonte: 'dev_force', expira: null });
+    console.log('[Premium] DEV: forçado free');
+  },
+
+  _limpar() {
+    try { localStorage.removeItem(this._cacheKey); } catch {}
+  },
+};
+
+// Atalho pra abrir o painel de planos futuros
+window._premiumVerPlanos = function() {
+  const existente = document.getElementById('modal-planos');
+  if (existente) existente.remove();
+  const modal = document.createElement('div');
+  modal.id = 'modal-planos';
+  modal.setAttribute('role', 'dialog');
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,10,30,0.9);z-index:99990;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(10px);overflow-y:auto';
+
+  const planos = Object.entries(window.BF_PLANOS);
+  modal.innerHTML = `
+    <div style="max-width:440px;width:100%;background:linear-gradient(135deg,#0a1a3d,#031027);border:1px solid rgba(199,125,255,0.4);border-radius:16px;padding:22px;box-shadow:0 20px 60px rgba(0,0,0,0.8);max-height:92vh;overflow-y:auto">
+      <div style="text-align:center;margin-bottom:16px">
+        <div style="font-size:2.2rem;margin-bottom:6px">✨</div>
+        <div style="font-family:'Orbitron',monospace;font-size:0.82rem;color:var(--purple-glow);letter-spacing:0.1em;font-weight:700">PLANOS BABYFORCE</div>
+        <div style="font-size:0.68rem;color:var(--text-dim);margin-top:6px;font-style:italic">Em breve. Hoje tudo é gratuito.</div>
+      </div>
+
+      ${planos.map(([id, p]) => `
+        <div style="background:rgba(0,30,70,0.5);border:1px solid ${p.cor}55;border-radius:12px;padding:14px;margin-bottom:10px">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+            <div style="width:8px;height:8px;border-radius:50%;background:${p.cor}"></div>
+            <div style="flex:1">
+              <div style="font-family:'Orbitron',monospace;font-size:0.76rem;color:${p.cor};letter-spacing:0.06em;font-weight:700">${p.nome.toUpperCase()}</div>
+              <div style="font-size:0.64rem;color:var(--text-dim);margin-top:1px">
+                ${p.preco === 0 ? 'Grátis' : `R$ ${p.preco.toFixed(2)}${p.ciclo === 'mensal' ? '/mês' : p.ciclo === 'anual' ? '/ano' : ''}`}
+                ${p.desconto ? ` · <span style="color:${p.cor};font-weight:700">${p.desconto}</span>` : ''}
+              </div>
+            </div>
+          </div>
+          ${p.extras ? `<div style="font-size:0.68rem;color:var(--white);padding:6px 10px;background:${p.cor}15;border-radius:6px;margin-top:4px">✨ ${p.extras}</div>` : ''}
+        </div>
+      `).join('')}
+
+      <div style="font-size:0.66rem;color:var(--text-dim);line-height:1.5;text-align:center;font-style:italic;margin:16px 0;padding:10px;background:rgba(199,125,255,0.08);border-radius:6px">
+        Os planos serão ativados quando o app sair das lojas. Marque "💛 Quero saber" em features premium para ser avisado antes.
+      </div>
+
+      <button onclick="document.getElementById('modal-planos')?.remove()" style="width:100%;padding:12px;background:rgba(0,60,120,0.6);border:1px solid rgba(0,180,255,0.4);border-radius:10px;color:var(--blue-neon);font-family:'Orbitron',monospace;font-size:0.7rem;letter-spacing:0.06em;cursor:pointer">Fechar</button>
+    </div>
+  `;
+  document.body.appendChild(modal);
+};
+
+// Relatório de telemetria de uso (dev)
+window._premiumRelatorioDev = function() {
+  const uso = window.Premium.relatorioUso();
+  const interesses = window.Premium.relatorioInteresses();
+  console.log('════ Relatório de Uso de Features ════');
+  console.table(uso);
+  console.log('════ Relatório de Interesse em Premium ════');
+  console.table(interesses);
+  return { uso, interesses };
+};
+
+console.log('[Premium] Sistema carregado. Monetização:', window.BF_MONETIZATION_ENABLED ? 'ATIVA' : 'DESLIGADA (dev mode)');
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// [DEV HELPER] BF_TEST — simular dados dummies para testar IA Proativa e Premium
+// Apenas para desenvolvimento/QA. Não afeta o app em produção.
+// Uso:
+//   BF_TEST.seed()      → Popula dados típicos (usuário com 2 semanas de uso)
+//   BF_TEST.sonoQueda() → Simula cenário "sono caiu 30%"
+//   BF_TEST.febre()     → Simula cenário "2+ febres em 7 dias"
+//   BF_TEST.alimQueda() → Simula cenário "refeições caíram 40%"
+//   BF_TEST.limpar()    → Limpa todos os dados de teste (preserva config)
+//   BF_TEST.rodarIA()   → Força análise da IA + rerender no dashboard
+//   BF_TEST.status()    → Imprime status atual do app
+// ═══════════════════════════════════════════════════════════════════════════════
+window.BF_TEST = {
+  _log(...args) { console.log('%c[BF_TEST]', 'color:#c77dff;font-weight:bold', ...args); },
+
+  _dataISO(diasAtras = 0) {
+    const d = new Date(Date.now() - diasAtras * 86400000);
+    return d.toISOString().slice(0, 10);
+  },
+
+  _horaRandom(baseHora = 8) {
+    const h = baseHora + Math.floor(Math.random() * 2);
+    const m = Math.floor(Math.random() * 60);
+    return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+  },
+
+  // Popula 14 dias de dados típicos (usuário saudável)
+  seed() {
+    this._log('🌱 Populando 14 dias de dados típicos...');
+    if (typeof db === 'undefined') {
+      this._log('❌ db não encontrado. Faça onboarding primeiro.');
+      return;
+    }
+
+    db.mamadas = db.mamadas || [];
+    db.sono = db.sono || [];
+    db.fraldas = db.fraldas || [];
+
+    // 14 dias, ~6 mamadas/dia, ~3 sonos/dia, ~5 fraldas/dia
+    for (let dia = 14; dia >= 1; dia--) {
+      // Mamadas (6/dia a cada ~3h)
+      for (let i = 0; i < 6; i++) {
+        const hora = 6 + i * 3 + Math.random();
+        db.mamadas.push({
+          id: `test_m_${dia}_${i}_${Date.now()}${i}`,
+          data: this._dataISO(dia),
+          hora: `${String(Math.floor(hora)).padStart(2, '0')}:${String(Math.floor((hora % 1) * 60)).padStart(2, '0')}`,
+          ml: 80 + Math.floor(Math.random() * 60),
+          lado: ['esquerdo', 'direito', 'ambos'][Math.floor(Math.random() * 3)],
+          tipo: 'leite_materno',
+        });
+      }
+      // Sonos (3/dia: manhã, tarde, noite)
+      const sonosDia = [
+        { inicio: '09:00', duracao: 60 + Math.floor(Math.random() * 30), tipo: 'soneca' },
+        { inicio: '14:00', duracao: 90 + Math.floor(Math.random() * 30), tipo: 'soneca' },
+        { inicio: '20:00', duracao: 540 + Math.floor(Math.random() * 60), tipo: 'noite' },
+      ];
+      sonosDia.forEach((s, i) => {
+        const [h, m] = s.inicio.split(':').map(Number);
+        const fimMin = h * 60 + m + s.duracao;
+        const fimH = Math.floor(fimMin / 60) % 24;
+        const fimM = fimMin % 60;
+        db.sono.push({
+          id: `test_s_${dia}_${i}_${Date.now()}${i}`,
+          data: this._dataISO(dia),
+          inicio: s.inicio,
+          fim: `${String(fimH).padStart(2, '0')}:${String(fimM).padStart(2, '0')}`,
+          duracao: s.duracao,
+          tipo: s.tipo,
+        });
+      });
+      // Fraldas (5/dia)
+      for (let i = 0; i < 5; i++) {
+        db.fraldas.push({
+          id: `test_f_${dia}_${i}_${Date.now()}${i}`,
+          data: this._dataISO(dia),
+          hora: `${String(7 + i * 3).padStart(2, '0')}:00`,
+          tipo: ['molhada', 'suja', 'mista'][Math.floor(Math.random() * 3)],
+        });
+      }
+    }
+
+    // Salva via APIs nativas
+    try {
+      if (typeof saveMamadas === 'function') saveMamadas(db.mamadas);
+      if (typeof saveSono === 'function') saveSono(db.sono);
+      if (typeof saveFraldas === 'function') saveFraldas(db.fraldas);
+    } catch (e) { this._log('⚠ saveXxx não encontrado, usando fallback localStorage'); }
+
+    this._log(`✓ Seeded: ${db.mamadas.length} mamadas, ${db.sono.length} sonos, ${db.fraldas.length} fraldas`);
+    this._log('Agora use: BF_TEST.sonoQueda() para disparar alerta de sono');
+  },
+
+  // Cenário: sono caiu 40% na última semana
+  sonoQueda() {
+    this._log('😴 Simulando queda de 40% no sono da última semana...');
+    if (!db.sono) db.sono = [];
+    // Apaga sonos da última semana (7 dias)
+    const limite = Date.now() - 7 * 86400000;
+    db.sono = db.sono.filter(s => {
+      const d = new Date(s.data + 'T00:00').getTime();
+      return d < limite;
+    });
+    // Adiciona só 1 sono curto por dia (simula queda drástica)
+    for (let dia = 6; dia >= 0; dia--) {
+      db.sono.push({
+        id: `test_s_q_${dia}_${Date.now()}`,
+        data: this._dataISO(dia),
+        inicio: '20:00',
+        fim: '23:00',
+        duracao: 180, // só 3h! normal seria ~11h
+        tipo: 'noite',
+      });
+    }
+    try { if (typeof saveSono === 'function') saveSono(db.sono); } catch {}
+    this._log('✓ Sono cortado. Rode BF_TEST.rodarIA() para ver alerta');
+  },
+
+  // Cenário: 3 febres em 7 dias
+  febre() {
+    this._log('🌡️ Simulando 3 febres nos últimos 7 dias...');
+    const QL = typeof QL_KEYS !== 'undefined' ? QL_KEYS : {};
+    const key = (typeof _bfKey === 'function' && QL.sintoma) ? _bfKey(QL.sintoma) : QL.sintoma || 'babyforce_sintomas_v1';
+    let sintomas = [];
+    try { sintomas = JSON.parse(localStorage.getItem(key) || '[]'); } catch {}
+    // Adiciona 3 febres
+    [1, 3, 5].forEach((dia, i) => {
+      sintomas.push({
+        id: `test_febre_${i}_${Date.now()}`,
+        data: this._dataISO(dia),
+        hora: '14:00',
+        tipo: 'febre',
+        temperatura: i === 0 ? '39.8' : '38.5',
+        descricao: 'Febre (teste BF_TEST)',
+      });
+    });
+    try { localStorage.setItem(key, JSON.stringify(sintomas)); } catch {}
+    this._log('✓ 3 febres inseridas (1 alta de 39.8°C). Rode BF_TEST.rodarIA()');
+  },
+
+  // Cenário: alimentação caiu 40%
+  alimQueda() {
+    this._log('🍼 Simulando queda de 40% na alimentação...');
+    const QL = typeof QL_KEYS !== 'undefined' ? QL_KEYS : {};
+    const key = (typeof _bfKey === 'function' && QL.alimentacao) ? _bfKey(QL.alimentacao) : QL.alimentacao || 'babyforce_alimentacao_v1';
+    let refs = [];
+    try { refs = JSON.parse(localStorage.getItem(key) || '[]'); } catch {}
+    // Semana anterior (dias 8-14): 15 refeições
+    for (let dia = 14; dia >= 8; dia--) {
+      for (let i = 0; i < Math.ceil(15 / 7); i++) {
+        refs.push({
+          id: `test_alim_a_${dia}_${i}_${Date.now()}${i}`,
+          data: this._dataISO(dia),
+          hora: `${7 + i * 3}:00`,
+          tipo: 'refeicao',
+          descricao: 'Refeição teste',
+        });
+      }
+    }
+    // Semana atual (dias 1-7): só 7 refeições (queda de ~53%)
+    for (let dia = 7; dia >= 1; dia -= 1) {
+      if (dia % 2 === 0) continue; // só metade dos dias
+      refs.push({
+        id: `test_alim_b_${dia}_${Date.now()}`,
+        data: this._dataISO(dia),
+        hora: '12:00',
+        tipo: 'refeicao',
+        descricao: 'Refeição teste',
+      });
+    }
+    try { localStorage.setItem(key, JSON.stringify(refs)); } catch {}
+    this._log(`✓ Refeições inseridas (queda simulada). Rode BF_TEST.rodarIA()`);
+  },
+
+  // Roda a análise da IA manualmente + renderiza no dashboard
+  rodarIA() {
+    this._log('🔮 Executando análise IA...');
+    try {
+      const alertas = _iaAnalisarTodos();
+      if (!alertas.length) {
+        this._log('Nenhum alerta detectado. Talvez precise de BF_TEST.seed() primeiro.');
+      } else {
+        console.table(alertas.map(a => ({ id: a.id, severidade: a.severidade, titulo: a.titulo })));
+      }
+      window._iaRenderizarAlertasDashboard();
+      this._log('✓ Dashboard atualizado. Vá para a aba 🌌 Hoje.');
+      return alertas;
+    } catch (e) {
+      this._log('❌ Erro:', e.message);
+    }
+  },
+
+  // Popula dados de interesse Premium (simula usuário curioso)
+  interessesPremium() {
+    this._log('💛 Simulando interesses em features premium...');
+    const features = ['oraculo_ilimitado', 'multiplas_criancas', 'relatorio_clinico_completo', 'comparacao_irmaos'];
+    features.forEach(f => { Premium.mostrarInteresse(f); });
+    this._log('✓ 4 interesses registrados. Rode _premiumRelatorioDev() para ver.');
+  },
+
+  // Popula uso de features (simula usuário ativo)
+  usosPremium() {
+    this._log('📊 Simulando uso de features...');
+    const features = Object.keys(window.BF_FEATURES);
+    features.forEach(f => {
+      const count = Math.floor(Math.random() * 50) + 1;
+      for (let i = 0; i < count; i++) Premium._registrarUso(f);
+    });
+    this._log('✓ Uso aleatório gerado. Rode _premiumRelatorioDev() para ver.');
+  },
+
+  // Status geral do app
+  status() {
+    console.log('%c══ STATUS BABYFORCE ══', 'color:#00d4ff;font-weight:bold;font-size:14px');
+    console.log('%cDB:', 'font-weight:bold', {
+      mamadas: db?.mamadas?.length || 0,
+      sono: db?.sono?.length || 0,
+      fraldas: db?.fraldas?.length || 0,
+      marcos: db?.mesversario?.length || 0,
+    });
+    console.log('%cPremium:', 'font-weight:bold', {
+      monetizationEnabled: window.BF_MONETIZATION_ENABLED,
+      cache: Premium._loadCache(),
+    });
+    console.log('%cIA Proativa:', 'font-weight:bold', {
+      config: _iaConfig(),
+      alertas: _iaAnalisarTodos().length,
+    });
+  },
+
+  // Limpa todos os dados de teste (mantém config do app)
+  limpar() {
+    this._log('🧹 Limpando dados de teste...');
+    try {
+      // Remove apenas itens com id iniciando em "test_"
+      if (db.mamadas) db.mamadas = db.mamadas.filter(m => !String(m.id || '').startsWith('test_'));
+      if (db.sono) db.sono = db.sono.filter(s => !String(s.id || '').startsWith('test_'));
+      if (db.fraldas) db.fraldas = db.fraldas.filter(f => !String(f.id || '').startsWith('test_'));
+      if (typeof saveMamadas === 'function') saveMamadas(db.mamadas);
+      if (typeof saveSono === 'function') saveSono(db.sono);
+      if (typeof saveFraldas === 'function') saveFraldas(db.fraldas);
+      // Limpa sintomas teste
+      const QL = typeof QL_KEYS !== 'undefined' ? QL_KEYS : {};
+      ['sintoma', 'alimentacao'].forEach(tipo => {
+        const k = QL[tipo] ? ((typeof _bfKey === 'function') ? _bfKey(QL[tipo]) : QL[tipo]) : null;
+        if (k) {
+          try {
+            let arr = JSON.parse(localStorage.getItem(k) || '[]');
+            arr = arr.filter(s => !String(s.id || '').startsWith('test_'));
+            localStorage.setItem(k, JSON.stringify(arr));
+          } catch {}
+        }
+      });
+      // Limpa cache IA (alertas vistos de teste)
+      const kVistos = (typeof _bfKey === 'function') ? _bfKey(IA_ALERTAS_VISTOS_KEY) : IA_ALERTAS_VISTOS_KEY;
+      try { localStorage.removeItem(kVistos); } catch {}
+      this._log('✓ Dados de teste removidos.');
+    } catch (e) { this._log('❌ Erro:', e.message); }
+  },
+
+  help() {
+    console.log(`%c╔══════════════════════════════════════════════╗
+║         BF_TEST — Comandos disponíveis       ║
+╠══════════════════════════════════════════════╣
+║ BF_TEST.seed()           → 14 dias de dados  ║
+║ BF_TEST.sonoQueda()      → Alerta sono -40%  ║
+║ BF_TEST.febre()          → Alerta 3 febres   ║
+║ BF_TEST.alimQueda()      → Alerta alim -40%  ║
+║ BF_TEST.rodarIA()        → Reanalisar IA     ║
+║ BF_TEST.interessesPremium() → Simular cliques║
+║ BF_TEST.usosPremium()    → Simular uso feat  ║
+║ BF_TEST.status()         → Ver estado atual  ║
+║ BF_TEST.limpar()         → Remover só testes ║
+╠══════════════════════════════════════════════╣
+║ Premium._forceDev('premium_mensal') → ativar ║
+║ Premium._forceFree() → desativar             ║
+║ Premium.mostrarPaywall('oraculo_ilimitado')  ║
+║ _premiumVerPlanos()                          ║
+║ _premiumRelatorioDev()                       ║
+║ _iaMostrarResumoSemanal()                    ║
+║ _iaAbrirConfig()                             ║
+╚══════════════════════════════════════════════╝`, 'color:#c77dff;font-family:monospace');
+  },
+};
+
+// Mensagem de boas-vindas ao dev
+console.log('%c🧪 BF_TEST carregado. Use BF_TEST.help() para lista de comandos.', 'color:#78ff99;font-weight:bold');
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// [EIXO 5 — Parte 2] INTEGRAÇÃO RevenueCat + Firebase Custom Claims (HÍBRIDA)
+// ═══════════════════════════════════════════════════════════════════════════════
+// Arquitetura Opção C (Híbrida) escolhida:
+//   1. Usuário paga via RevenueCat SDK (iOS/Android nativo, pós-Capacitor)
+//   2. RevenueCat envia webhook para Cloud Function no Firebase
+//   3. Cloud Function atualiza Custom Claims do usuário (ex: { premium: true })
+//   4. App lê o token do Firebase Auth, cacheia resultado 24h em localStorage
+//   5. Offline: usa cache; Online: revalida em background
+//
+// TUDO DORMENTE hoje. Ativação: setar BF_MONETIZATION_ENABLED = true após:
+//   - App publicado nas lojas
+//   - RevenueCat configurado com produtos
+//   - Cloud Function deployada
+//
+// Não requer instalar SDK npm no PWA (RevenueCat SDK é usado APENAS no wrapper
+// nativo Capacitor — o PWA web usa o Firebase Custom Claims diretamente).
+// ═══════════════════════════════════════════════════════════════════════════════
+
+window.PremiumSync = {
+  // URL da Cloud Function que retorna o status premium do usuário autenticado
+  // Substituir quando você deployar: https://SUA-REGIAO-PROJETO.cloudfunctions.net/getPremiumStatus
+  CLOUD_FUNCTION_URL: 'https://us-central1-babyforce-prod.cloudfunctions.net/getPremiumStatus',
+
+  // Identificador do RevenueCat (público, igual ao Stripe publishable key)
+  // Substituir quando você criar o projeto no RevenueCat
+  REVENUECAT_PUBLIC_KEY: null, // ex: 'goog_abc123' (Android) / 'appl_xyz789' (iOS)
+
+  /**
+   * Revalida status premium no servidor + atualiza cache local.
+   * Roda em background ao abrir o app + a cada hora enquanto usuário usa.
+   */
+  async revalidar() {
+    if (!window.BF_MONETIZATION_ENABLED) return null;
+
+    try {
+      // Precisa de usuário autenticado no Firebase
+      if (typeof firebase === 'undefined' || !firebase.auth) return null;
+      const user = firebase.auth().currentUser;
+      if (!user) return null;
+
+      // Força refresh do token pra pegar claims atualizados
+      const tokenResult = await user.getIdTokenResult(true);
+      const claims = tokenResult.claims || {};
+
+      const status = {
+        ativo: !!claims.premium,
+        plano: claims.plano || (claims.premium ? 'premium' : 'free'),
+        fonte: 'firebase_custom_claims',
+        expira: claims.premium_expira || null,
+        revalidadoEm: Date.now(),
+      };
+
+      // Salva no cache local (24h)
+      window.Premium._saveCache(status);
+
+      // Notifica UI se houve mudança
+      window.dispatchEvent(new CustomEvent('premium:changed', { detail: status }));
+      return status;
+    } catch (e) {
+      console.warn('[PremiumSync] Erro ao revalidar:', e);
+      return null;
+    }
+  },
+
+  /**
+   * Força revalidação após evento de pagamento (RevenueCat webhook → retry)
+   * Pode ser chamada manualmente após ação de compra no wrapper nativo
+   */
+  async apósPagamento() {
+    // Aguarda 3s para o webhook RevenueCat→Cloud Function processar
+    await new Promise(r => setTimeout(r, 3000));
+    const tentativas = [1, 3, 8]; // retry exponencial em segundos
+    for (const delay of tentativas) {
+      const status = await this.revalidar();
+      if (status?.ativo) return status;
+      await new Promise(r => setTimeout(r, delay * 1000));
+    }
+    console.warn('[PremiumSync] Pagamento não confirmado após 3 tentativas');
+    return null;
+  },
+
+  /**
+   * Valida status no primeiro load + agenda revalidação periódica
+   * Chama em background — não bloqueia o startup
+   */
+  _inicializar() {
+    if (!window.BF_MONETIZATION_ENABLED) {
+      console.log('[PremiumSync] Dormente (BF_MONETIZATION_ENABLED=false)');
+      return;
+    }
+
+    // Espera Firebase Auth estar pronto
+    const iniciar = () => {
+      try {
+        if (typeof firebase === 'undefined' || !firebase.auth) return;
+        firebase.auth().onAuthStateChanged(async (user) => {
+          if (user) {
+            await this.revalidar();
+            // Revalida a cada 1h
+            setInterval(() => this.revalidar(), 60 * 60 * 1000);
+          } else {
+            // Usuário deslogou → limpa cache premium
+            window.Premium._limpar();
+          }
+        });
+      } catch (e) { console.warn('[PremiumSync] init:', e); }
+    };
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => setTimeout(iniciar, 2000));
+    } else {
+      setTimeout(iniciar, 2000);
+    }
+  },
+};
+
+// Dispara inicialização (não bloqueante)
+window.PremiumSync._inicializar();
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// WRAPPER NATIVO: integração com RevenueCat via Capacitor (quando houver)
+// ═══════════════════════════════════════════════════════════════════════════════
+// Essa função só é chamada no wrapper nativo Capacitor (quando você empacotar o app)
+// No PWA web, não faz nada. Mantemos aqui para o código estar pronto quando você
+// for fazer o wrapper iOS/Android.
+window.PremiumCompra = {
+  // Verifica se está rodando no wrapper nativo (Capacitor)
+  isNativo() {
+    return typeof window.Capacitor !== 'undefined' && window.Capacitor.isNativePlatform?.();
+  },
+
+  /**
+   * Inicia fluxo de compra. No wrapper nativo chama o RevenueCat SDK.
+   * No PWA (navegador), redireciona para landing page de assinatura.
+   */
+  async iniciar(planoId) {
+    if (!window.BF_MONETIZATION_ENABLED) {
+      if (typeof showToast === 'function') showToast('💛 Monetização ainda não ativada');
+      return;
+    }
+
+    if (!this.isNativo()) {
+      // PWA: abre landing page de assinatura (será criada no domínio babyforce.com.br/assinar)
+      window.open('https://babyforce.com.br/assinar?plano=' + planoId, '_blank');
+      return;
+    }
+
+    // Wrapper nativo Capacitor → RevenueCat Purchases SDK
+    try {
+      // Quando integrar RevenueCat, descomente:
+      // const { Purchases } = await import('@revenuecat/purchases-capacitor');
+      // const offerings = await Purchases.getOfferings();
+      // const produto = offerings.current?.availablePackages?.find(p => p.identifier === planoId);
+      // if (!produto) { if (typeof showToast === 'function') showToast('Produto não encontrado'); return; }
+      // await Purchases.purchasePackage({ aPackage: produto });
+      // Após compra bem-sucedida, revalida no servidor:
+      // await window.PremiumSync.apósPagamento();
+      // if (typeof showToast === 'function') showToast('✓ Premium ativado');
+
+      console.log('[PremiumCompra] Stub nativo — integrar RevenueCat SDK ao ativar monetização');
+      if (typeof showToast === 'function') showToast('🚧 RevenueCat SDK pendente de integração');
+    } catch (e) {
+      console.error('[PremiumCompra] Erro:', e);
+      if (typeof showToast === 'function') showToast('Erro ao processar compra');
+    }
+  },
+
+  async restaurar() {
+    if (!this.isNativo() || !window.BF_MONETIZATION_ENABLED) return;
+    try {
+      // const { Purchases } = await import('@revenuecat/purchases-capacitor');
+      // await Purchases.restorePurchases();
+      // await window.PremiumSync.apósPagamento();
+      console.log('[PremiumCompra] Restaurar compras — stub');
+    } catch (e) { console.warn('[PremiumCompra restaurar]', e); }
+  },
+};
 
 </script>
 </body>
