@@ -1532,6 +1532,7 @@ html.bf-tema-claro [style*="color: var(--white)"] { color: var(--white) !importa
   <div class="orbitas-subtabs">
     <button class="orbitas-stab active" id="ostab-marcos" onclick="showOrbitasTab('marcos',this)">🌙 Marcos</button>
     <button class="orbitas-stab" id="ostab-crescimento" onclick="showOrbitasTab('crescimento',this)">📏 Crescimento</button>
+    <button class="orbitas-stab" id="ostab-conquistas" onclick="showOrbitasTab('conquistas',this)">🏆 Conquistas</button>
   </div>
   <div id="orbitas-panel-marcos" class="orbitas-panel">
     <div class="card" id="atividades-ai-card" style="background:linear-gradient(135deg,rgba(100,30,180,0.28),rgba(0,120,80,0.18));border:1px solid rgba(199,125,255,0.3);padding:0;overflow:hidden">
@@ -1687,6 +1688,63 @@ html.bf-tema-claro [style*="color: var(--white)"] { color: var(--white) !importa
     </div>
     
     <div id="lista-crescimento"></div>
+  </div>
+
+  <!-- [Conquistas] Painel Conquistas — sub-aba em Desenvolvimento -->
+  <div id="orbitas-panel-conquistas" class="orbitas-panel" style="display:none">
+    <!-- HEADER -->
+    <div class="card" style="background:linear-gradient(135deg,rgba(255,200,80,0.14),rgba(199,125,255,0.14));border:1px solid rgba(255,200,80,0.35);margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:12px;padding:4px">
+        <div style="font-size:2.4rem;line-height:1">🏆</div>
+        <div style="flex:1">
+          <div style="font-family:'Orbitron',monospace;font-size:0.68rem;color:var(--gold);letter-spacing:0.1em;font-weight:700;margin-bottom:2px">CONQUISTAS DA JORNADA</div>
+          <div style="font-size:0.72rem;color:var(--white);line-height:1.4">Celebração das vitórias e marcos do seu guardião</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEÇÃO 1: Números da Jornada -->
+    <div class="card">
+      <div class="section-title" style="display:flex;align-items:center;gap:8px">
+        <span>📊 Números da Jornada</span>
+        <span style="font-family:'Orbitron',monospace;font-size:0.52rem;color:var(--blue-neon);background:rgba(0,180,255,0.12);padding:2px 7px;border-radius:8px;letter-spacing:0.08em;font-weight:600">ACUMULADO</span>
+      </div>
+      <div id="conquistas-stats-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px"></div>
+      <div style="font-size:0.64rem;color:var(--text-dim);margin-top:10px;text-align:center;font-style:italic">Cada registro é um gesto de cuidado. ✨</div>
+    </div>
+
+    <!-- SEÇÃO 2: Timeline de Marcos -->
+    <div class="card">
+      <div class="section-title" style="display:flex;align-items:center;gap:8px">
+        <span>🌟 Marcos Celebrados</span>
+        <span id="conquistas-marcos-total" style="font-family:'Orbitron',monospace;font-size:0.52rem;color:var(--gold);background:rgba(255,200,80,0.12);padding:2px 7px;border-radius:8px;letter-spacing:0.08em;font-weight:600">—</span>
+      </div>
+      <div id="conquistas-marcos-filtros" style="display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 12px"></div>
+      <div id="conquistas-marcos-body"></div>
+    </div>
+
+    <!-- SEÇÃO 3: Emblemas Conquistados -->
+    <div class="card">
+      <div class="section-title" style="display:flex;align-items:center;gap:8px">
+        <span>🎖️ Emblemas Conquistados</span>
+        <span id="conquistas-emblemas-total" style="font-family:'Orbitron',monospace;font-size:0.52rem;color:var(--purple-neon);background:rgba(199,125,255,0.14);padding:2px 7px;border-radius:8px;letter-spacing:0.08em;font-weight:600">—</span>
+      </div>
+      <div style="font-size:0.66rem;color:var(--text-dim);margin-bottom:10px;line-height:1.5">Conquistas derivadas dos registros da jornada. Aparecem silenciosamente quando alcançadas.</div>
+      <div id="conquistas-emblemas-body"></div>
+    </div>
+
+    <!-- SEÇÃO 4: Conquistas Especiais -->
+    <div class="card">
+      <div class="section-title" style="display:flex;align-items:center;gap:8px">
+        <span>📜 Conquistas Especiais</span>
+      </div>
+      <div id="conquistas-especiais-body"></div>
+    </div>
+
+    <!-- Botão atualizar -->
+    <div style="text-align:center;margin:16px 0 10px">
+      <button onclick="window.renderConquistasAba()" style="background:none;border:1px solid rgba(0,180,255,0.3);color:var(--blue-neon);padding:7px 16px;border-radius:16px;font-family:'Orbitron',monospace;font-size:0.58rem;letter-spacing:0.08em;cursor:pointer">↻ ATUALIZAR</button>
+    </div>
   </div>
 </div>
 
@@ -10086,7 +10144,7 @@ function renderMesversario(){
 }
 function setMvFiltro(val,btn){mvFiltroMes=val;renderMesversario();}
 function showSubTabMissoes(id){document.querySelectorAll('#tab-agenda .subpanel').forEach(p=>p.classList.remove('active'));document.querySelectorAll('#tab-agenda .sub-tab').forEach(b=>b.classList.remove('active'));document.getElementById('subpanel-'+id).classList.add('active');document.getElementById('stab-'+id).classList.add('active');if(id==='medicacao')renderMedicacao();if(id==='missivas'){renderDuvidas();renderDashboard();}if(id==='oraculo')oraculoInit();if(id==='sabedoria'&&typeof renderSabedoria==='function')renderSabedoria();}
-function showOrbitasTab(tab,btn){document.querySelectorAll('.orbitas-stab').forEach(b=>b.classList.remove('active'));document.querySelectorAll('.orbitas-panel').forEach(p=>p.style.display='none');if(btn)btn.classList.add('active');else document.getElementById('ostab-'+tab)?.classList.add('active');document.getElementById('orbitas-panel-'+tab).style.display='block';if(tab==='crescimento'){initCrescForm();renderCrescimento();setTimeout(renderGraficoCrescimento,50);}}
+function showOrbitasTab(tab,btn){document.querySelectorAll('.orbitas-stab').forEach(b=>b.classList.remove('active'));document.querySelectorAll('.orbitas-panel').forEach(p=>p.style.display='none');if(btn)btn.classList.add('active');else document.getElementById('ostab-'+tab)?.classList.add('active');document.getElementById('orbitas-panel-'+tab).style.display='block';if(tab==='crescimento'){initCrescForm();renderCrescimento();setTimeout(renderGraficoCrescimento,50);}if(tab==='conquistas'){if(typeof window.renderConquistasAba==='function')window.renderConquistasAba();}}
 
 // ── CRESCIMENTO ──
 const CRESC_KEY='babyforce_crescimento_v1';let crescData=[];let _crescMetrica='peso';
@@ -26777,6 +26835,17 @@ window._fecharCardTransicao = function() {
       <div style="font-size:0.68rem;color:var(--text-dim);line-height:1.5;text-align:center;padding:8px 0">Escolha uma categoria e clique em <strong style="color:var(--purple-neon)">Gerar análise</strong> para que a IA leia os dados e produza insights + recomendações preditivas.</div>
     </div>
 
+    <!-- [Conquistas] Checkbox opcional pra incluir conquistas no PDF -->
+    <div style="background:rgba(255,200,80,0.08);border:1px solid rgba(255,200,80,0.25);border-radius:8px;padding:10px 12px;margin-top:10px">
+      <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:0.76rem;color:var(--white);line-height:1.5">
+        <input type="checkbox" id="rc-incluir-conquistas" style="margin-top:2px;accent-color:#ffe066;cursor:pointer">
+        <span>
+          <strong style="color:var(--gold)">🏆 Incluir página de Conquistas</strong>
+          <div style="font-size:0.66rem;color:var(--text-dim);margin-top:2px">Adiciona números da jornada, marcos celebrados e emblemas conquistados ao relatório PDF.</div>
+        </span>
+      </label>
+    </div>
+
     <div class="rc-btn-row">
       <button id="rc-btn-gerar" class="rc-btn-primary" onclick="rcGerarAnalise()">🔮 Gerar análise</button>
       <button id="rc-btn-enviar" class="rc-btn-primary" onclick="rcEnviarRelatorio()" disabled style="background:linear-gradient(135deg,#00d4ff,#78ff99);color:#000">📤 Enviar</button>
@@ -27158,6 +27227,105 @@ function rcEnviarRelatorio() {
   doc.setFont('helvetica','italic'); doc.setFontSize(7); doc.setTextColor(130, 95, 30);
   doc.text('Relatório gerado por BabyForce para apoio à consulta clínica.', pW/2, y+5, { align:'center' });
   doc.text('A análise por IA é ferramenta de triagem e não substitui avaliação médica.', pW/2, y+9, { align:'center' });
+
+  // [Conquistas] Página opcional de conquistas (checkbox)
+  try {
+    const incluir = document.getElementById('rc-incluir-conquistas')?.checked;
+    if (incluir && typeof window.getConquistasEmblemasConquistados === 'function') {
+      doc.addPage();
+      let cy = 20;
+      // Header da página
+      doc.setFillColor(255, 200, 80); doc.rect(0, 0, pW, 24, 'F');
+      doc.setFont('helvetica','bold'); doc.setFontSize(16);
+      doc.setTextColor(20, 15, 40);
+      doc.text('🏆 CONQUISTAS DA JORNADA', pW/2, 15, { align: 'center' });
+      cy = 36;
+
+      const dadosConq = window.getConquistasStatsAtuais();
+      const emblemas = window.getConquistasEmblemasConquistados();
+
+      // Seção 1: Números
+      doc.setFillColor(245, 240, 255); doc.roundedRect(14, cy, pW-28, 6, 1, 1, 'F');
+      doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.setTextColor(100,50,180);
+      doc.text('NÚMEROS DA JORNADA', 16, cy+4); cy += 12;
+
+      const idadeMeses = (typeof _idadeCriancaMeses === 'function') ? _idadeCriancaMeses() : 0;
+      const stats = [];
+      if (idadeMeses < 24) {
+        stats.push(['🍼 Mamadas totais', (dadosConq.mamadas || []).length]);
+        stats.push(['😴 Sonos registrados', (dadosConq.sonos || []).length]);
+        stats.push(['🩲 Fraldas trocadas', (dadosConq.fraldas || []).length]);
+        stats.push(['🌙 Marcos celebrados', (dadosConq.marcos || []).length]);
+      } else {
+        stats.push(['🌙 Marcos celebrados', (dadosConq.marcos || []).length]);
+        stats.push(['💉 Vacinas aplicadas', Object.values(dadosConq.vacinas || {}).filter(v => v && v.aplicada).length]);
+        stats.push(['🗺️ Consultas/missões', (dadosConq.missoes || []).length]);
+        stats.push(['🥣 Refeições', (dadosConq.alimentacao || []).length]);
+      }
+      doc.setFontSize(9); doc.setTextColor(40); doc.setFont('helvetica','normal');
+      stats.forEach(([label, num]) => {
+        doc.text(label, 18, cy);
+        doc.setFont('helvetica','bold'); doc.setTextColor(100, 50, 180);
+        doc.text(String(num), pW - 18, cy, { align: 'right' });
+        doc.setFont('helvetica','normal'); doc.setTextColor(40);
+        cy += 5.5;
+      });
+      cy += 6;
+
+      // Seção 2: Marcos
+      if (cy > 230) { doc.addPage(); cy = 20; }
+      doc.setFillColor(255, 250, 230); doc.roundedRect(14, cy, pW-28, 6, 1, 1, 'F');
+      doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.setTextColor(160, 120, 20);
+      doc.text('MARCOS CELEBRADOS', 16, cy+4); cy += 10;
+      doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.setTextColor(60);
+      const marcosOrd = (dadosConq.marcos || []).slice().sort((a, b) => (a.mes || 0) - (b.mes || 0));
+      if (!marcosOrd.length) {
+        doc.setTextColor(150); doc.setFont('helvetica','italic');
+        doc.text('Nenhum marco registrado ainda.', 18, cy); cy += 6;
+        doc.setFont('helvetica','normal');
+      } else {
+        marcosOrd.slice(0, 15).forEach(m => {
+          if (cy > 275) { doc.addPage(); cy = 20; }
+          const idade = m.mes || 0;
+          const idLab = idade === 0 ? 'Nasc.' : idade < 12 ? idade + 'm' : Math.floor(idade/12) + 'a' + (idade%12 ? ' ' + (idade%12) + 'm' : '');
+          doc.setFont('helvetica','bold'); doc.setTextColor(160, 120, 20);
+          doc.text(idLab, 18, cy);
+          doc.setFont('helvetica','normal'); doc.setTextColor(40);
+          doc.text(((m.titulo || '(sem título)').substring(0, 90)), 42, cy);
+          cy += 4.5;
+        });
+        if (marcosOrd.length > 15) {
+          doc.setFont('helvetica','italic'); doc.setTextColor(120); doc.setFontSize(7);
+          doc.text('+ ' + (marcosOrd.length - 15) + ' marcos adicionais registrados.', 18, cy); cy += 5;
+          doc.setFontSize(8.5); doc.setFont('helvetica','normal');
+        }
+      }
+      cy += 4;
+
+      // Seção 3: Emblemas
+      if (cy > 230) { doc.addPage(); cy = 20; }
+      doc.setFillColor(240, 255, 245); doc.roundedRect(14, cy, pW-28, 6, 1, 1, 'F');
+      doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.setTextColor(30, 120, 80);
+      doc.text('EMBLEMAS CONQUISTADOS (' + emblemas.length + ')', 16, cy+4); cy += 10;
+      doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.setTextColor(60);
+      if (!emblemas.length) {
+        doc.setTextColor(150); doc.setFont('helvetica','italic');
+        doc.text('Emblemas aparecem conforme a jornada avança.', 18, cy); cy += 6;
+      } else {
+        emblemas.forEach(e => {
+          if (cy > 275) { doc.addPage(); cy = 20; }
+          doc.setFont('helvetica','bold'); doc.setTextColor(30, 120, 80);
+          doc.text((e.emoji || '•') + ' ' + e.nome, 18, cy);
+          doc.setFont('helvetica','normal'); doc.setTextColor(80);
+          cy += 4;
+          doc.setFontSize(7.5);
+          doc.text(doc.splitTextToSize(e.descricao, pW - 40), 22, cy);
+          cy += 5.5;
+          doc.setFontSize(8.5);
+        });
+      }
+    }
+  } catch (errConq) { console.warn('[rc conquistas]', errConq); }
 
   // Salva
   const nomeArq = `BabyForce_${cat.label}_${dados.nome}_${new Date().toISOString().slice(0,10)}.pdf`;
@@ -30729,7 +30897,434 @@ window._confirmarDeletarTudo = async function() {
 };
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// [Sprint E] MÓDULO JORNADA ENCERRADA — 12 ANOS
+// [Conquistas] MÓDULO ABA CONQUISTAS
+// ═══════════════════════════════════════════════════════════════════════════════
+// Sub-aba em Desenvolvimento com 4 seções:
+// 1. Números da jornada (adaptados à idade)
+// 2. Timeline de marcos celebrados
+// 3. Emblemas automáticos (silenciosos, sem contador de progresso)
+// 4. Conquistas especiais (desmame, fim fraldas, jornada infantil)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// Coleta TODAS as estatísticas e dados brutos necessários para as conquistas
+function _coletarDadosConquistas() {
+  const dados = {
+    mamadas: [], sonos: [], fraldas: [], marcos: [], medicacoes: [],
+    vacinas: {}, sintomas: [], alimentacao: [], esportes: [], missoes: [],
+    bilhetes: [], alimentos: [],
+  };
+  try {
+    if (typeof db !== 'undefined') {
+      dados.mamadas = (db.mamadas || []).slice();
+      dados.sonos = (db.sono || []).slice();
+      dados.fraldas = (db.fraldas || []).slice();
+      dados.marcos = (db.mesversario || []).slice();
+      dados.missoes = (db.agenda || []).slice();
+    }
+    if (typeof medicacoes !== 'undefined') dados.medicacoes = medicacoes.slice();
+    try { dados.sintomas = JSON.parse(localStorage.getItem((typeof QL_KEYS !== 'undefined' && QL_KEYS?.sintoma) || 'babyforce_sintomas_v1') || '[]'); } catch {}
+    try { dados.alimentacao = JSON.parse(localStorage.getItem((typeof QL_KEYS !== 'undefined' && QL_KEYS?.alimentacao) || 'babyforce_alimentacao_v1') || '[]'); } catch {}
+    try { dados.esportes = JSON.parse(localStorage.getItem((typeof QL_KEYS !== 'undefined' && QL_KEYS?.esporte) || 'babyforce_esporte_v1') || '[]'); } catch {}
+    try { dados.vacinas = JSON.parse(localStorage.getItem('babyforce_vacinas_v1') || '{}'); } catch {}
+    try { dados.alimentos = JSON.parse(localStorage.getItem('babyforce_alimentos_v1') || '{}'); } catch {}
+    try { dados.bilhetes = JSON.parse(localStorage.getItem('babyforce_bilhetes_cuidado_v1') || '[]'); } catch {}
+  } catch (e) { console.warn('[conquistas dados]', e); }
+  return dados;
+}
+
+// Calcula idade atual da criança em meses
+function _idadeCriancaMeses() {
+  try {
+    const birthISO = (typeof getBirthISO === 'function') ? getBirthISO() : null;
+    if (!birthISO) return 0;
+    const nasc = new Date(birthISO + 'T00:00:00');
+    const hoje = new Date();
+    return Math.max(0, Math.floor((hoje - nasc) / (1000 * 60 * 60 * 24 * 30.44)));
+  } catch { return 0; }
+}
+
+// Conta vacinas aplicadas do calendário PNI
+function _contarVacinasAplicadas(vacinasStatus) {
+  return Object.values(vacinasStatus || {}).filter(v => v && v.aplicada).length;
+}
+
+// ───────────────────────────────────────────────────────────────
+// SEÇÃO 1: NÚMEROS DA JORNADA (adaptado à idade)
+// ───────────────────────────────────────────────────────────────
+function _renderConquistasStats() {
+  const el = document.getElementById('conquistas-stats-grid');
+  if (!el) return;
+  const d = _coletarDadosConquistas();
+  const idadeMeses = _idadeCriancaMeses();
+
+  let cards;
+  if (idadeMeses < 24) {
+    // Bebê <2a: mamadas/sonos/fraldas/marcos
+    cards = [
+      { num: d.mamadas.length, label: '🍼 MAMADAS' },
+      { num: d.sonos.length, label: '😴 SONOS' },
+      { num: d.fraldas.length, label: '🩲 FRALDAS' },
+      { num: d.marcos.length, label: '🌙 MARCOS' },
+    ];
+  } else if (idadeMeses < 60) {
+    // Criança 2-5a: marcos/vacinas/refeições/exercício
+    cards = [
+      { num: d.marcos.length, label: '🌙 MARCOS' },
+      { num: _contarVacinasAplicadas(d.vacinas), label: '💉 VACINAS' },
+      { num: d.alimentacao.length, label: '🥣 REFEIÇÕES' },
+      { num: d.esportes.length, label: '⚽ EXERCÍCIOS' },
+    ];
+  } else {
+    // Criança 5a+: marcos/vacinas/consultas/esportes
+    cards = [
+      { num: d.marcos.length, label: '🌙 MARCOS' },
+      { num: _contarVacinasAplicadas(d.vacinas), label: '💉 VACINAS' },
+      { num: d.missoes.length, label: '🗺️ CONSULTAS' },
+      { num: d.esportes.length, label: '⚽ ESPORTES' },
+    ];
+  }
+
+  el.innerHTML = cards.map(c => `
+    <div style="background:rgba(0,30,70,0.5);border:1px solid rgba(0,180,255,0.25);border-radius:12px;padding:14px 10px;text-align:center">
+      <div style="font-family:'Orbitron',monospace;font-size:1.6rem;font-weight:800;background:linear-gradient(135deg,#ffe066,#c77dff);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent">${c.num.toLocaleString('pt-BR')}</div>
+      <div style="font-family:'Orbitron',monospace;font-size:0.58rem;color:var(--text-dim);letter-spacing:0.08em;margin-top:3px">${c.label}</div>
+    </div>
+  `).join('');
+}
+
+// ───────────────────────────────────────────────────────────────
+// SEÇÃO 2: TIMELINE DE MARCOS (read-only, celebrativo)
+// ───────────────────────────────────────────────────────────────
+const _MARCO_CATEGORIAS = {
+  motor: { label: '💪 Motor', cor: '#78ff99' },
+  fala: { label: '🗣️ Fala', cor: '#00d4ff' },
+  social: { label: '💛 Social', cor: '#ff78b4' },
+  cognitivo: { label: '🧠 Cognitivo', cor: '#ffe066' },
+  outro: { label: '✨ Outro', cor: '#c77dff' },
+};
+
+let _conquistasFiltroMarco = 'todos';
+
+function _renderConquistasMarcos() {
+  const body = document.getElementById('conquistas-marcos-body');
+  const filtros = document.getElementById('conquistas-marcos-filtros');
+  const total = document.getElementById('conquistas-marcos-total');
+  if (!body || !filtros || !total) return;
+
+  const d = _coletarDadosConquistas();
+  const marcos = d.marcos.slice().sort((a, b) => (a.mes || 0) - (b.mes || 0));
+  total.textContent = marcos.length + (marcos.length === 1 ? ' MARCO' : ' MARCOS');
+
+  // Categorias disponíveis (baseadas nos marcos existentes)
+  const catsPresentes = new Set(marcos.map(m => m.cat || 'outro'));
+  const filtrosHTML = [
+    `<button class="conq-filtro-btn ${_conquistasFiltroMarco === 'todos' ? 'active' : ''}" onclick="window._conquistasFiltrarMarcos('todos')" style="padding:5px 12px;border-radius:14px;font-family:'Orbitron',monospace;font-size:0.56rem;letter-spacing:0.06em;cursor:pointer;background:${_conquistasFiltroMarco === 'todos' ? 'rgba(255,200,80,0.2)' : 'rgba(0,30,70,0.5)'};border:1px solid ${_conquistasFiltroMarco === 'todos' ? 'rgba(255,200,80,0.5)' : 'rgba(0,180,255,0.25)'};color:${_conquistasFiltroMarco === 'todos' ? 'var(--gold)' : 'var(--text-dim)'}">TODOS</button>`,
+    ...Array.from(catsPresentes).map(cat => {
+      const info = _MARCO_CATEGORIAS[cat] || _MARCO_CATEGORIAS.outro;
+      const ativo = _conquistasFiltroMarco === cat;
+      return `<button class="conq-filtro-btn ${ativo ? 'active' : ''}" onclick="window._conquistasFiltrarMarcos('${cat}')" style="padding:5px 12px;border-radius:14px;font-family:'Orbitron',monospace;font-size:0.56rem;letter-spacing:0.06em;cursor:pointer;background:${ativo ? 'rgba(255,200,80,0.2)' : 'rgba(0,30,70,0.5)'};border:1px solid ${ativo ? 'rgba(255,200,80,0.5)' : 'rgba(0,180,255,0.25)'};color:${ativo ? 'var(--gold)' : 'var(--text-dim)'}">${info.label.toUpperCase()}</button>`;
+    }),
+  ].join('');
+  filtros.innerHTML = filtrosHTML;
+
+  const filtrados = _conquistasFiltroMarco === 'todos' ? marcos : marcos.filter(m => (m.cat || 'outro') === _conquistasFiltroMarco);
+
+  if (!filtrados.length) {
+    body.innerHTML = `<div style="text-align:center;padding:24px 12px;color:var(--text-dim);font-size:0.78rem;line-height:1.6">
+      <div style="font-size:2rem;opacity:0.4;margin-bottom:8px">🌙</div>
+      ${marcos.length ? 'Nenhum marco nesta categoria.' : 'Ainda não há marcos registrados. Use a aba 🌙 Marcos para celebrar cada conquista!'}
+    </div>`;
+    return;
+  }
+
+  body.innerHTML = filtrados.map(m => {
+    const idade = m.mes || 0;
+    const idadeLabel = idade === 0 ? '🌌 Nascimento' : idade < 12 ? idade + 'm' : Math.floor(idade/12) + 'a' + (idade%12 ? ' ' + (idade%12) + 'm' : '');
+    const cat = _MARCO_CATEGORIAS[m.cat || 'outro'] || _MARCO_CATEGORIAS.outro;
+    const titulo = m.titulo || '(sem título)';
+    const obs = m.obs || '';
+    return `<div style="display:flex;gap:12px;margin-bottom:10px;padding:11px 13px;background:rgba(0,30,70,0.4);border-left:3px solid ${cat.cor};border-radius:8px">
+      <div style="font-family:'Orbitron',monospace;font-size:0.64rem;color:${cat.cor};font-weight:700;min-width:52px;padding-top:2px;letter-spacing:0.04em">${idadeLabel}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:0.8rem;color:var(--white);font-weight:700;line-height:1.4">${_rcEsc(titulo)}</div>
+        <div style="display:flex;align-items:center;gap:6px;margin-top:3px">
+          <span style="font-size:0.56rem;color:${cat.cor};background:${cat.cor}22;padding:1px 6px;border-radius:6px;font-family:'Orbitron',monospace;letter-spacing:0.04em;font-weight:600">${cat.label}</span>
+        </div>
+        ${obs ? `<div style="font-size:0.7rem;color:var(--text-dim);margin-top:5px;line-height:1.5;font-style:italic">${_rcEsc(obs)}</div>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+window._conquistasFiltrarMarcos = function(cat) {
+  _conquistasFiltroMarco = cat;
+  _renderConquistasMarcos();
+};
+
+// ───────────────────────────────────────────────────────────────
+// SEÇÃO 3: EMBLEMAS AUTOMÁTICOS
+// Regras: zero notificações, sem contador de progresso, foco
+// em comportamentos saudáveis (não quantidade).
+// ───────────────────────────────────────────────────────────────
+
+const _CONQUISTAS_EMBLEMAS = [
+  // 🛡️ SAÚDE
+  {
+    id: 'saude_carteira_dia', cat: '🛡️ Saúde', emoji: '💉', nome: 'Carteira em dia',
+    descricao: 'Todas as vacinas do calendário PNI aplicadas.',
+    cor: '#78ff99',
+    conquistou: (d) => {
+      // Considera conquistado se ≥8 vacinas aplicadas (cobre marcos do calendário básico)
+      return _contarVacinasAplicadas(d.vacinas) >= 8;
+    },
+  },
+  {
+    id: 'saude_crescimento', cat: '🛡️ Saúde', emoji: '⚖️', nome: 'Crescimento acompanhado',
+    descricao: 'Medições registradas em múltiplos momentos da jornada.',
+    cor: '#78ff99',
+    conquistou: (d) => {
+      try {
+        const cresc = JSON.parse(localStorage.getItem(typeof _bfKey === 'function' ? _bfKey('babyforce_crescimento_v1') : 'babyforce_crescimento_v1') || '[]');
+        return cresc.length >= 6;
+      } catch { return false; }
+    },
+  },
+  {
+    id: 'saude_consultas', cat: '🛡️ Saúde', emoji: '🩺', nome: 'Acompanhamento médico',
+    descricao: 'Múltiplas consultas ou exames registrados.',
+    cor: '#78ff99',
+    conquistou: (d) => d.missoes.filter(m => m.tipo === 'consulta' || m.tipo === 'exame').length >= 5,
+  },
+
+  // 🍼 NUTRIÇÃO
+  {
+    id: 'nut_amamentacao_6m', cat: '🍼 Nutrição', emoji: '🤱', nome: '6 meses de amamentação',
+    descricao: 'Aleitamento materno registrado por 6+ meses.',
+    cor: '#ff78b4',
+    conquistou: (d) => {
+      if (!d.mamadas.length) return false;
+      const peitoMamadas = d.mamadas.filter(m => m.tipo === 'peito' || m.tipo === 'seio');
+      if (peitoMamadas.length < 30) return false;
+      // Verifica se há registros em 6+ meses distintos (ano-mes)
+      const meses = new Set(peitoMamadas.map(m => (m.data || '').slice(0, 7)));
+      return meses.size >= 6;
+    },
+  },
+  {
+    id: 'nut_paladar_diverso', cat: '🍼 Nutrição', emoji: '🌈', nome: 'Paladar diverso',
+    descricao: '20+ alimentos experimentados na introdução alimentar.',
+    cor: '#ff78b4',
+    conquistou: (d) => {
+      try {
+        const alims = d.alimentos || {};
+        const oferecidos = Object.values(alims).filter(a => a && a.oferecido).length;
+        return oferecidos >= 20;
+      } catch { return false; }
+    },
+  },
+  {
+    id: 'nut_refeicoes_familia', cat: '🍼 Nutrição', emoji: '🥣', nome: 'Refeições acompanhadas',
+    descricao: '30+ refeições registradas.',
+    cor: '#ff78b4',
+    conquistou: (d) => d.alimentacao.length >= 30,
+  },
+
+  // 😴 SONO
+  {
+    id: 'sono_noite_inteira', cat: '😴 Sono', emoji: '🌙', nome: 'Noite inteira',
+    descricao: 'Primeiro sono contínuo de 8+ horas registrado.',
+    cor: '#00d4ff',
+    conquistou: (d) => d.sonos.some(s => (s.duracao || 0) >= 480),
+  },
+  {
+    id: 'sono_rotina', cat: '😴 Sono', emoji: '⏰', nome: 'Sono rotineiro',
+    descricao: '30+ sonos registrados — uma rotina saudável está formada.',
+    cor: '#00d4ff',
+    conquistou: (d) => d.sonos.length >= 30,
+  },
+
+  // 💛 AFETO
+  {
+    id: 'afeto_bilhetes', cat: '💛 Afeto', emoji: '💌', nome: 'Cuidado compartilhado',
+    descricao: 'Guardiões trocando bilhetes de cuidado entre si.',
+    cor: '#ffe066',
+    conquistou: (d) => (d.bilhetes || []).length >= 5,
+  },
+  {
+    id: 'afeto_familia_presente', cat: '💛 Afeto', emoji: '👨‍👩‍👧', nome: 'Família presente',
+    descricao: '3+ guardiões ativos no acompanhamento.',
+    cor: '#ffe066',
+    conquistou: (d) => {
+      try {
+        const fam = JSON.parse(localStorage.getItem('babyforce_familia_v1') || '{}');
+        const membros = Object.keys(fam.membros || {}).length;
+        return membros >= 3;
+      } catch { return false; }
+    },
+  },
+
+  // 📈 DESENVOLVIMENTO
+  {
+    id: 'dev_caçador_marcos', cat: '📈 Desenvolvimento', emoji: '🌙', nome: 'Caçador de marcos',
+    descricao: '10+ marcos celebrados na jornada.',
+    cor: '#c77dff',
+    conquistou: (d) => d.marcos.length >= 10,
+  },
+  {
+    id: 'dev_motor', cat: '📈 Desenvolvimento', emoji: '💪', nome: 'Motor em ação',
+    descricao: '5+ marcos da categoria motor registrados.',
+    cor: '#c77dff',
+    conquistou: (d) => d.marcos.filter(m => m.cat === 'motor').length >= 5,
+  },
+];
+
+// Retorna apenas os conquistados (o grid não mostra bloqueados com progresso)
+function _calcularEmblemasConquistados(dados) {
+  const d = dados || _coletarDadosConquistas();
+  return _CONQUISTAS_EMBLEMAS.map(e => ({
+    ...e,
+    conquistado: !!e.conquistou(d),
+  }));
+}
+
+function _renderConquistasEmblemas() {
+  const body = document.getElementById('conquistas-emblemas-body');
+  const total = document.getElementById('conquistas-emblemas-total');
+  if (!body || !total) return;
+
+  const dados = _coletarDadosConquistas();
+  const emblemas = _calcularEmblemasConquistados(dados);
+  const conquistados = emblemas.filter(e => e.conquistado);
+  total.textContent = conquistados.length + '/' + emblemas.length;
+
+  if (!conquistados.length) {
+    body.innerHTML = `<div style="text-align:center;padding:24px 12px;color:var(--text-dim);font-size:0.78rem;line-height:1.6">
+      <div style="font-size:2rem;opacity:0.4;margin-bottom:8px">🎖️</div>
+      Nenhum emblema ainda. Eles aparecem silenciosamente conforme a jornada avança.
+    </div>`;
+    return;
+  }
+
+  // Agrupa por categoria
+  const porCat = {};
+  conquistados.forEach(e => {
+    if (!porCat[e.cat]) porCat[e.cat] = [];
+    porCat[e.cat].push(e);
+  });
+
+  body.innerHTML = Object.entries(porCat).map(([cat, itens]) => `
+    <div style="margin-bottom:14px">
+      <div style="font-family:'Orbitron',monospace;font-size:0.62rem;color:var(--text-dim);letter-spacing:0.08em;margin-bottom:6px;font-weight:600">${cat.toUpperCase()}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        ${itens.map(e => `
+          <div style="background:linear-gradient(135deg,${e.cor}22,${e.cor}0a);border:1px solid ${e.cor}55;border-radius:10px;padding:11px 10px;text-align:center">
+            <div style="font-size:1.8rem;line-height:1;margin-bottom:4px">${e.emoji}</div>
+            <div style="font-family:'Orbitron',monospace;font-size:0.6rem;color:${e.cor};letter-spacing:0.04em;font-weight:700;line-height:1.3">${e.nome}</div>
+            <div style="font-size:0.62rem;color:var(--text-dim);margin-top:4px;line-height:1.3">${e.descricao}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+// ───────────────────────────────────────────────────────────────
+// SEÇÃO 4: CONQUISTAS ESPECIAIS (eventos únicos do app)
+// ───────────────────────────────────────────────────────────────
+function _renderConquistasEspeciais() {
+  const body = document.getElementById('conquistas-especiais-body');
+  if (!body) return;
+
+  const items = [];
+
+  // Aleitamento concluído (desmame)
+  try {
+    const desmameFn = typeof getDesmameInfo === 'function' ? getDesmameInfo() : null;
+    if (desmameFn && desmameFn.encerrado) {
+      const data = desmameFn.encerradoEm ? new Date(desmameFn.encerradoEm).toLocaleDateString('pt-BR') : '—';
+      items.push({
+        emoji: '🤱', titulo: 'Aleitamento concluído', cor: '#ff78b4',
+        detalhe: 'Registrado em ' + data,
+        msg: desmameFn.obs || 'Uma fase linda de nutrição foi vivida.'
+      });
+    }
+  } catch {}
+
+  // Fim do uso de fraldas (desfralde)
+  try {
+    const fraldasInfo = typeof getFimFraldasInfo === 'function' ? getFimFraldasInfo() : null;
+    if (fraldasInfo && fraldasInfo.encerrado) {
+      const data = fraldasInfo.encerradoEm ? new Date(fraldasInfo.encerradoEm).toLocaleDateString('pt-BR') : '—';
+      items.push({
+        emoji: '🚽', titulo: 'Desfralde conquistado', cor: '#78ff99',
+        detalhe: 'Registrado em ' + data,
+        msg: fraldasInfo.obs || 'Autonomia conquistada — um marco de crescimento!'
+      });
+    }
+  } catch {}
+
+  // Jornada infantil completa (12 anos)
+  try {
+    const jornadaInfo = typeof getJornadaEncerrada === 'function' ? getJornadaEncerrada() : null;
+    if (jornadaInfo && jornadaInfo.encerrada) {
+      const data = jornadaInfo.encerradaEm ? new Date(jornadaInfo.encerradaEm).toLocaleDateString('pt-BR') : '—';
+      items.push({
+        emoji: '🎓', titulo: 'Jornada infantil completa', cor: '#ffe066',
+        detalhe: 'Encerrada em ' + data,
+        msg: 'A fase infantil chegou ao fim. 12 anos de cuidado preservados.'
+      });
+    }
+  } catch {}
+
+  if (!items.length) {
+    body.innerHTML = `<div style="text-align:center;padding:24px 12px;color:var(--text-dim);font-size:0.78rem;line-height:1.6">
+      <div style="font-size:2rem;opacity:0.4;margin-bottom:8px">📜</div>
+      Conquistas especiais aparecem aqui quando fases importantes são concluídas: desmame, desfralde, jornada infantil.
+    </div>`;
+    return;
+  }
+
+  body.innerHTML = items.map(i => `
+    <div style="background:linear-gradient(135deg,${i.cor}22,${i.cor}0a);border:1px solid ${i.cor}55;border-radius:12px;padding:14px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+        <div style="font-size:2.2rem;line-height:1">${i.emoji}</div>
+        <div style="flex:1">
+          <div style="font-family:'Orbitron',monospace;font-size:0.78rem;color:${i.cor};letter-spacing:0.06em;font-weight:700">${i.titulo.toUpperCase()}</div>
+          <div style="font-size:0.66rem;color:var(--text-dim);margin-top:2px">${i.detalhe}</div>
+        </div>
+      </div>
+      <div style="font-size:0.76rem;color:var(--white);line-height:1.5;font-style:italic">"${_rcEsc(i.msg)}"</div>
+    </div>
+  `).join('');
+}
+
+// ───────────────────────────────────────────────────────────────
+// RENDER TODO o conteúdo da aba
+// ───────────────────────────────────────────────────────────────
+window.renderConquistasAba = function() {
+  try {
+    _renderConquistasStats();
+    _renderConquistasMarcos();
+    _renderConquistasEmblemas();
+    _renderConquistasEspeciais();
+  } catch (e) {
+    console.warn('[conquistas render]', e);
+  }
+};
+
+// Expor a API pública
+window.getConquistasEmblemasConquistados = function() {
+  const dados = _coletarDadosConquistas();
+  return _calcularEmblemasConquistados(dados).filter(e => e.conquistado);
+};
+window.getConquistasStatsAtuais = function() {
+  return _coletarDadosConquistas();
+};
+
+</script>
+<script>
+// ═══════════════════════════════════════════════════════════════════════════════
+// [Conquistas] MÓDULO JORNADA ENCERRADA — 12 ANOS
 // ═══════════════════════════════════════════════════════════════════════════════
 // Quando a criança completa 12a0m0d, mostra modal full-screen épico comemorando
 // a conclusão da jornada infantil. 5 telas navegáveis, animação de partículas,
