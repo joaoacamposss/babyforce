@@ -1532,9 +1532,9 @@ html.bf-tema-claro [style*="color: var(--white)"] { color: var(--white) !importa
         </div>
         <!-- BIBLIOTECA DE PROMPTS RÁPIDOS -->
         <div id="oraculo-prompts-bar" style="display:flex;gap:6px;padding:10px 12px;overflow-x:auto;scrollbar-width:none;border-top:1px dashed rgba(0,180,255,0.12);border-bottom:1px dashed rgba(0,180,255,0.12);margin-top:6px"></div>
-        <div style="border-top:1px solid rgba(0,180,255,0.1);padding:10px;display:flex;gap:6px;align-items:flex-end;background:rgba(0,20,50,0.4)">
-          <textarea id="oraculo-input" placeholder="Pergunte ao Oráculo..." rows="1" style="flex:1;background:rgba(0,30,70,0.5);border:1px solid rgba(0,180,255,0.25);color:var(--white);padding:10px 12px;border-radius:10px;font-family:inherit;font-size:0.82rem;resize:none;max-height:120px;outline:none" onkeydown="oraculoHandleKey(event)"></textarea>
-          <button class="oraculo-voice-btn" id="oraculo-voice" onclick="oraculoToggleVoice()" title="Falar (PT-BR)" aria-label="Gravar áudio">🎤</button><button class="btn btn-primary" id="oraculo-send" onclick="oraculoEnviar()" style="padding:10px 14px;white-space:nowrap" aria-label="Enviar">➤</button>
+        <div style="border-top:1px solid rgba(0,180,255,0.1);padding:10px;display:flex;gap:6px;align-items:flex-end;background:rgba(0,20,50,0.4);width:100%;min-width:0;box-sizing:border-box;flex-wrap:nowrap">
+          <textarea id="oraculo-input" placeholder="Pergunte ao Oráculo..." rows="1" style="flex:1 1 auto;min-width:0;background:rgba(0,30,70,0.5);border:1px solid rgba(0,180,255,0.25);color:var(--white);padding:10px 12px;border-radius:10px;font-family:inherit;font-size:0.82rem;resize:none;max-height:120px;outline:none" onkeydown="oraculoHandleKey(event)"></textarea>
+          <button class="oraculo-voice-btn" id="oraculo-voice" onclick="oraculoToggleVoice()" title="Falar (PT-BR)" aria-label="Gravar áudio" style="flex:0 0 auto;min-width:40px;min-height:40px">🎤</button><button class="btn btn-primary" id="oraculo-send" onclick="oraculoEnviar()" style="flex:0 0 auto;min-width:44px;min-height:40px;padding:10px 14px;white-space:nowrap;font-size:1.05rem;font-weight:700" aria-label="Enviar">➤</button>
         </div>
       </div>
     </div>
@@ -2438,6 +2438,38 @@ html.bf-tema-claro [style*="color: var(--white)"] { color: var(--white) !importa
   animation: oraculoCursor 0.7s infinite;
 }
 @keyframes oraculoCursor { 50% { opacity: 0; } }
+
+/* BF-FIX 22/abr/2026: Garantir que o botão ➤ e 🎤 do Oráculo sempre apareçam */
+#oraculo-chat-card { width: 100%; min-width: 0; box-sizing: border-box; }
+#oraculo-chat-card > div:last-child {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  flex-wrap: nowrap !important;
+}
+#oraculo-input {
+  min-width: 0 !important;
+  width: 100%;
+  flex: 1 1 auto !important;
+}
+#oraculo-send, #oraculo-voice {
+  flex: 0 0 auto !important;
+  min-width: 44px !important;
+  min-height: 40px !important;
+  box-sizing: border-box;
+}
+#oraculo-send {
+  font-size: 1.05rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0;
+}
+#subpanel-oraculo { width: 100%; min-width: 0; }
+#subpanel-oraculo .card { width: 100%; box-sizing: border-box; }
+/* Proteção contra encolhimento cascata em flex containers */
+#tab-agenda, #tab-agenda .subpanel, #tab-agenda .subpanel > * {
+  min-width: 0;
+}
+/* BF-FIX fim */
 
 /* Voice input button */
 .oraculo-voice-btn {
@@ -13713,6 +13745,40 @@ function oraculoInit() {
       inp.style.height = Math.min(120, inp.scrollHeight) + 'px';
     });
   }
+  // BF-FIX 22/abr/2026: Garantir que botões send/voice estão visíveis após render
+  try {
+    const send = document.getElementById('oraculo-send');
+    const voice = document.getElementById('oraculo-voice');
+    if (send) {
+      send.style.flex = '0 0 auto';
+      send.style.minWidth = '44px';
+      send.style.minHeight = '40px';
+      send.style.fontSize = '1.05rem';
+      send.style.fontWeight = '700';
+    }
+    if (voice) {
+      voice.style.flex = '0 0 auto';
+      voice.style.minWidth = '40px';
+      voice.style.minHeight = '40px';
+    }
+    if (inp) {
+      inp.style.flex = '1 1 auto';
+      inp.style.minWidth = '0';
+    }
+    const container = send ? send.parentElement : null;
+    if (container) {
+      container.style.width = '100%';
+      container.style.minWidth = '0';
+      container.style.boxSizing = 'border-box';
+      container.style.flexWrap = 'nowrap';
+    }
+    const card = document.getElementById('oraculo-chat-card');
+    if (card) {
+      card.style.width = '100%';
+      card.style.minWidth = '0';
+      card.style.boxSizing = 'border-box';
+    }
+  } catch (e) { console.warn('[BF-FIX] oraculoInit layout guard falhou:', e); }
 }
 
 // ── Renderizar sugestões ──
