@@ -1479,7 +1479,9 @@ html.bf-tema-claro [style*="color: var(--white)"] { color: var(--white) !importa
       <div class="repo-search-bar"><input type="text" id="repo-busca" placeholder="🔍  Buscar no Cristal do Saber..." oninput="renderRepositorio()"></div>
       <div id="lista-repositorio"></div>
     </div>
-    <div id="subpanel-sabedoria" class="subpanel">
+  </div>
+  <!-- BF-FIX 22/abr/2026: subpanels sabedoria e oraculo movidos para fora de subpanel-missivas (eram filhos aninhados por bug de </div> faltante) -->
+  <div id="subpanel-sabedoria" class="subpanel">
       <div class="card" style="background:linear-gradient(135deg,rgba(0,80,160,0.3),rgba(100,30,180,0.2));border:1px solid rgba(0,212,255,0.3)">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
           <div style="width:36px;height:36px;border-radius:50%;background:radial-gradient(circle,rgba(0,212,255,0.4),rgba(100,30,180,0.15));display:flex;align-items:center;justify-content:center;font-size:1.2rem;border:1px solid rgba(0,212,255,0.4)">📖</div>
@@ -1538,8 +1540,6 @@ html.bf-tema-claro [style*="color: var(--white)"] { color: var(--white) !importa
         </div>
       </div>
     </div>
-
-  </div>
 
 </div>
 
