@@ -12464,6 +12464,31 @@ async function obEnviarCodigoVerificacao() {
     return;
   }
 
+  // ═══ FLUXO 10+ : detecta email já cadastrado e sugere Entrar ═══
+  try {
+    if (typeof GUARDIOES !== 'undefined' && GUARDIOES) {
+      const emailExistente = Object.values(GUARDIOES).some(g =>
+        g && g.email && g.email.trim().toLowerCase() === email
+      );
+      if (emailExistente) {
+        if (errEl) {
+          errEl.innerHTML = '⚠️ Este e-mail já está cadastrado neste dispositivo.<br>' +
+            '<a href="#" onclick="event.preventDefault();' +
+            'const step0=document.getElementById(\'ob-step-0\');' +
+            'const step1=document.getElementById(\'ob-step-1\');' +
+            'if(step1)step1.classList.remove(\'active\');' +
+            'if(step0)step0.classList.add(\'active\');' +
+            'if(typeof obAtualizarDots===\'function\')obAtualizarDots(0);' +
+            'setTimeout(()=>{if(typeof obBemVindoEntrar===\'function\')obBemVindoEntrar();},200);' +
+            'return false;" ' +
+            'style="color:var(--blue-neon);text-decoration:underline;cursor:pointer">Voltar e usar o botão Entrar</a>';
+        }
+        document.getElementById('ob-admin-email').focus();
+        return;
+      }
+    }
+  } catch (e) { console.warn('[email duplicado check]', e); }
+
   // 2. Gerar hash da senha com salt (SHA-256 + salt aleatório)
   let senhaHash = null, senhaSalt = null;
   try {
@@ -12590,6 +12615,36 @@ async function obVerificarEmailClicado() {
   if (btn) btn.disabled = true;
   if (typeof _obAtualizarVerifyStatusBar === 'function') {
     _obAtualizarVerifyStatusBar('sending', 'Verificando...', 'Aguarde');
+  }
+
+  // ═══ FIX: curto-circuito se já verificado anteriormente ═══
+  // Cenário típico: o handler do boot (verifyOnboarding=1) já chamou esta função
+  // automaticamente quando o link foi clicado, consumiu o oobCode e marcou
+  // emailVerificado=true. Se o usuário clica também no botão "Já verifiquei",
+  // a URL não tem mais o magic link e isSignInWithEmailLink retorna false,
+  // resultando em falso-negativo "E-mail ainda não verificado".
+  // Solução: se _obAdminDados.emailVerificado já é true, avança direto.
+  if (_obAdminDados.emailVerificado === true) {
+    if (typeof _obAtualizarVerifyStatusBar === 'function') {
+      _obAtualizarVerifyStatusBar('success',
+        _obAdminDados.verificadoRealmente ? 'E-mail já verificado!' : 'Continuando (já confirmado)',
+        'Avançando para o próximo passo...');
+    }
+    // Parar polling e countdown
+    if (_obPollingVerifyInterval) { clearInterval(_obPollingVerifyInterval); _obPollingVerifyInterval = null; }
+    if (_obReenviarCountdownInterval) { clearInterval(_obReenviarCountdownInterval); _obReenviarCountdownInterval = null; }
+    // Avança para step 3
+    setTimeout(() => {
+      _obCurrentStep = 3;
+      document.getElementById('ob-step-2-email').classList.remove('active');
+      document.getElementById('ob-step-3-bebe').classList.add('active');
+      obAtualizarDots(3);
+      const inp = document.getElementById('ob-nasc-bebe');
+      if (inp && !inp.value) inp.value = todayISO();
+      if (statusEl) statusEl.innerHTML = '';
+      if (btn) btn.disabled = false;
+    }, 800);
+    return;
   }
 
   // Tentar validar via Firebase (se disponível)
@@ -12738,23 +12793,168 @@ async function obReenviarCodigo() {
   }
 }
 
+// ═══════════════════════════════════════════════════════════════
+// FLUXO 10+ : Handler de retorno do magic link do botão "Entrar"
+// (?bemvindoLogin=1) — valida o link, encontra guardião por email e loga direto
+// ═══════════════════════════════════════════════════════════════
+(function() {
+  document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(async () => {
+      if (!location.search.includes('bemvindoLogin=1')) return;
+
+      let emailPendente = null;
+      try { emailPendente = localStorage.getItem('babyforce_email_pending_login_v1'); } catch (_) {}
+
+      // Validar link Firebase e obter email verificado
+      let emailVerificado = null;
+      try {
+        if (typeof firebase !== 'undefined' && firebase.auth) {
+          const auth = firebase.auth();
+          if (auth.isSignInWithEmailLink && auth.isSignInWithEmailLink(window.location.href)) {
+            // Se não temos email pendente, pede interativamente (caso raro — outro dispositivo/navegador)
+            let emailParaLogar = emailPendente;
+            if (!emailParaLogar) {
+              emailParaLogar = prompt('Confirme seu e-mail para concluir o login:');
+              if (!emailParaLogar) return;
+              emailParaLogar = emailParaLogar.trim().toLowerCase();
+            }
+            const result = await auth.signInWithEmailLink(emailParaLogar, window.location.href);
+            emailVerificado = (result && result.user && result.user.email)
+              ? result.user.email.toLowerCase()
+              : emailParaLogar;
+            // Não mantemos a sessão Firebase — o app usa auth local
+            try { await auth.signOut(); } catch (_) {}
+            // Limpar URL
+            try { window.history.replaceState({}, document.title, window.location.pathname); } catch (_) {}
+          }
+        }
+      } catch (e) {
+        console.warn('[bemvindoLogin] Firebase falhou:', e);
+      }
+
+      if (!emailVerificado) {
+        // Firebase não disponível ou link inválido — ignora silenciosamente
+        // (cai no fluxo normal de onboarding/login que já sabe lidar com app vazio)
+        return;
+      }
+
+      // Busca guardião com esse email
+      let guardiaoId = null;
+      try {
+        if (typeof GUARDIOES !== 'undefined' && GUARDIOES) {
+          for (const [id, g] of Object.entries(GUARDIOES)) {
+            if (g && g.email && g.email.trim().toLowerCase() === emailVerificado) {
+              guardiaoId = id;
+              break;
+            }
+          }
+        }
+      } catch (e) { console.warn('[bemvindoLogin buscar guardião]', e); }
+
+      if (!guardiaoId) {
+        // Dispositivo novo OU app limpo: não temos o guardião local.
+        // Orientação: usar "Criar Conta" neste dispositivo e ativar convite depois.
+        setTimeout(() => {
+          if (typeof BFModal !== 'undefined' && BFModal.alert) {
+            BFModal.alert({
+              title: 'Conta não encontrada neste dispositivo',
+              icon: '📱',
+              variant: 'info',
+              message: 'Verificamos seu e-mail com sucesso, mas este parece ser um novo dispositivo.\n\nUse "Criar Conta" para configurar localmente. Você poderá sincronizar com sua conta existente ao fazer login no app.',
+            });
+          } else {
+            alert('✓ E-mail verificado. Use "Criar Conta" para configurar este dispositivo.');
+          }
+        }, 500);
+        return;
+      }
+
+      // Sucesso: loga direto
+      try { localStorage.removeItem('babyforce_email_pending_login_v1'); } catch (_) {}
+      try {
+        const chaveSessao = (typeof SESSION_KEY !== 'undefined') ? SESSION_KEY : 'babyforce_session_v1';
+        sessionStorage.setItem(chaveSessao, guardiaoId);
+      } catch (_) {}
+
+      if (typeof BFAudit !== 'undefined' && BFAudit.log) {
+        try { BFAudit.log('bemvindo_magiclink_retorno', { guardiaoId }); } catch (_) {}
+      }
+
+      // Esconde tela-login se estiver visível e loga
+      const telaOnb = document.getElementById('tela-onboarding');
+      const telaLogin = document.getElementById('tela-login');
+      if (telaOnb) telaOnb.style.display = 'none';
+      if (telaLogin) telaLogin.style.display = 'none';
+
+      const g = GUARDIOES[guardiaoId];
+      const nomeG = (g && g.nome) ? g.nome.split(' ')[0] : 'Guardião';
+      showToast(`🛸 Bem-vindo(a) de volta, ${nomeG}!`);
+
+      if (typeof fazerLogin === 'function') {
+        fazerLogin(guardiaoId);
+      }
+    }, 1800);
+  });
+})();
+
 // Detectar retorno do magic link no onboarding
 (function() {
   document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(() => {
+    setTimeout(async () => {
       if (location.search.includes('verifyOnboarding=1')) {
         // Usuário voltou após clicar no link — tenta recuperar dados pendentes e validar
         try {
           const raw = localStorage.getItem(OB_ADMIN_PENDING_KEY);
-          if (raw) {
-            _obAdminDados = JSON.parse(raw);
-            // Se o onboarding está ativo no step 2-email, já aciona a verificação
-            const step2 = document.getElementById('ob-step-2-email');
-            if (step2 && step2.classList.contains('active')) {
-              obVerificarEmailClicado();
-            }
+          if (!raw) {
+            console.warn('[verifyOnboarding] Sem dados pendentes — possível uso em dispositivo diferente');
+            return;
           }
-        } catch {}
+          _obAdminDados = JSON.parse(raw);
+
+          // Se o onboarding não está ativo ou está em outro step, força abertura no step 2
+          const telaOnb = document.getElementById('tela-onboarding');
+          const telaLogin = document.getElementById('tela-login');
+          const step0 = document.getElementById('ob-step-0');
+          const step1 = document.getElementById('ob-step-1');
+          const step2 = document.getElementById('ob-step-2-email');
+
+          if (telaOnb) telaOnb.style.display = 'flex';
+          if (telaLogin) telaLogin.style.display = 'none';
+          if (step0) step0.classList.remove('active');
+          if (step1) step1.classList.remove('active');
+          if (step2) step2.classList.add('active');
+
+          // Atualiza _obCurrentStep e o indicador de dots
+          try { if (typeof _obCurrentStep !== 'undefined') window._obCurrentStep = 2; } catch (_) {}
+          try { if (typeof obAtualizarDots === 'function') obAtualizarDots(2); } catch (_) {}
+
+          // Exibe o email no step 2
+          const emailDisplayEl = document.getElementById('ob-email-display');
+          if (emailDisplayEl && _obAdminDados.email) emailDisplayEl.textContent = _obAdminDados.email;
+
+          // Desabilita o botão "Já verifiquei" durante processamento automático
+          // (evita race condition: usuário clica antes do boot terminar)
+          const btnVerificar = document.getElementById('ob-btn-verificar');
+          if (btnVerificar) {
+            btnVerificar.disabled = true;
+            btnVerificar.style.opacity = '0.6';
+            btnVerificar.textContent = '⏳ Verificando automaticamente...';
+          }
+
+          // Aciona a verificação automaticamente (sem exigir clique no botão)
+          if (typeof obVerificarEmailClicado === 'function') {
+            await obVerificarEmailClicado();
+          }
+
+          // Reabilita botão após processamento (caso tenha dado erro e o usuário queira tentar de novo)
+          if (btnVerificar) {
+            btnVerificar.disabled = false;
+            btnVerificar.style.opacity = '1';
+            btnVerificar.textContent = '✓ Já verifiquei — continuar';
+          }
+        } catch (e) {
+          console.warn('[verifyOnboarding handler]', e);
+        }
       }
     }, 1800);
   });
@@ -13015,10 +13215,13 @@ function obBemVindoCriarConta() {
 }
 window.obBemVindoCriarConta = obBemVindoCriarConta;
 
-// ENTRAR — envia magic link passwordless para usuário já cadastrado
-// NOTA: em dispositivo novo sem guardião local, o link ao retornar cai no onboarding normal.
-// TODO (próxima iteração): criar handler de '?bemvindoLogin=1' no boot que consulte
-// Firestore por email e hidrate GUARDIOES local antes de mostrar a tela de login.
+// ═══════════════════════════════════════════════════════════════
+// ENTRAR — fluxo padrão 10+ (email + senha como primário, magic link como backup)
+// ═══════════════════════════════════════════════════════════════
+// Abordagem de mercado (Apple ID, Nubank, Spotify):
+//   • Principal:  email + senha → validação local via hash → fazerLogin direto
+//   • Secundário: magic link    → para quem esqueceu a senha OU está em outro dispositivo
+//   • Recuperação: "Esqueci minha senha" envia magic link de reset
 async function obBemVindoEntrar() {
   const existente = document.getElementById('modal-bemvindo-entrar');
   if (existente) existente.remove();
@@ -13027,80 +13230,206 @@ async function obBemVindoEntrar() {
   modal.id = 'modal-bemvindo-entrar';
   modal.setAttribute('role', 'dialog');
   modal.setAttribute('aria-modal', 'true');
-  modal.style.cssText = 'position:fixed;inset:0;background:rgba(2,11,24,0.92);z-index:99990;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(10px);';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(2,11,24,0.92);z-index:99990;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(10px);overflow-y:auto;';
   modal.innerHTML = ''
-    + '<div style="background:linear-gradient(135deg,#0a2a4a,#030f1f);border:1px solid rgba(255,224,102,0.3);border-radius:16px;padding:28px 22px;max-width:400px;width:100%;box-shadow:0 0 40px rgba(255,224,102,0.15);font-family:\'Exo 2\',sans-serif;color:#e8f4fd">'
-    +   '<div style="text-align:center;font-size:2.2rem;margin-bottom:10px">👤</div>'
-    +   '<div style="font-family:\'Orbitron\',monospace;font-size:0.82rem;font-weight:700;letter-spacing:0.08em;text-align:center;margin-bottom:6px;color:#ffe066">ENTRAR NA SUA CONTA</div>'
-    +   '<div style="font-size:0.75rem;color:#7ab3d4;text-align:center;margin-bottom:20px;line-height:1.55">Enviaremos um link por e-mail para você entrar sem precisar de senha.</div>'
-    +   '<label style="font-family:\'Orbitron\',monospace;font-size:0.62rem;letter-spacing:0.1em;color:#7ab3d4;display:block;margin-bottom:6px">E-MAIL *</label>'
-    +   '<input id="modal-bv-entrar-email" type="email" inputmode="email" autocomplete="email" autocapitalize="off" spellcheck="false" placeholder="seu@email.com" style="width:100%;padding:12px 14px;background:rgba(0,30,60,0.5);border:1px solid rgba(0,180,255,0.25);border-radius:10px;color:#e8f4fd;font-size:0.9rem;font-family:\'Exo 2\',sans-serif;box-sizing:border-box;margin-bottom:6px">'
+    + '<div style="background:linear-gradient(135deg,#0a2a4a,#030f1f);border:1px solid rgba(255,224,102,0.3);border-radius:16px;padding:26px 22px;max-width:400px;width:100%;box-shadow:0 0 40px rgba(255,224,102,0.15);font-family:\'Exo 2\',sans-serif;color:#e8f4fd;margin:auto;max-height:calc(100vh - 40px);overflow-y:auto">'
+    +   '<div style="text-align:center;font-size:2rem;margin-bottom:8px">👤</div>'
+    +   '<div style="font-family:\'Orbitron\',monospace;font-size:0.82rem;font-weight:700;letter-spacing:0.08em;text-align:center;margin-bottom:4px;color:#ffe066">ENTRAR NA SUA CONTA</div>'
+    +   '<div style="font-size:0.72rem;color:#7ab3d4;text-align:center;margin-bottom:18px;line-height:1.5">Use seu e-mail e senha cadastrados.</div>'
+    +   '<label style="font-family:\'Orbitron\',monospace;font-size:0.62rem;letter-spacing:0.1em;color:#7ab3d4;display:block;margin-bottom:6px">E-MAIL</label>'
+    +   '<input id="modal-bv-entrar-email" type="email" inputmode="email" autocomplete="email" autocapitalize="off" spellcheck="false" placeholder="seu@email.com" style="width:100%;padding:12px 14px;background:rgba(0,30,60,0.5);border:1px solid rgba(0,180,255,0.25);border-radius:10px;color:#e8f4fd;font-size:0.9rem;font-family:\'Exo 2\',sans-serif;box-sizing:border-box;margin-bottom:12px">'
+    +   '<label style="font-family:\'Orbitron\',monospace;font-size:0.62rem;letter-spacing:0.1em;color:#7ab3d4;display:block;margin-bottom:6px">SENHA</label>'
+    +   '<input id="modal-bv-entrar-senha" type="password" autocomplete="current-password" placeholder="sua senha" style="width:100%;padding:12px 14px;background:rgba(0,30,60,0.5);border:1px solid rgba(0,180,255,0.25);border-radius:10px;color:#e8f4fd;font-size:0.9rem;font-family:\'Exo 2\',sans-serif;box-sizing:border-box;margin-bottom:6px">'
     +   '<div id="modal-bv-entrar-error" role="alert" aria-live="polite" style="color:#ff8080;font-size:0.72rem;min-height:18px;margin-bottom:10px;line-height:1.4"></div>'
-    +   '<button id="modal-bv-entrar-send" style="width:100%;padding:13px;border-radius:10px;border:none;background:linear-gradient(135deg,#c9a227,#ffe066);color:#020b18;font-family:\'Orbitron\',monospace;font-size:0.72rem;font-weight:700;letter-spacing:0.1em;cursor:pointer;box-shadow:0 0 20px rgba(255,224,102,0.28)">📧 ENVIAR LINK DE ACESSO</button>'
-    +   '<button id="modal-bv-entrar-cancel" style="width:100%;padding:10px;margin-top:10px;border-radius:10px;border:1px solid rgba(0,180,255,0.2);background:transparent;color:#7ab3d4;font-family:\'Orbitron\',monospace;font-size:0.7rem;letter-spacing:0.08em;cursor:pointer">Cancelar</button>'
-    +   '<div style="font-size:0.62rem;color:#7ab3d4;opacity:0.72;text-align:center;margin-top:14px;line-height:1.5;font-style:italic">Se você nunca criou conta ou está em dispositivo novo, prefira <strong style="color:#00d4ff;font-style:normal">Criar Conta</strong>.</div>'
+    +   '<button id="modal-bv-entrar-submit" style="width:100%;padding:14px;border-radius:10px;border:none;background:linear-gradient(135deg,#c9a227,#ffe066);color:#020b18;font-family:\'Orbitron\',monospace;font-size:0.74rem;font-weight:700;letter-spacing:0.1em;cursor:pointer;box-shadow:0 0 20px rgba(255,224,102,0.28)">ENTRAR</button>'
+    +   '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px;font-size:0.68rem">'
+    +     '<a id="modal-bv-esqueci" href="#" style="color:#7ab3d4;text-decoration:underline;opacity:0.85">Esqueci minha senha</a>'
+    +     '<a id="modal-bv-magiclink" href="#" style="color:#7ab3d4;text-decoration:underline;opacity:0.85">Entrar por link no e-mail</a>'
+    +   '</div>'
+    +   '<div style="border-top:1px solid rgba(0,180,255,0.15);margin:18px 0 12px"></div>'
+    +   '<button id="modal-bv-entrar-cancel" style="width:100%;padding:10px;border-radius:10px;border:1px solid rgba(0,180,255,0.2);background:transparent;color:#7ab3d4;font-family:\'Orbitron\',monospace;font-size:0.7rem;letter-spacing:0.08em;cursor:pointer">Cancelar</button>'
     + '</div>';
   document.body.appendChild(modal);
 
-  const input = modal.querySelector('#modal-bv-entrar-email');
+  const emailInput = modal.querySelector('#modal-bv-entrar-email');
+  const senhaInput = modal.querySelector('#modal-bv-entrar-senha');
   const errEl = modal.querySelector('#modal-bv-entrar-error');
-  const btnSend = modal.querySelector('#modal-bv-entrar-send');
+  const btnSubmit = modal.querySelector('#modal-bv-entrar-submit');
   const btnCancel = modal.querySelector('#modal-bv-entrar-cancel');
+  const linkEsqueci = modal.querySelector('#modal-bv-esqueci');
+  const linkMagic = modal.querySelector('#modal-bv-magiclink');
 
-  setTimeout(() => { try { input.focus(); } catch (_) {} }, 100);
+  setTimeout(() => { try { emailInput.focus(); } catch (_) {} }, 100);
   btnCancel.onclick = () => modal.remove();
 
-  const enviar = async () => {
-    const email = (input.value || '').trim().toLowerCase();
+  // Submit principal: email + senha
+  const submitLogin = async () => {
+    const email = (emailInput.value || '').trim().toLowerCase();
+    const senha = senhaInput.value || '';
     errEl.textContent = '';
+
     if (!email || !email.includes('@') || email.length < 5) {
       errEl.textContent = '⚠ Digite um e-mail válido';
-      try { input.focus(); } catch (_) {}
+      try { emailInput.focus(); } catch (_) {}
       return;
     }
-    btnSend.disabled = true;
-    btnSend.style.opacity = '0.6';
-    btnSend.textContent = '⏳ ENVIANDO...';
+    if (!senha || senha.length < 1) {
+      errEl.textContent = '⚠ Digite sua senha';
+      try { senhaInput.focus(); } catch (_) {}
+      return;
+    }
+
+    btnSubmit.disabled = true;
+    btnSubmit.style.opacity = '0.6';
+    btnSubmit.textContent = '⏳ VERIFICANDO...';
+
+    // Busca guardião com esse email
+    let guardiaoMatch = null;
     try {
-      if (typeof BF_AUTH === 'undefined' || !BF_AUTH.sendSignInLink) {
-        throw new Error('BF_AUTH indisponível');
+      if (typeof GUARDIOES !== 'undefined' && GUARDIOES) {
+        for (const [id, g] of Object.entries(GUARDIOES)) {
+          if (g && g.email && g.email.trim().toLowerCase() === email) {
+            guardiaoMatch = { id, guardiao: g };
+            break;
+          }
+        }
       }
-      await BF_AUTH.sendSignInLink(email, '?bemvindoLogin=1', 'login_bemvindo');
-      try { localStorage.setItem('babyforce_email_pending_login_v1', email); } catch (_) {}
-      if (typeof BFAudit !== 'undefined' && BFAudit.log) {
-        try { BFAudit.log('bemvindo_entrar_link_enviado', { emailPrefix: email.substring(0, 3) }); } catch (_) {}
+    } catch (e) { console.warn('[entrar buscar guardião]', e); }
+
+    if (!guardiaoMatch) {
+      btnSubmit.disabled = false;
+      btnSubmit.style.opacity = '1';
+      btnSubmit.textContent = 'ENTRAR';
+      errEl.innerHTML = '⚠ E-mail não cadastrado neste dispositivo.<br>' +
+        '<span style="color:#7ab3d4;opacity:0.85">Use <strong style="color:#00d4ff">Entrar por link no e-mail</strong> abaixo se está em outro dispositivo, ' +
+        'ou <strong style="color:#00d4ff">Criar Conta</strong> se é seu primeiro acesso.</span>';
+      return;
+    }
+
+    // Valida senha
+    const g = guardiaoMatch.guardiao;
+    const id = guardiaoMatch.id;
+    if (!g.senhaHash || !g.senhaSalt) {
+      btnSubmit.disabled = false;
+      btnSubmit.style.opacity = '1';
+      btnSubmit.textContent = 'ENTRAR';
+      errEl.innerHTML = '⚠ Esta conta foi criada sem senha.<br>' +
+        '<span style="color:#7ab3d4;opacity:0.85">Use <strong style="color:#00d4ff">Entrar por link no e-mail</strong> abaixo.</span>';
+      return;
+    }
+
+    try {
+      let hashDigitado;
+      if (typeof BFSec !== 'undefined' && BFSec.sha256) {
+        hashDigitado = await BFSec.sha256(senha + g.senhaSalt);
+      } else {
+        const data = new TextEncoder().encode(senha + g.senhaSalt);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+        hashDigitado = Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
       }
-      modal.innerHTML = ''
-        + '<div style="background:linear-gradient(135deg,#0a2a4a,#030f1f);border:1px solid rgba(57,255,20,0.4);border-radius:16px;padding:32px 22px;max-width:400px;width:100%;text-align:center;color:#e8f4fd;font-family:\'Exo 2\',sans-serif">'
-        +   '<div style="font-size:2.6rem;margin-bottom:12px">✉️</div>'
-        +   '<div style="font-family:\'Orbitron\',monospace;font-size:0.82rem;font-weight:700;letter-spacing:0.08em;color:#39ff14;margin-bottom:14px">LINK ENVIADO</div>'
-        +   '<div style="font-size:0.82rem;color:#e8f4fd;margin-bottom:8px;line-height:1.6">Enviamos um link de acesso para:<br><strong style="color:#00d4ff">' + email.replace(/[<>&"]/g, '') + '</strong></div>'
-        +   '<div style="font-size:0.72rem;color:#7ab3d4;margin-top:14px;line-height:1.55">Abra seu e-mail e clique no link para entrar.<br><br>💡 Se não chegar em 1 minuto, confira <strong style="color:#ffe066">spam/lixo eletrônico</strong>.</div>'
-        +   '<button id="modal-bv-ok" style="margin-top:20px;width:100%;padding:12px;border-radius:10px;border:1px solid rgba(0,180,255,0.3);background:transparent;color:#7ab3d4;font-family:\'Orbitron\',monospace;font-size:0.7rem;letter-spacing:0.08em;cursor:pointer">Entendi</button>'
-        + '</div>';
-      const btnOk = modal.querySelector('#modal-bv-ok');
-      if (btnOk) btnOk.onclick = () => modal.remove();
+
+      if (hashDigitado !== g.senhaHash) {
+        btnSubmit.disabled = false;
+        btnSubmit.style.opacity = '1';
+        btnSubmit.textContent = 'ENTRAR';
+        errEl.textContent = '⚠ Senha incorreta. Tente novamente ou use "Esqueci minha senha".';
+        try { senhaInput.focus(); senhaInput.select(); } catch (_) {}
+        return;
+      }
     } catch (e) {
-      btnSend.disabled = false;
-      btnSend.style.opacity = '1';
-      btnSend.textContent = '📧 ENVIAR LINK DE ACESSO';
-      const code = (e && e.code) || '';
-      const msg = (code === 'bf/firebase-unavailable' || /firebase/i.test(String(e && e.message || '')))
-        ? '⚠ Sem conexão com servidor. Tente mais tarde ou use Criar Conta.'
-        : (code === 'bf/invalid-email' || code === 'auth/invalid-email')
-        ? '⚠ E-mail inválido'
-        : (code === 'auth/user-not-found')
-        ? '⚠ E-mail não cadastrado. Use Criar Conta.'
-        : '⚠ Não foi possível enviar o link. Tente novamente em instantes.';
-      errEl.textContent = msg;
-      console.warn('[obBemVindoEntrar]', e);
+      console.warn('[entrar validar senha]', e);
+      btnSubmit.disabled = false;
+      btnSubmit.style.opacity = '1';
+      btnSubmit.textContent = 'ENTRAR';
+      errEl.textContent = '⚠ Erro ao validar senha. Tente novamente.';
+      return;
+    }
+
+    // Sucesso: fecha modal, marca sessão, chama fazerLogin
+    if (typeof BFAudit !== 'undefined' && BFAudit.log) {
+      try { BFAudit.log('bemvindo_entrar_sucesso', { guardiaoId: id }); } catch (_) {}
+    }
+    try {
+      const chaveSessao = (typeof SESSION_KEY !== 'undefined') ? SESSION_KEY : 'babyforce_session_v1';
+      sessionStorage.setItem(chaveSessao, id);
+    } catch (_) {}
+    modal.remove();
+    const nomeG = g.nome ? g.nome.split(' ')[0] : 'Guardião';
+    showToast(`🛸 Bem-vindo(a) de volta, ${nomeG}!`);
+    if (typeof fazerLogin === 'function') {
+      fazerLogin(id);
     }
   };
 
-  btnSend.onclick = enviar;
-  input.onkeydown = (ev) => { if (ev.key === 'Enter') enviar(); };
+  btnSubmit.onclick = submitLogin;
+  emailInput.onkeydown = (ev) => { if (ev.key === 'Enter') senhaInput.focus(); };
+  senhaInput.onkeydown = (ev) => { if (ev.key === 'Enter') submitLogin(); };
+
+  // Link "Esqueci minha senha" — envia magic link de recuperação
+  linkEsqueci.onclick = async (ev) => {
+    ev.preventDefault();
+    const email = (emailInput.value || '').trim().toLowerCase();
+    errEl.textContent = '';
+    if (!email || !email.includes('@')) {
+      errEl.textContent = '⚠ Digite seu e-mail antes de clicar em "Esqueci minha senha"';
+      try { emailInput.focus(); } catch (_) {}
+      return;
+    }
+    try {
+      if (typeof BF_AUTH === 'undefined' || !BF_AUTH.sendSignInLink) throw new Error('BF_AUTH indisponível');
+      await BF_AUTH.sendSignInLink(email, '?recoverPassword=1', 'recuperar_senha_bemvindo');
+      try { localStorage.setItem('babyforce_email_pending_login_v1', email); } catch (_) {}
+      _mostrarTelaMagicLinkEnviado(modal, email, 'recuperação de senha');
+    } catch (e) {
+      errEl.textContent = '⚠ Não foi possível enviar o link de recuperação. Tente novamente.';
+      console.warn('[esqueci senha]', e);
+    }
+  };
+
+  // Link "Entrar por link no e-mail" — magic link de login
+  linkMagic.onclick = async (ev) => {
+    ev.preventDefault();
+    const email = (emailInput.value || '').trim().toLowerCase();
+    errEl.textContent = '';
+    if (!email || !email.includes('@')) {
+      errEl.textContent = '⚠ Digite seu e-mail antes de pedir o link';
+      try { emailInput.focus(); } catch (_) {}
+      return;
+    }
+    try {
+      if (typeof BF_AUTH === 'undefined' || !BF_AUTH.sendSignInLink) throw new Error('BF_AUTH indisponível');
+      await BF_AUTH.sendSignInLink(email, '?bemvindoLogin=1', 'login_bemvindo_magic');
+      try { localStorage.setItem('babyforce_email_pending_login_v1', email); } catch (_) {}
+      if (typeof BFAudit !== 'undefined' && BFAudit.log) {
+        try { BFAudit.log('bemvindo_magiclink_enviado', { emailPrefix: email.substring(0, 3) }); } catch (_) {}
+      }
+      _mostrarTelaMagicLinkEnviado(modal, email, 'login');
+    } catch (e) {
+      errEl.textContent = '⚠ Não foi possível enviar o link. Tente novamente.';
+      console.warn('[magic link login]', e);
+    }
+  };
 }
 window.obBemVindoEntrar = obBemVindoEntrar;
+
+// Helper: transforma o modal numa tela de confirmação de envio de link
+function _mostrarTelaMagicLinkEnviado(modal, email, tipo) {
+  const emailSafe = String(email).replace(/[<>&"]/g, '');
+  const tipoTxt = tipo === 'recuperação de senha' ? 'recuperação de senha' : 'entrar na sua conta';
+  const corBorda = tipo === 'recuperação de senha' ? '255,224,102' : '57,255,20';
+  const corTitulo = tipo === 'recuperação de senha' ? '#ffe066' : '#39ff14';
+  modal.innerHTML = ''
+    + '<div style="background:linear-gradient(135deg,#0a2a4a,#030f1f);border:1px solid rgba(' + corBorda + ',0.4);border-radius:16px;padding:32px 22px;max-width:400px;width:100%;text-align:center;color:#e8f4fd;font-family:\'Exo 2\',sans-serif;margin:auto">'
+    +   '<div style="font-size:2.6rem;margin-bottom:12px">✉️</div>'
+    +   '<div style="font-family:\'Orbitron\',monospace;font-size:0.82rem;font-weight:700;letter-spacing:0.08em;color:' + corTitulo + ';margin-bottom:14px">LINK ENVIADO</div>'
+    +   '<div style="font-size:0.82rem;color:#e8f4fd;margin-bottom:8px;line-height:1.6">Enviamos um link para ' + tipoTxt + ' para:<br><strong style="color:#00d4ff">' + emailSafe + '</strong></div>'
+    +   '<div style="font-size:0.72rem;color:#7ab3d4;margin-top:14px;line-height:1.55">Abra seu e-mail e clique no link.<br><br>💡 Se não chegar em 1 minuto, confira <strong style="color:#ffe066">spam/lixo eletrônico</strong>.</div>'
+    +   '<button id="modal-bv-ok" style="margin-top:20px;width:100%;padding:12px;border-radius:10px;border:1px solid rgba(0,180,255,0.3);background:transparent;color:#7ab3d4;font-family:\'Orbitron\',monospace;font-size:0.7rem;letter-spacing:0.08em;cursor:pointer">Entendi</button>'
+    + '</div>';
+  const btnOk = modal.querySelector('#modal-bv-ok');
+  if (btnOk) btnOk.onclick = () => modal.remove();
+}
+
 
 // MODO TESTE — cria guardião local sem email/senha e pula pra step 3 (bebê)
 async function obBemVindoModoTeste() {
@@ -13232,12 +13561,13 @@ function obFinalizar() {
   // ATALHO MODO TESTE: se já existe guardião com flag modoTeste criado via
   // obBemVindoModoTeste, não recria nada — só conclui o onboarding.
   try {
-    const jaTemTeste = Object.values(GUARDIOES || {}).some(g => g && g.modoTeste === true);
-    if (jaTemTeste) {
+    const entryTeste = Object.entries(GUARDIOES || {}).find(([_, g]) => g && g.modoTeste === true);
+    if (entryTeste) {
+      const [idTeste] = entryTeste;
       if (typeof BFAudit !== 'undefined' && BFAudit.log) {
         try { BFAudit.log('modo_teste_onboarding_concluido'); } catch (_) {}
       }
-      obConcluir();
+      obConcluir(idTeste);  // ← passa ID do guardião de teste para entrar direto
       return;
     }
   } catch (e) { console.warn('[obFinalizar modoTeste check]', e); }
@@ -13284,7 +13614,7 @@ function obFinalizar() {
   // Limpar dados de onboarding pendente
   try { localStorage.removeItem(OB_ADMIN_PENDING_KEY); } catch {}
   if (typeof BFAudit !== 'undefined') BFAudit.log('admin_criado', { email: email.substring(0, 3) + '***', verificado: verificadoRealmente });
-  obConcluir();
+  obConcluir(id);  // ← passa ID para obConcluir entrar direto no app
 }
 
 function obFinalizarSemGuardiao() { obConcluir(); }
@@ -13351,7 +13681,7 @@ function validarDataEvento(d, hora) {
   // Atualiza a cada meia-noite (pra não prender usuário se o app ficar aberto à noite)
   setInterval(aplicar, 60 * 60 * 1000); // a cada hora (bem conservador)
 })();
-function obConcluir(){
+function obConcluir(guardiaoId){
   const appCfg=getAppConfig();saveAppConfig({...appCfg,setupDone:true});
   const babyCfg=getBabyConfig();
   if(_obFotoPendente)saveBabyConfig({...babyCfg,photo:_obFotoPendente});
@@ -13361,6 +13691,34 @@ function obConcluir(){
   _obAdminDados = null;
   document.getElementById('tela-onboarding').style.display='none';
   atualizarHeaderBebe();atualizarFotoArthurHeader();
+
+  // ═══ FLUXO 10+ : se temos o ID do guardião recém-criado, loga direto no app ═══
+  // Evita a fricção de forçar o usuário a voltar pra tela de login e digitar PIN de novo
+  // logo após ter acabado de criar a conta + definir PIN + escolher emoji.
+  if (guardiaoId && GUARDIOES && GUARDIOES[guardiaoId]) {
+    try {
+      const g = GUARDIOES[guardiaoId];
+      const nome = (g && g.nome) ? g.nome.split(' ')[0] : 'Guardião';
+      const babyNome = (typeof getBabyName === 'function') ? getBabyName() : '';
+      const saudacao = babyNome
+        ? `🛸 Bem-vindo(a), ${nome}! ${babyNome} está pronto(a) para a jornada.`
+        : `🛸 Bem-vindo(a), ${nome}!`;
+      showToast(saudacao);
+      // Persistir sessão como se tivesse logado normalmente
+      try {
+        const chaveSessao = (typeof SESSION_KEY !== 'undefined') ? SESSION_KEY : 'babyforce_session_v1';
+        sessionStorage.setItem(chaveSessao, guardiaoId);
+      } catch (_) {}
+      // fazerLogin é quem conecta o app: define usuarioAtual, abre seleção da criança
+      // (ou pula direto se só tem uma criança cadastrada)
+      if (typeof fazerLogin === 'function') {
+        fazerLogin(guardiaoId);
+        return;
+      }
+    } catch (e) { console.warn('[obConcluir entrar direto]', e); }
+  }
+
+  // Fallback legado: mostra tela de login (usado apenas se guardiaoId não veio ou falhou)
   renderListaGuardioes();
   document.getElementById('tela-login').style.display='flex';
   showToast('🛸 Bem-vindo(a) ao BabyForce, '+getBabyName()+'!');
