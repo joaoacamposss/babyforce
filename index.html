@@ -1194,6 +1194,7 @@ html.bf-tema-claro [style*="color: var(--white)"] { color: var(--white) !importa
 <div id="tab-mamadas" class="tab-panel">
   <div class="nutricao-subtabs" style="display:flex;gap:8px;margin-bottom:14px;background:rgba(0,20,50,0.5);border:1px solid rgba(0,180,255,0.15);border-radius:12px;padding:5px">
     <button class="nutricao-stab active" id="nstab-mamadas" onclick="showNutricaoTab('mamadas',this)" style="flex:1;padding:9px 6px;border-radius:8px;border:none;background:transparent;color:var(--text-dim);font-family:'Orbitron',monospace;font-size:0.62rem;letter-spacing:0.07em;cursor:pointer;transition:all 0.2s">🍼 Mamadas</button>
+    <button class="nutricao-stab" id="nstab-estoque-leite" onclick="showNutricaoTab('estoque-leite',this)" style="flex:1;padding:9px 6px;border-radius:8px;border:none;background:transparent;color:var(--text-dim);font-family:'Orbitron',monospace;font-size:0.62rem;letter-spacing:0.07em;cursor:pointer;transition:all 0.2s">❄️ Estoque</button>
     <button class="nutricao-stab" id="nstab-alimentos" onclick="showNutricaoTab('alimentos',this)" style="flex:1;padding:9px 6px;border-radius:8px;border:none;background:transparent;color:var(--text-dim);font-family:'Orbitron',monospace;font-size:0.62rem;letter-spacing:0.07em;cursor:pointer;transition:all 0.2s;position:relative">
       🥣 Alimentos <span id="lock-badge-alimentos" style="margin-left:3px">🔒</span>
     </button>
@@ -1311,6 +1312,75 @@ html.bf-tema-claro [style*="color: var(--white)"] { color: var(--white) !importa
   </div>
 
   <div id="nutricao-panel-alimentos" class="nutricao-panel" style="display:none"></div>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       ESTOQUE DE LEITE MATERNO · [BF 24/abr/2026]
+       Baseado em: SBP (Soc. Bras. Pediatria) · rBLH/FIOCRUZ (Rede Bras. Bancos de Leite Humano) · Ministério da Saúde
+       ═══════════════════════════════════════════════════════════════ -->
+  <div id="nutricao-panel-estoque-leite" class="nutricao-panel" style="display:none">
+    <!-- Card intro com referências -->
+    <div class="card" style="background:linear-gradient(135deg,rgba(0,180,255,0.14),rgba(120,220,255,0.08));border:1px solid rgba(0,180,255,0.35);margin-bottom:12px">
+      <div class="section-title" style="display:flex;align-items:center;gap:8px">
+        <span>❄️ Estoque de Leite Materno</span>
+        <span style="font-family:'Orbitron',monospace;font-size:0.52rem;color:var(--blue-neon);background:rgba(0,180,255,0.14);padding:2px 7px;border-radius:8px;letter-spacing:0.08em;font-weight:600">SBP · rBLH · MS</span>
+      </div>
+      <div style="font-size:0.72rem;color:var(--text-dim);line-height:1.55">
+        Registre ordenhas, monitore a <strong style="color:var(--white)">validade</strong> de cada frasco e receba orientações de armazenamento conforme <strong style="color:var(--blue-neon)">Sociedade Brasileira de Pediatria</strong>, <strong style="color:var(--blue-neon)">Rede Brasileira de Bancos de Leite Humano (rBLH/FIOCRUZ)</strong> e <strong style="color:var(--blue-neon)">Ministério da Saúde</strong>.
+      </div>
+      <button onclick="_estLeiteAbrirGuia()" style="margin-top:10px;padding:8px 14px;background:rgba(0,180,255,0.1);border:1px solid rgba(0,180,255,0.4);border-radius:20px;color:var(--blue-neon);font-family:'Orbitron',monospace;font-size:0.62rem;letter-spacing:0.06em;cursor:pointer;font-weight:600">📚 Ver guia completo de armazenamento</button>
+    </div>
+
+    <!-- Resumo de estoque ativo -->
+    <div id="est-leite-resumo" style="margin-bottom:12px"></div>
+
+    <!-- Form: registrar ordenha -->
+    <div class="card">
+      <div class="section-title">🍼 Registrar Ordenha</div>
+      <div class="row-2">
+        <div class="form-group"><label>Data</label><input type="date" id="el-data"></div>
+        <div class="form-group"><label>Local de armazenamento</label>
+          <select id="el-local" onchange="_estLeiteAtualizarValidadeHint()">
+            <option value="geladeira">🧊 Geladeira (até 12h)</option>
+            <option value="freezer_domestico">❄️ Freezer doméstico (até 15 dias)</option>
+            <option value="freezer_comercial">🧊 Freezer comercial −20°C (até 6 meses)</option>
+            <option value="ambiente">🌡️ Temperatura ambiente (uso imediato, até 2h)</option>
+          </select>
+        </div>
+      </div>
+      <div class="row-2">
+        <div class="form-group"><label>Início da extração</label><input type="time" id="el-hora-inicio"></div>
+        <div class="form-group"><label>Término da extração</label><input type="time" id="el-hora-fim"></div>
+      </div>
+      <div class="row-2">
+        <div class="form-group">
+          <label>Seio</label>
+          <select id="el-lado">
+            <option value="E">🤱 Esquerdo</option>
+            <option value="D">🤱 Direito</option>
+            <option value="AMBOS">🤱🤱 Ambos</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Volume extraído (ml)</label><input type="number" id="el-volume" min="1" max="500" step="1" placeholder="ex: 60"></div>
+      </div>
+      <div class="form-group">
+        <label>Observações</label>
+        <input type="text" id="el-obs" placeholder="ex: dor no mamilo, choques vasoespasmo, coloração...">
+        <div style="font-size:0.62rem;color:var(--text-dim);margin-top:4px;line-height:1.4">Registre dor, desconforto, vasoespasmo (mamilo fica branco), engurgitamento, bloqueios — útil para discutir com pediatra/banco de leite.</div>
+      </div>
+      <!-- Hint dinâmico de validade -->
+      <div id="el-validade-hint" style="background:rgba(0,180,255,0.08);border-left:3px solid rgba(0,180,255,0.5);padding:8px 12px;border-radius:6px;font-size:0.7rem;color:var(--text-dim);line-height:1.4;margin-bottom:12px"></div>
+      <button class="btn btn-primary btn-full" onclick="salvarEstoqueLeite()">❄️ Registrar Ordenha</button>
+    </div>
+
+    <!-- Filtros -->
+    <div class="filter-bar" style="margin-top:12px">
+      <button class="filter-btn active" id="elf-todos" onclick="_estLeiteFiltrar('todos', this)">❄️ Todos</button>
+      <button class="filter-btn" id="elf-validos" onclick="_estLeiteFiltrar('validos', this)">✓ Válidos</button>
+      <button class="filter-btn" id="elf-vencendo" onclick="_estLeiteFiltrar('vencendo', this)">⚠ Vencendo</button>
+      <button class="filter-btn" id="elf-vencidos" onclick="_estLeiteFiltrar('vencidos', this)">✗ Vencidos</button>
+    </div>
+    <div id="lista-estoque-leite" style="margin-top:10px"></div>
+  </div>
 </div>
 
 <!-- MISSÕES -->
@@ -1907,11 +1977,20 @@ html.bf-tema-claro [style*="color: var(--white)"] { color: var(--white) !importa
 
 <!-- SINTOMAS (sempre desbloqueado — registro de febre, tosse, dor etc.) -->
 <div id="tab-sintomas" class="tab-panel">
+  <!-- [BF-FIX 24/abr/2026] Disclaimer forte e padronizado (consistente com Medicação) -->
+  <div style="background:linear-gradient(135deg,rgba(255,136,136,0.16),rgba(255,80,80,0.1));border:2px solid rgba(255,136,136,0.5);border-radius:10px;padding:12px 14px;margin-bottom:12px">
+    <div style="display:flex;align-items:flex-start;gap:10px">
+      <div style="font-size:1.4rem;line-height:1">⚠️</div>
+      <div style="flex:1;font-size:0.74rem;line-height:1.5;color:#ffd4d4">
+        <strong style="color:#ff9090;font-family:'Orbitron',monospace;font-size:0.7rem;letter-spacing:0.05em;display:block;margin-bottom:4px">IMPORTANTE</strong>
+        Este app <strong>NÃO substitui</strong> avaliação médica. O registro de sintomas serve apenas como diário para discussão com o <strong>pediatra</strong>. Em caso de <strong>febre alta, convulsão, dificuldade respiratória, desidratação, letargia incomum, vômitos persistentes ou qualquer sinal de alerta</strong>, procure atendimento médico imediato ou ligue para o SAMU (192).
+      </div>
+    </div>
+  </div>
   <div class="card" style="margin-bottom:12px;background:linear-gradient(135deg,rgba(255,136,136,0.14),rgba(0,60,120,0.15));border:1px solid rgba(255,136,136,0.3)">
     <div class="section-title">🤒 Registro de Sintomas</div>
     <div style="font-size:0.72rem;color:var(--text-dim);line-height:1.5">
-      Registre febre, tosse, dor, vômito e outros sintomas. O Oráculo pode ajudar a avaliar sinais de alerta.<br>
-      <strong style="color:var(--gold)">Em emergência</strong>, procure um pediatra imediatamente.
+      Registre febre, tosse, dor, vômito e outros sintomas para acompanhar a evolução e discutir com o pediatra.
     </div>
   </div>
   <div class="card">
@@ -10345,8 +10424,8 @@ function _gerarOpcoesIdadeSelector(incluirNascer) {
   opcoes.push({ value: 48, label: '🎂 4 anos' });
   opcoes.push({ value: 54, label: '🎈 4 anos e 6 meses' });
   opcoes.push({ value: 60, label: '🎂 5 anos' });
-  // Anual: 6, 7, 8, 9, 10, 11 anos (até 11a11m29d é coberto pela idade 132m = 11a)
-  for (let ano = 6; ano <= 11; ano++) {
+  // Anual: 6, 7, 8, 9, 10, 11, 12 anos — [BF-FIX 24/abr/2026 · Bug 25] agora até 12 anos
+  for (let ano = 6; ano <= 12; ano++) {
     opcoes.push({ value: ano * 12, label: '🎂 ' + ano + ' anos' });
   }
   return opcoes;
@@ -10397,8 +10476,8 @@ function initCrescForm(){
     const diffMeses=Math.floor((new Date()-new Date(nasc+'T00:00:00'))/(1000*60*60*24*30.44));
     const sel=document.getElementById('cresc-mes');
     if(sel && diffMeses>=0) {
-      // [Sprint B] Agora suporta até 132 meses (11 anos)
-      const valor = Math.min(diffMeses, 132);
+      // [BF-FIX 24/abr/2026 · Bug 25] Suporta até 144 meses (12 anos)
+      const valor = Math.min(diffMeses, 144);
       // Procurar a opção mais próxima <= valor
       const options = Array.from(sel.options).map(o => parseInt(o.value));
       const melhor = options.filter(v => v <= valor).sort((a,b)=>b-a)[0] || 0;
@@ -17876,9 +17955,17 @@ async function oraculoToggleVoice() {
     return;
   }
 
-  // Se está gravando (ou em processo de parar), 2ª clique FORÇA parada
-  if (_oraculoVozEstado === 'listening' || _oraculoVozEstado === 'stopping') {
+  // [BF-FIX 24/abr/2026 · Bug 21] Se está gravando OU em processo de parar OU se a classe listening
+  // persistiu (estado corrompido), forçar parada sempre. Dupla camada de garantia.
+  const btnEstaVisualmenteAtivo = btn.classList.contains('listening');
+  if (_oraculoVozEstado === 'listening' || _oraculoVozEstado === 'stopping' || btnEstaVisualmenteAtivo) {
     _oraculoVozPararForcado();
+    // Reset extra forçado após 300ms caso o SR se recuse a parar
+    setTimeout(() => {
+      _oraculoVozResetVisual();
+      _oraculoVozRec = null;
+      _oraculoVozEstado = 'idle';
+    }, 300);
     return;
   }
 
@@ -22120,6 +22207,352 @@ function showNutricaoTab(tab, btn) {
   if (panel) panel.style.display = 'block';
   if (tab === 'alimentos') renderAlimentosPanel();
   if (tab === 'mamadas') _aplicarLockDesmame();
+  if (tab === 'estoque-leite') { if (typeof initEstoqueLeite === 'function') initEstoqueLeite(); }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ESTOQUE DE LEITE MATERNO · [BF 24/abr/2026]
+// Módulo baseado em SBP, rBLH/FIOCRUZ, Ministério da Saúde
+// ═══════════════════════════════════════════════════════════════
+const ESTOQUE_LEITE_KEY = 'babyforce_estoque_leite_v1';
+
+// Tempos de validade por local de armazenamento (em horas)
+// Fontes: rBLH-FIOCRUZ, SBP Departamento de Aleitamento Materno, MS
+const EL_VALIDADE_HORAS = {
+  ambiente: 2,              // Temperatura ambiente (até 25°C): uso imediato, máx 2h
+  geladeira: 12,            // Geladeira 2-4°C (prateleira do meio): até 12h após ordenha para uso doméstico
+  freezer_domestico: 15 * 24,   // Freezer doméstico (-18°C): até 15 dias
+  freezer_comercial: 180 * 24,  // Freezer comercial/industrial (-20°C): até 6 meses
+};
+
+const EL_LOCAL_LABEL = {
+  ambiente: '🌡️ Temperatura ambiente',
+  geladeira: '🧊 Geladeira',
+  freezer_domestico: '❄️ Freezer doméstico',
+  freezer_comercial: '🧊 Freezer comercial (−20°C)',
+};
+
+const EL_LOCAL_VALIDADE_TXT = {
+  ambiente: 'até 2 horas — uso imediato após extração',
+  geladeira: 'até 12 horas (prateleira do meio, parte mais fria)',
+  freezer_domestico: 'até 15 dias',
+  freezer_comercial: 'até 6 meses',
+};
+
+function _estLeiteLoad() {
+  try { return JSON.parse(localStorage.getItem(ESTOQUE_LEITE_KEY)) || []; } catch { return []; }
+}
+function _estLeiteSave(arr) {
+  try { localStorage.setItem(ESTOQUE_LEITE_KEY, JSON.stringify(arr)); } catch {}
+}
+
+function initEstoqueLeite() {
+  const hoje = new Date();
+  const dataEl = document.getElementById('el-data');
+  if (dataEl && !dataEl.value) {
+    dataEl.value = `${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2,'0')}-${String(hoje.getDate()).padStart(2,'0')}`;
+  }
+  const horaFimEl = document.getElementById('el-hora-fim');
+  if (horaFimEl && !horaFimEl.value) {
+    horaFimEl.value = hoje.toTimeString().slice(0,5);
+  }
+  _estLeiteAtualizarValidadeHint();
+  renderEstoqueLeite();
+}
+
+function _estLeiteAtualizarValidadeHint() {
+  const local = document.getElementById('el-local')?.value || 'geladeira';
+  const hint = document.getElementById('el-validade-hint');
+  if (hint) {
+    hint.innerHTML = `<strong style="color:var(--blue-neon)">⏳ ${EL_LOCAL_LABEL[local]}:</strong> ${EL_LOCAL_VALIDADE_TXT[local]}. <span style="color:var(--text-dim)">Recipiente estéril de vidro com tampa plástica. <em>Fonte: rBLH-FIOCRUZ / SBP.</em></span>`;
+  }
+}
+
+function salvarEstoqueLeite() {
+  const data = document.getElementById('el-data')?.value;
+  const horaIni = document.getElementById('el-hora-inicio')?.value;
+  const horaFim = document.getElementById('el-hora-fim')?.value;
+  const lado = document.getElementById('el-lado')?.value || 'AMBOS';
+  const volume = parseFloat(document.getElementById('el-volume')?.value || '0');
+  const local = document.getElementById('el-local')?.value || 'geladeira';
+  const obs = (document.getElementById('el-obs')?.value || '').trim();
+
+  if (!data || !horaFim) {
+    if (typeof showToast === 'function') showToast('⚠ Defina data e horário de término');
+    return;
+  }
+  if (!volume || volume <= 0) {
+    if (typeof showToast === 'function') showToast('⚠ Informe o volume extraído');
+    return;
+  }
+  if (typeof validarDataEvento === 'function' && !validarDataEvento(data, horaFim)) {
+    if (typeof showToast === 'function') showToast('⚠ Data/hora não pode ser no futuro');
+    return;
+  }
+
+  const registro = {
+    id: Date.now(),
+    data,
+    horaInicio: horaIni || null,
+    horaFim,
+    lado,
+    volume,
+    local,
+    obs,
+    // timestamp ISO do fim da extração (usado pra calcular validade)
+    extracaoTs: new Date(`${data}T${horaFim}:00`).getTime(),
+    criadoEm: Date.now(),
+  };
+
+  const lista = _estLeiteLoad();
+  lista.push(registro);
+  lista.sort((a, b) => b.extracaoTs - a.extracaoTs);
+  _estLeiteSave(lista);
+
+  // Limpar form
+  document.getElementById('el-hora-inicio').value = '';
+  document.getElementById('el-volume').value = '';
+  document.getElementById('el-obs').value = '';
+
+  if (typeof showToast === 'function') showToast('❄️ Ordenha registrada!');
+  renderEstoqueLeite();
+}
+
+function _estLeiteStatus(reg) {
+  const horasDesdeExtr = (Date.now() - reg.extracaoTs) / (1000 * 60 * 60);
+  const validadeH = EL_VALIDADE_HORAS[reg.local] || 12;
+  const restanteH = validadeH - horasDesdeExtr;
+  if (restanteH <= 0) return { status: 'vencido', restanteH, validadeH, horasDesdeExtr };
+  if (restanteH < validadeH * 0.2) return { status: 'vencendo', restanteH, validadeH, horasDesdeExtr };
+  return { status: 'valido', restanteH, validadeH, horasDesdeExtr };
+}
+
+function _estLeiteFormatarRestante(horas) {
+  if (horas <= 0) return 'Vencido';
+  if (horas < 1) return `${Math.round(horas * 60)}min`;
+  if (horas < 48) return `${Math.round(horas)}h`;
+  const dias = Math.floor(horas / 24);
+  return `${dias}d`;
+}
+
+let _estLeiteFiltroAtivo = 'todos';
+function _estLeiteFiltrar(f, btn) {
+  _estLeiteFiltroAtivo = f;
+  document.querySelectorAll('#nutricao-panel-estoque-leite .filter-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  renderEstoqueLeite();
+}
+
+function renderEstoqueLeite() {
+  const el = document.getElementById('lista-estoque-leite');
+  const resumoEl = document.getElementById('est-leite-resumo');
+  if (!el) return;
+
+  const lista = _estLeiteLoad();
+
+  // Resumo de volume ativo
+  if (resumoEl) {
+    let volValido = 0, volVencendo = 0, volVencido = 0, qtdValido = 0;
+    lista.forEach(r => {
+      const s = _estLeiteStatus(r);
+      if (s.status === 'valido') { volValido += r.volume; qtdValido++; }
+      else if (s.status === 'vencendo') { volVencendo += r.volume; qtdValido++; }
+      else volVencido += r.volume;
+    });
+    if (lista.length === 0) {
+      resumoEl.innerHTML = '';
+    } else {
+      resumoEl.innerHTML = `
+        <div class="card" style="background:linear-gradient(135deg,rgba(120,255,153,0.1),rgba(0,180,255,0.08));border:1px solid rgba(120,255,153,0.25);padding:12px 14px">
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center">
+            <div><div style="font-size:0.52rem;color:var(--text-dim);font-family:'Orbitron',monospace;letter-spacing:0.08em">DISPONÍVEL</div><div style="font-size:1.1rem;color:#78ff99;font-weight:700;font-family:'Orbitron',monospace">${volValido} ml</div><div style="font-size:0.58rem;color:var(--text-dim)">${qtdValido} frasco${qtdValido!==1?'s':''}</div></div>
+            <div><div style="font-size:0.52rem;color:var(--text-dim);font-family:'Orbitron',monospace;letter-spacing:0.08em">VENCENDO</div><div style="font-size:1.1rem;color:#ffc94f;font-weight:700;font-family:'Orbitron',monospace">${volVencendo} ml</div></div>
+            <div><div style="font-size:0.52rem;color:var(--text-dim);font-family:'Orbitron',monospace;letter-spacing:0.08em">VENCIDO</div><div style="font-size:1.1rem;color:#ff8080;font-weight:700;font-family:'Orbitron',monospace">${volVencido} ml</div></div>
+          </div>
+        </div>`;
+    }
+  }
+
+  if (!lista.length) {
+    el.innerHTML = '<div class="empty"><div class="empty-icon">❄️</div><p>Nenhuma ordenha registrada</p><div style="font-size:0.7rem;color:var(--text-dim);margin-top:8px;line-height:1.5">Registre sua primeira ordenha acima para começar a acompanhar o estoque.</div></div>';
+    return;
+  }
+
+  const filtrados = lista.filter(r => {
+    if (_estLeiteFiltroAtivo === 'todos') return true;
+    const s = _estLeiteStatus(r).status;
+    if (_estLeiteFiltroAtivo === 'validos') return s === 'valido';
+    if (_estLeiteFiltroAtivo === 'vencendo') return s === 'vencendo';
+    if (_estLeiteFiltroAtivo === 'vencidos') return s === 'vencido';
+    return true;
+  });
+
+  if (!filtrados.length) {
+    el.innerHTML = '<div class="empty"><p style="color:var(--text-dim);font-size:0.76rem">Nenhum registro nesta categoria.</p></div>';
+    return;
+  }
+
+  const ladoLabel = { E: '🤱 Esquerdo', D: '🤱 Direito', AMBOS: '🤱🤱 Ambos' };
+  const statusCor = { valido: '#78ff99', vencendo: '#ffc94f', vencido: '#ff8080' };
+  const statusLabel = { valido: '✓ Válido', vencendo: '⚠ Vencendo', vencido: '✗ Vencido' };
+
+  el.innerHTML = filtrados.map(r => {
+    const s = _estLeiteStatus(r);
+    const dataFmt = r.data ? new Date(r.data + 'T12:00').toLocaleDateString('pt-BR') : '—';
+    const duracao = r.horaInicio ? _estLeiteDuracao(r.horaInicio, r.horaFim) : null;
+    const obsHtml = r.obs ? `<div style="font-size:0.68rem;color:var(--text-dim);margin-top:4px;line-height:1.45;font-style:italic">💬 ${r.obs.replace(/</g,'&lt;')}</div>` : '';
+    const duracaoHtml = duracao ? `<span style="font-size:0.62rem;color:var(--text-dim)">⏱ ${duracao}</span>` : '';
+    return `
+      <div style="background:rgba(0,30,60,0.45);border:1px solid ${statusCor[s.status]}40;border-left:3px solid ${statusCor[s.status]};border-radius:10px;padding:12px 14px;margin-bottom:8px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+          <div style="flex:1">
+            <div style="font-family:'Orbitron',monospace;font-size:1.05rem;color:var(--white);font-weight:700">${r.volume} ml · ${ladoLabel[r.lado] || r.lado}</div>
+            <div style="font-size:0.66rem;color:var(--text-dim);margin-top:3px">📅 ${dataFmt} · ⏰ ${r.horaFim} ${duracaoHtml ? '· '+duracaoHtml : ''}</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-family:'Orbitron',monospace;font-size:0.6rem;color:${statusCor[s.status]};font-weight:700;letter-spacing:0.06em">${statusLabel[s.status]}</div>
+            <div style="font-size:0.6rem;color:var(--text-dim);margin-top:2px">${s.status !== 'vencido' ? 'Resta '+_estLeiteFormatarRestante(s.restanteH) : 'há '+_estLeiteFormatarRestante(s.horasDesdeExtr - s.validadeH)}</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:0.62rem;color:var(--text-dim);padding-top:6px;border-top:1px dashed rgba(0,180,255,0.1)">
+          <span>${EL_LOCAL_LABEL[r.local] || r.local}</span>
+          <span style="margin-left:auto">
+            <button onclick="deleteEstoqueLeite(${r.id})" style="background:rgba(255,128,128,0.1);border:1px solid rgba(255,128,128,0.3);color:#ff8080;padding:3px 9px;border-radius:6px;font-size:0.62rem;cursor:pointer">🗑</button>
+          </span>
+        </div>
+        ${obsHtml}
+      </div>
+    `;
+  }).join('');
+}
+
+function _estLeiteDuracao(hIni, hFim) {
+  if (!hIni || !hFim) return null;
+  const [h1, m1] = hIni.split(':').map(Number);
+  const [h2, m2] = hFim.split(':').map(Number);
+  let min = (h2 * 60 + m2) - (h1 * 60 + m1);
+  if (min < 0) return null;
+  if (min < 60) return `${min}min`;
+  return `${Math.floor(min/60)}h${String(min%60).padStart(2,'0')}`;
+}
+
+function deleteEstoqueLeite(id) {
+  const lista = _estLeiteLoad().filter(r => r.id !== id);
+  _estLeiteSave(lista);
+  renderEstoqueLeite();
+  if (typeof showToast === 'function') showToast('🗑 Ordenha removida');
+}
+
+// Guia completo de armazenamento
+function _estLeiteAbrirGuia() {
+  const existente = document.getElementById('modal-guia-estoque-leite');
+  if (existente) existente.remove();
+  const modal = document.createElement('div');
+  modal.id = 'modal-guia-estoque-leite';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,10,30,0.94);z-index:99998;display:flex;align-items:center;justify-content:center;padding:14px;backdrop-filter:blur(8px);';
+  modal.innerHTML = `
+    <div style="max-width:520px;width:100%;background:linear-gradient(135deg,#031027,#0a1a3d);border:1px solid rgba(0,180,255,0.4);border-radius:14px;padding:22px;color:#fff;font-family:'Exo 2',sans-serif;max-height:92vh;overflow-y:auto">
+      <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:14px">
+        <div style="font-size:2.2rem">❄️</div>
+        <div style="flex:1">
+          <div style="font-family:'Orbitron',monospace;font-size:0.85rem;color:var(--blue-neon);letter-spacing:0.08em;font-weight:700">GUIA DE ARMAZENAMENTO</div>
+          <div style="font-size:0.72rem;color:var(--text-dim);margin-top:3px">Leite materno ordenhado · uso doméstico</div>
+        </div>
+        <button onclick="document.getElementById('modal-guia-estoque-leite').remove()" style="background:rgba(255,128,128,0.12);border:1px solid rgba(255,128,128,0.4);border-radius:8px;color:#ff8080;width:32px;height:32px;cursor:pointer;font-size:1rem">✕</button>
+      </div>
+
+      <!-- Passo 1: Higiene -->
+      <div style="background:rgba(120,255,153,0.08);border:1px solid rgba(120,255,153,0.3);border-radius:10px;padding:12px 14px;margin-bottom:10px">
+        <div style="font-family:'Orbitron',monospace;font-size:0.66rem;color:#78ff99;letter-spacing:0.06em;margin-bottom:6px;font-weight:700">1. HIGIENE ANTES DA ORDENHA</div>
+        <ul style="font-size:0.72rem;color:var(--white);line-height:1.6;padding-left:18px;margin:0">
+          <li>Lavar mãos e antebraços até o cotovelo com água e sabão</li>
+          <li>Prender cabelos; usar máscara ou pano cobrindo boca/nariz</li>
+          <li>Seios apenas com água morna (sem sabonetes ou álcool)</li>
+          <li>Desprezar os primeiros jatos em lenço descartável</li>
+        </ul>
+      </div>
+
+      <!-- Passo 2: Recipiente -->
+      <div style="background:rgba(0,180,255,0.08);border:1px solid rgba(0,180,255,0.3);border-radius:10px;padding:12px 14px;margin-bottom:10px">
+        <div style="font-family:'Orbitron',monospace;font-size:0.66rem;color:var(--blue-neon);letter-spacing:0.06em;margin-bottom:6px;font-weight:700">2. RECIPIENTE</div>
+        <ul style="font-size:0.72rem;color:var(--white);line-height:1.6;padding-left:18px;margin:0">
+          <li><strong>Vidro com tampa plástica rosqueável</strong> (ex: pote de café solúvel)</li>
+          <li>Sem borracha na tampa</li>
+          <li>Ferver o recipiente por <strong>15 minutos</strong> antes do uso, depois escorrer de boca para baixo sobre pano limpo</li>
+          <li>Completar até ¾ da capacidade (leite expande ao congelar)</li>
+          <li>Rotular com <strong>nome, data e hora</strong> da ordenha</li>
+        </ul>
+      </div>
+
+      <!-- Passo 3: Tempos de conservação -->
+      <div style="background:rgba(199,125,255,0.08);border:1px solid rgba(199,125,255,0.3);border-radius:10px;padding:12px 14px;margin-bottom:10px">
+        <div style="font-family:'Orbitron',monospace;font-size:0.66rem;color:var(--purple-neon);letter-spacing:0.06em;margin-bottom:8px;font-weight:700">3. TEMPO DE CONSERVAÇÃO</div>
+        <table style="width:100%;font-size:0.72rem;color:var(--white);border-collapse:collapse">
+          <tr style="border-bottom:1px dashed rgba(0,180,255,0.15)">
+            <td style="padding:6px 0">🌡️ Temperatura ambiente</td>
+            <td style="text-align:right;color:var(--gold);font-family:'Orbitron',monospace">até 2h</td>
+          </tr>
+          <tr style="border-bottom:1px dashed rgba(0,180,255,0.15)">
+            <td style="padding:6px 0">🧊 Geladeira (2-4°C)</td>
+            <td style="text-align:right;color:var(--gold);font-family:'Orbitron',monospace">até 12h</td>
+          </tr>
+          <tr style="border-bottom:1px dashed rgba(0,180,255,0.15)">
+            <td style="padding:6px 0">❄️ Freezer doméstico (−18°C)</td>
+            <td style="text-align:right;color:var(--gold);font-family:'Orbitron',monospace">até 15 dias</td>
+          </tr>
+          <tr>
+            <td style="padding:6px 0">🧊 Freezer comercial (−20°C)</td>
+            <td style="text-align:right;color:var(--gold);font-family:'Orbitron',monospace">até 6 meses</td>
+          </tr>
+        </table>
+        <div style="font-size:0.62rem;color:var(--text-dim);margin-top:8px;font-style:italic;line-height:1.45">Guardar na prateleira do meio da geladeira (mais fria), não na porta.</div>
+      </div>
+
+      <!-- Passo 4: Descongelamento -->
+      <div style="background:rgba(255,200,80,0.08);border:1px solid rgba(255,200,80,0.3);border-radius:10px;padding:12px 14px;margin-bottom:10px">
+        <div style="font-family:'Orbitron',monospace;font-size:0.66rem;color:var(--gold);letter-spacing:0.06em;margin-bottom:6px;font-weight:700">4. DESCONGELAR E AQUECER</div>
+        <ul style="font-size:0.72rem;color:var(--white);line-height:1.6;padding-left:18px;margin:0">
+          <li>Transferir para geladeira <strong>12h antes</strong> do uso, OU</li>
+          <li>Aquecer em <strong>banho-maria</strong> (fogo desligado), agitando suavemente</li>
+          <li><strong style="color:#ff8080">NUNCA ferver</strong> (destrói componentes imunológicos)</li>
+          <li><strong style="color:#ff8080">NUNCA usar micro-ondas</strong> (aquece de forma desigual, queima o bebê)</li>
+          <li>Após descongelado, consumir em <strong>até 24h</strong> (refrigerado)</li>
+          <li><strong style="color:#ff8080">NUNCA recongelar</strong> leite já descongelado</li>
+        </ul>
+      </div>
+
+      <!-- Passo 5: Sinais de alerta -->
+      <div style="background:rgba(255,128,128,0.08);border:1px solid rgba(255,128,128,0.3);border-radius:10px;padding:12px 14px;margin-bottom:10px">
+        <div style="font-family:'Orbitron',monospace;font-size:0.66rem;color:#ff8080;letter-spacing:0.06em;margin-bottom:6px;font-weight:700">⚠ DESCARTAR SE:</div>
+        <ul style="font-size:0.72rem;color:var(--white);line-height:1.6;padding-left:18px;margin:0">
+          <li>Cheiro rançoso ou azedo</li>
+          <li>Coloração muito diferente do normal (amarelo esverdeado, rosado)</li>
+          <li>Ficou mais tempo que os prazos acima</li>
+          <li>Frasco ficou fora da geladeira/freezer por período indeterminado</li>
+        </ul>
+      </div>
+
+      <!-- Doação -->
+      <div style="background:rgba(120,255,153,0.12);border:1px solid rgba(120,255,153,0.4);border-radius:10px;padding:12px 14px;margin-bottom:10px">
+        <div style="font-family:'Orbitron',monospace;font-size:0.66rem;color:#78ff99;letter-spacing:0.06em;margin-bottom:6px;font-weight:700">💝 DOAR LEITE MATERNO</div>
+        <div style="font-size:0.72rem;color:var(--white);line-height:1.55">
+          A <strong>Rede Brasileira de Bancos de Leite Humano (rBLH)</strong> coleta doações em todo o país. Cada 1 ml pode alimentar um recém-nascido prematuro por 1 dia. Ligue <strong>136</strong> (Disque Saúde) ou busque o banco de leite mais próximo em <strong>rblh.fiocruz.br</strong>.
+        </div>
+      </div>
+
+      <!-- Fontes -->
+      <div style="border-top:1px dashed rgba(0,180,255,0.2);padding-top:12px;font-size:0.62rem;color:var(--text-dim);line-height:1.55">
+        <strong style="color:var(--white)">Fontes:</strong><br>
+        • <strong>Sociedade Brasileira de Pediatria (SBP)</strong> — Departamento Científico de Aleitamento Materno<br>
+        • <strong>Rede Brasileira de Bancos de Leite Humano (rBLH-FIOCRUZ)</strong> — Normas Técnicas BLH-IFF/NT<br>
+        • <strong>Ministério da Saúde</strong> — Caderneta da Criança e Manual de Aleitamento Materno<br>
+        • <strong>Organização Mundial da Saúde (OMS)</strong> — diretrizes complementares
+      </div>
+      <div style="margin-top:14px;text-align:center">
+        <button onclick="document.getElementById('modal-guia-estoque-leite').remove()" style="padding:10px 24px;background:linear-gradient(135deg,#00d4ff,#c77dff);border:none;border-radius:22px;color:#fff;font-family:'Orbitron',monospace;font-size:0.68rem;letter-spacing:0.08em;cursor:pointer;font-weight:700">ENTENDI</button>
+      </div>
+    </div>`;
+  document.body.appendChild(modal);
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -22319,15 +22752,59 @@ function _aplicarLockFimFraldas() {
   // Remover lock anterior se existir
   const existing = document.getElementById('fim-fraldas-lock-card');
   if (existing) existing.remove();
+  // [BF-FIX 24/abr/2026 · Bug 22] Remover sugestão anterior se existir
+  const sugAnt = document.getElementById('fim-fraldas-sugestao');
+  if (sugAnt) sugAnt.remove();
   // Re-exibir conteúdo original
   Array.from(conteudo.children).forEach(c => {
     if (c.id !== 'fim-fraldas-lock-card') c.style.display = '';
   });
-  if (!info || !info.encerrado) return;
-  // Estado encerrado: esconder conteúdo, mostrar card de celebração
-  Array.from(conteudo.children).forEach(c => {
-    if (c.id !== 'fim-fraldas-lock-card') c.style.display = 'none';
-  });
+  if (info && info.encerrado) {
+    // Estado encerrado: esconder conteúdo, mostrar card de celebração
+    Array.from(conteudo.children).forEach(c => {
+      if (c.id !== 'fim-fraldas-lock-card') c.style.display = 'none';
+    });
+  } else {
+    // [BF-FIX 24/abr/2026 · Bug 22] Se bebê tem 4+ anos e nunca encerrou fraldas,
+    // mostrar sugestão suave no topo (usuário decide se celebra ou ignora)
+    try {
+      const cfg = (typeof getBabyConfig === 'function') ? getBabyConfig() : {};
+      const nasc = cfg.birthDate;
+      if (nasc) {
+        const idadeMesesReais = Math.floor(
+          (new Date() - new Date(nasc + 'T00:00:00')) / (1000 * 60 * 60 * 24 * 30.44)
+        );
+        const dismissedKey = 'babyforce_fralda_sugestao_dismissed_v1';
+        const dismissed = localStorage.getItem(dismissedKey) === 'true';
+        if (idadeMesesReais >= 48 && !dismissed) {
+          const nome = (typeof getBabyName === 'function') ? getBabyName() : 'Seu filho(a)';
+          const anosAprox = Math.floor(idadeMesesReais / 12);
+          const sug = document.createElement('div');
+          sug.id = 'fim-fraldas-sugestao';
+          sug.innerHTML = `
+            <div class="card" style="background:linear-gradient(135deg,rgba(120,255,153,0.12),rgba(255,200,80,0.08));border:1.5px solid rgba(120,255,153,0.35);padding:14px 16px;margin-bottom:12px">
+              <div style="display:flex;align-items:flex-start;gap:12px">
+                <div style="font-size:1.8rem;line-height:1">🎉</div>
+                <div style="flex:1">
+                  <div style="font-family:'Orbitron',monospace;font-size:0.7rem;color:#78ff99;letter-spacing:0.06em;margin-bottom:4px;font-weight:600">DESFRALDE PROVÁVEL</div>
+                  <div style="font-size:0.78rem;color:var(--white);line-height:1.5;margin-bottom:10px">
+                    ${nome} já tem ${anosAprox} anos. Se o desfralde já aconteceu,
+                    que tal celebrar e encerrar esta aba? O histórico fica preservado.
+                  </div>
+                  <div style="display:flex;gap:6px;flex-wrap:wrap">
+                    <button onclick="window.abrirModalFimFraldas()" style="padding:7px 14px;background:linear-gradient(135deg,#78ff99,#00d4ff);border:none;border-radius:18px;color:#001;font-family:'Orbitron',monospace;font-size:0.6rem;letter-spacing:0.06em;cursor:pointer;font-weight:700">🎉 CELEBRAR AGORA</button>
+                    <button onclick="localStorage.setItem('babyforce_fralda_sugestao_dismissed_v1','true');document.getElementById('fim-fraldas-sugestao').remove()" style="padding:7px 14px;background:rgba(0,30,70,0.5);border:1px solid rgba(0,180,255,0.3);border-radius:18px;color:var(--text-dim);font-family:'Orbitron',monospace;font-size:0.58rem;letter-spacing:0.06em;cursor:pointer">Ainda não</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+          conteudo.insertBefore(sug.firstElementChild, conteudo.firstChild);
+        }
+      }
+    } catch (e) { console.warn('[fralda-sugestao]', e); }
+    return;
+  }
   const dataFmt = info.data ? new Date(info.data + 'T12:00').toLocaleDateString('pt-BR', { day:'2-digit', month:'long', year:'numeric' }) : '—';
   const idade = info.idadeMeses ? `${info.idadeMeses} ${info.idadeMeses===1?'mês':'meses'}` : '—';
   const nome = (typeof getBabyName === 'function') ? getBabyName() : 'Seu bebê';
