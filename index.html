@@ -58,6 +58,324 @@ body{background:#020b18;margin:0;}
 #splash-bar{height:100%;background:linear-gradient(90deg,#00d4ff,#9d4edd);border-radius:2px;animation:splash-load 2s ease-out forwards;box-shadow:0 0 8px #00d4ff;}
 @keyframes splash-pulse{0%,100%{filter:drop-shadow(0 0 6px rgba(0,212,255,0.6));transform:scale(1);}50%{filter:drop-shadow(0 0 14px rgba(0,212,255,0.85));transform:scale(1.04);}}
 @keyframes splash-load{0%{width:0%;}60%{width:70%;}100%{width:100%;}}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   BFAuth2 — estilos do módulo isolado de autenticação
+   ═══════════════════════════════════════════════════════════════ */
+
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  :root {
+    --bg-deep:#050814; --bg-dark:#0a1626; --bg-mid:#0a2a4a;
+    --blue:#4a9eff; --blue-bright:#7ad3ff; --blue-neon:#00d4ff;
+    --purple:#b968ff; --pink:#ff6ec7;
+    --gold:#ffe066; --gold-warm:#ffe89a; --gold-dim:#c9a227;
+    --green:#78ff99;
+    --red:#ff6b6b; --orange:#ffb464;
+    --text:#e8f4fd; --text-dim:#a8b5d1; --text-muted:#7ab3d4;
+  }
+  html, body { height:100%; }
+  body {
+    font-family:'Outfit', sans-serif;
+    background:var(--bg-deep);
+    color:var(--text);
+    line-height:1.5;
+    overflow-x:hidden;
+  }
+  body::before {
+    content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
+    background:
+      radial-gradient(ellipse 80% 60% at 20% 20%, rgba(74,158,255,0.13), transparent 55%),
+      radial-gradient(ellipse 70% 50% at 80% 40%, rgba(185,104,255,0.10), transparent 55%),
+      radial-gradient(ellipse 90% 60% at 50% 100%, rgba(255,110,199,0.08), transparent 60%);
+  }
+
+  /* ─── Tela principal ─── */
+  #tela-auth-v2 {
+    position:relative; z-index:1;
+    min-height:100vh;
+    display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+    padding:24px 16px; gap:24px;
+  }
+  .bf-auth-card {
+    width:100%; max-width:420px;
+    background:linear-gradient(135deg, rgba(10,42,74,0.7), rgba(3,15,31,0.8));
+    border:1px solid rgba(74,158,255,0.25);
+    border-radius:20px; padding:32px 24px;
+    backdrop-filter:blur(16px);
+    -webkit-backdrop-filter:blur(16px);
+    box-shadow:0 20px 60px rgba(0,0,0,0.5), 0 0 60px rgba(74,158,255,0.08);
+  }
+  .bf-auth-header { text-align:center; margin-bottom:24px; }
+  .bf-auth-logo {
+    width:72px; height:72px; margin:0 auto 14px;
+    border-radius:20px;
+    background:radial-gradient(circle at 50% 40%, #1c2a6e 0%, #040724 80%);
+    display:flex; align-items:center; justify-content:center;
+    font-size:2.4rem;
+    box-shadow:0 0 30px rgba(74,158,255,0.3);
+    filter:drop-shadow(0 0 12px rgba(255,232,154,0.25));
+  }
+  .bf-auth-brand {
+    font-family:'Orbitron', monospace;
+    font-size:1.6rem; font-weight:900;
+    letter-spacing:0.05em;
+  }
+  .bf-auth-brand .b { color:var(--blue-bright); }
+  .bf-auth-brand .p { color:var(--purple); }
+  .bf-auth-tagline {
+    font-family:'Cormorant Garamond', serif;
+    font-size:1.05rem; font-style:italic;
+    color:var(--text-muted); margin-top:4px;
+  }
+  .bf-auth-step-title {
+    font-family:'Orbitron', monospace;
+    font-size:0.78rem; letter-spacing:0.18em;
+    color:var(--blue-bright);
+    text-align:center; margin-bottom:6px;
+    font-weight:700;
+  }
+  .bf-auth-step-sub {
+    font-size:0.82rem; color:var(--text-dim);
+    text-align:center; margin-bottom:20px;
+    line-height:1.55;
+  }
+  .bf-auth-progress {
+    display:flex; justify-content:center; gap:6px; margin:16px 0 22px;
+  }
+  .bf-auth-dot {
+    width:8px; height:8px; border-radius:50%;
+    background:rgba(74,158,255,0.2); transition:all 0.25s;
+  }
+  .bf-auth-dot.active { background:var(--gold); box-shadow:0 0 10px rgba(255,224,102,0.5); transform:scale(1.2); }
+  .bf-auth-dot.done { background:var(--blue-neon); }
+
+  /* ─── Campos ─── */
+  .bf-field { margin-bottom:14px; }
+  .bf-label {
+    display:block; font-family:'Orbitron', monospace;
+    font-size:0.62rem; letter-spacing:0.1em;
+    color:var(--text-muted); margin-bottom:6px;
+    text-transform:uppercase;
+  }
+  .bf-input, .bf-select {
+    width:100%; padding:13px 14px;
+    background:rgba(0,30,60,0.45);
+    border:1px solid rgba(74,158,255,0.25);
+    border-radius:10px;
+    color:var(--text); font-size:0.95rem;
+    font-family:'Exo 2', sans-serif;
+    transition:border-color 0.2s, box-shadow 0.2s;
+  }
+  .bf-input:focus, .bf-select:focus {
+    outline:none;
+    border-color:var(--blue-bright);
+    box-shadow:0 0 0 3px rgba(122,211,255,0.15);
+  }
+  .bf-hint {
+    font-size:0.68rem; color:var(--text-muted);
+    margin-top:4px; line-height:1.5;
+    font-style:italic; opacity:0.85;
+  }
+  .bf-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  @media (max-width:380px) { .bf-row { grid-template-columns:1fr; } }
+
+  /* ─── Gender chips ─── */
+  .bf-chips { display:flex; gap:8px; flex-wrap:wrap; }
+  .bf-chip {
+    flex:1; min-width:80px;
+    padding:10px 12px; border-radius:10px;
+    background:rgba(0,30,60,0.4);
+    border:1px solid rgba(74,158,255,0.2);
+    color:var(--text-dim);
+    font-family:'Orbitron', monospace; font-size:0.68rem;
+    letter-spacing:0.06em; cursor:pointer;
+    transition:all 0.2s; text-align:center;
+  }
+  .bf-chip:hover { border-color:rgba(74,158,255,0.5); color:var(--text); }
+  .bf-chip.active { background:rgba(122,211,255,0.15); border-color:var(--blue-bright); color:var(--blue-bright); }
+
+  /* ─── PIN dots ─── */
+  .bf-pin-dots {
+    display:flex; justify-content:center; gap:12px;
+    margin:20px 0;
+    min-height:56px; align-items:center;
+    cursor:pointer;
+  }
+  .bf-pin-dot {
+    width:44px; height:44px; border-radius:50%;
+    background:rgba(0,30,60,0.5);
+    border:2px solid rgba(74,158,255,0.3);
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Orbitron',monospace; font-size:1.2rem;
+    color:var(--text-dim);
+    transition:all 0.15s;
+  }
+  .bf-pin-dot.filled { background:rgba(255,224,102,0.15); border-color:var(--gold); color:var(--gold); }
+  .bf-pin-hint { font-size:0.66rem; color:var(--text-muted); text-align:center; font-style:italic; margin-top:-8px; margin-bottom:8px; }
+  #bf-pin-input { position:absolute; opacity:0; width:1px; height:1px; pointer-events:none; left:-9999px; }
+
+  /* ─── Emoji grid ─── */
+  .bf-emoji-grid { display:grid; grid-template-columns:repeat(6, 1fr); gap:8px; margin:16px 0; }
+  .bf-emoji-btn {
+    aspect-ratio:1; border-radius:10px;
+    background:rgba(0,30,60,0.4);
+    border:1px solid rgba(74,158,255,0.2);
+    font-size:1.5rem; cursor:pointer;
+    transition:all 0.2s;
+  }
+  .bf-emoji-btn:hover { border-color:rgba(74,158,255,0.5); transform:scale(1.05); }
+  .bf-emoji-btn.active { background:rgba(255,224,102,0.2); border-color:var(--gold); box-shadow:0 0 15px rgba(255,224,102,0.3); }
+
+  /* ─── Botões ─── */
+  .bf-btn {
+    width:100%; padding:14px;
+    border:none; border-radius:12px;
+    font-family:'Orbitron', monospace;
+    font-size:0.74rem; font-weight:700;
+    letter-spacing:0.1em; cursor:pointer;
+    transition:all 0.2s;
+    margin-bottom:10px;
+    display:flex; align-items:center; justify-content:center; gap:8px;
+  }
+  .bf-btn:disabled { opacity:0.5; cursor:wait; }
+  .bf-btn-primary {
+    background:linear-gradient(135deg, #0056b3, var(--blue-neon));
+    color:#fff;
+    box-shadow:0 0 20px rgba(0,180,255,0.3);
+  }
+  .bf-btn-primary:hover:not(:disabled) { box-shadow:0 0 30px rgba(0,180,255,0.5); transform:translateY(-1px); }
+  .bf-btn-gold {
+    background:linear-gradient(135deg, var(--gold-dim), var(--gold));
+    color:#031027;
+    box-shadow:0 0 20px rgba(255,224,102,0.28);
+  }
+  .bf-btn-gold:hover:not(:disabled) { filter:brightness(1.08); box-shadow:0 0 30px rgba(255,224,102,0.45); }
+  .bf-btn-green {
+    background:linear-gradient(135deg, var(--green), var(--blue-neon));
+    color:#031027;
+  }
+  .bf-btn-ghost {
+    background:transparent;
+    border:1px solid rgba(74,158,255,0.3);
+    color:var(--text-muted); font-size:0.68rem;
+  }
+  .bf-btn-ghost:hover { border-color:var(--blue-bright); color:var(--blue-bright); }
+  .bf-btn-link {
+    background:none; border:none; color:var(--blue-bright);
+    font-family:'Outfit', sans-serif;
+    font-size:0.82rem; font-weight:500;
+    text-decoration:underline; cursor:pointer;
+    padding:6px; letter-spacing:0;
+    display:inline; margin:0;
+  }
+  .bf-btn-link:hover { color:var(--gold); }
+  .bf-btns-row { display:flex; gap:10px; flex-wrap:wrap; justify-content:space-between; font-size:0.78rem; margin-top:12px; }
+
+  /* ─── Alerts / feedback ─── */
+  .bf-alert {
+    padding:12px 14px; border-radius:10px;
+    font-size:0.82rem; line-height:1.55;
+    margin-bottom:14px;
+  }
+  .bf-alert.error { background:rgba(255,107,107,0.1); border:1px solid rgba(255,107,107,0.3); color:#ffb4b4; }
+  .bf-alert.warn  { background:rgba(255,180,100,0.1); border:1px solid rgba(255,180,100,0.3); color:#ffd599; }
+  .bf-alert.ok    { background:rgba(120,255,153,0.1); border:1px solid rgba(120,255,153,0.3); color:#a6ffbc; }
+  .bf-alert.info  { background:rgba(74,158,255,0.1); border:1px solid rgba(74,158,255,0.3); color:var(--blue-bright); }
+  .bf-alert a { color:inherit; font-weight:600; text-decoration:underline; }
+  .bf-error-inline {
+    color:var(--red); font-size:0.78rem;
+    min-height:20px; margin-bottom:10px; line-height:1.4;
+  }
+
+  /* ─── Divider ─── */
+  .bf-divider {
+    height:1px; background:linear-gradient(90deg, transparent, rgba(74,158,255,0.25), transparent);
+    margin:18px 0;
+  }
+
+  /* ─── Toast ─── */
+  #bf-toast {
+    position:fixed; bottom:24px; left:50%;
+    transform:translateX(-50%) translateY(20px);
+    background:linear-gradient(135deg, #0056b3, var(--blue-neon));
+    color:#fff;
+    padding:12px 22px; border-radius:24px;
+    font-family:'Orbitron', monospace; font-size:0.78rem;
+    letter-spacing:0.04em;
+    box-shadow:0 10px 30px rgba(0,180,255,0.4);
+    opacity:0; pointer-events:none;
+    transition:opacity 0.25s, transform 0.25s;
+    z-index:10000;
+    max-width:calc(100vw - 32px);
+  }
+  #bf-toast.show { opacity:1; transform:translateX(-50%) translateY(0); pointer-events:auto; }
+  #bf-toast.ok { background:linear-gradient(135deg, var(--green), var(--blue-neon)); color:#031027; }
+  #bf-toast.error { background:linear-gradient(135deg, #c62828, var(--red)); }
+
+  /* ─── Loading spinner ─── */
+  .bf-spinner {
+    display:inline-block;
+    width:14px; height:14px;
+    border:2px solid rgba(255,255,255,0.3);
+    border-top-color:#fff;
+    border-radius:50%;
+    animation:bfspin 0.8s linear infinite;
+  }
+  @keyframes bfspin { to { transform:rotate(360deg); } }
+
+  /* ─── Debug panel ─── */
+  #bf-debug-toggle {
+    position:fixed; top:10px; right:10px; z-index:9999;
+    padding:6px 10px; border-radius:6px;
+    background:rgba(185,104,255,0.2);
+    border:1px solid rgba(185,104,255,0.4);
+    color:var(--purple);
+    font-family:'Orbitron', monospace; font-size:0.6rem;
+    cursor:pointer;
+  }
+  #bf-debug-panel {
+    position:fixed; top:50px; right:10px; z-index:9999;
+    width:360px; max-width:calc(100vw - 20px);
+    max-height:calc(100vh - 80px); overflow-y:auto;
+    background:rgba(5,8,20,0.95);
+    border:1px solid rgba(185,104,255,0.4);
+    border-radius:12px; padding:14px;
+    font-family:'Consolas', 'Menlo', monospace;
+    font-size:0.72rem; color:var(--text);
+    display:none;
+  }
+  #bf-debug-panel.show { display:block; }
+  #bf-debug-panel h4 {
+    font-family:'Orbitron', monospace; font-size:0.64rem;
+    color:var(--purple); letter-spacing:0.12em;
+    margin:8px 0 4px; padding-top:6px; border-top:1px solid rgba(185,104,255,0.2);
+  }
+  #bf-debug-panel h4:first-child { border-top:none; padding-top:0; }
+  #bf-debug-panel pre {
+    background:rgba(0,0,0,0.3); padding:8px; border-radius:6px;
+    font-size:0.68rem; overflow-x:auto;
+    max-height:180px; overflow-y:auto;
+  }
+  #bf-debug-panel button {
+    display:block; width:100%; margin:4px 0;
+    padding:6px; border-radius:5px;
+    background:rgba(255,107,107,0.15); border:1px solid rgba(255,107,107,0.3);
+    color:#ffb4b4; font-family:'Orbitron',monospace; font-size:0.62rem;
+    cursor:pointer;
+  }
+
+  /* ─── Nav back ─── */
+  .bf-back {
+    position:absolute; top:16px; left:16px;
+    background:transparent; border:none; color:var(--text-muted);
+    font-family:'Orbitron', monospace; font-size:0.66rem;
+    cursor:pointer; padding:8px;
+  }
+  .bf-back:hover { color:var(--blue-bright); }
+  .bf-auth-card.has-back { position:relative; padding-top:40px; }
+
 </style>
 <style>
 :root{
@@ -712,6 +1030,16 @@ html.bf-tema-claro [style*="color: var(--white)"] { color: var(--white) !importa
 <div class="nebula"></div>
 
 <!-- ONBOARDING -->
+
+<!-- ═══════════════════════════════════════════════════════════════
+     BFAuth2 — tela única de autenticação (substitui tela-onboarding no fluxo novo)
+     ═══════════════════════════════════════════════════════════════ -->
+<div id="tela-auth-v2" style="display:none">
+  <div class="bf-auth-card" id="bf-auth-card-root">
+    <!-- Conteúdo injetado por BFAuth2._render() -->
+  </div>
+</div>
+
 <div id="tela-onboarding" style="display:none">
   <div class="ob-box">
     <div class="ob-logo"><span class="bf-blue">Baby</span><span class="bf-purple">Force</span></div>
@@ -8912,7 +9240,11 @@ window.JornadaGuardiao = JornadaGuardiao;
 
 
 function loadGuardioes(){try{const r=localStorage.getItem(GUARDIOES_KEY);return r?JSON.parse(r):{};}catch(e){return{};}}
-function saveGuardioes(g){try{localStorage.setItem(GUARDIOES_KEY,JSON.stringify(g));}catch(e){}try{GUARDIOES_REF.set({guardioes:g});}catch(e){}}
+function saveGuardioesLegado(g){try{localStorage.setItem(GUARDIOES_KEY,JSON.stringify(g));}catch(e){}try{GUARDIOES_REF.set({guardioes:g});}catch(e){}}
+
+window.saveGuardioesLegado = saveGuardioesLegado;
+function saveGuardioes(g){ return saveGuardioesLegado(g); }
+
 let GUARDIOES=loadGuardioes();
 
 // ═══════════════════════════════════════════════════════════════
@@ -10074,14 +10406,55 @@ function initFirebaseRefs(){
 function removerSplash(){const s=document.getElementById('splash');if(!s)return;s.classList.add('fadeout');setTimeout(()=>{s.style.display='none';},420);}
 
 function iniciarApp(){
-  injetarIconeBabyForce();
-  initFirebaseRefs();
-  loadFotos();loadVacinasOuter();loadMedicacaoOuter();
-  crescData=loadCrescimento();
+  // Chamadas protegidas: qualquer uma pode falhar (Firebase offline, etc.)
+  // mas NÃO pode impedir o BFAuth2 de renderizar.
+  try { injetarIconeBabyForce(); } catch (e) { console.warn('[iniciarApp injetarIcone]', e); }
+  try { initFirebaseRefs(); } catch (e) { console.warn('[iniciarApp initFirebase]', e); }
+  try { loadFotos(); } catch (e) { console.warn('[iniciarApp loadFotos]', e); }
+  try { loadVacinasOuter(); } catch (e) { console.warn('[iniciarApp loadVacinas]', e); }
+  try { loadMedicacaoOuter(); } catch (e) { console.warn('[iniciarApp loadMedicacao]', e); }
+  try { crescData=loadCrescimento(); } catch (e) { console.warn('[iniciarApp loadCresc]', e); crescData = []; }
 
   // FASE 2 — Migração suave: promove primeiro guardião para admin se ainda não há
   try { _migrarGuardiaoParaAdmin(); } catch (e) { console.warn('[migração admin]', e); }
 
+  // ═══════════════════════════════════════════════════════════════
+  // BFAuth2 ATIVO: substitui TODO o fluxo de auth legado.
+  // Decisões tomadas internamente pelo módulo:
+  //   • Retorno de magic link reset → abre reset_password
+  //   • Tem sessão válida → auto-login (usa fazerLogin do app)
+  //   • Tem guardiões mas sem sessão → abre signin
+  //   • Zero guardiões → abre welcome/signup
+  // ═══════════════════════════════════════════════════════════════
+  if (typeof BFAuth2 !== 'undefined' && BFAuth2.init) {
+    removerSplash();
+    // Esconde todas as telas legadas
+    ['tela-onboarding', 'tela-login'].forEach(tid => {
+      const el = document.getElementById(tid);
+      if (el) el.style.display = 'none';
+    });
+    // Mostra tela nova
+    const telaAuthV2 = document.getElementById('tela-auth-v2');
+    if (telaAuthV2) telaAuthV2.style.display = 'flex';
+    // Inicia BFAuth2 — decide internamente o que mostrar
+    try { BFAuth2.init(); }
+    catch(e){
+      console.error('[BFAuth2 init]', e);
+      // Fallback crítico: volta pro fluxo legado
+      if (telaAuthV2) telaAuthV2.style.display = 'none';
+      if (!isSetupDone()) {
+        document.getElementById('tela-onboarding').style.display='flex';
+        if (typeof obRenderEmojiGrid === 'function') obRenderEmojiGrid();
+      } else {
+        document.getElementById('tela-login').style.display='flex';
+        if (typeof renderListaGuardioes === 'function') renderListaGuardioes();
+      }
+    }
+    return;
+  }
+
+  // Fallback se BFAuth2 não carregou (script quebrou em parse)
+  console.error('[iniciarApp] BFAuth2 não carregado — usando fluxo legado');
   if(!isSetupDone()){
     removerSplash();
     document.getElementById('tela-onboarding').style.display='flex';
@@ -35462,5 +35835,1036 @@ window.PremiumCompra = {
 };
 
 </script>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     BFAuth2 — módulo de autenticação isolado (v1, integrado)
+     Standalone: /mnt/user-data/outputs/bfauth2-standalone.html
+     ═══════════════════════════════════════════════════════════════ -->
+<script>
+
+// ═══════════════════════════════════════════════════════════════════════
+// BFAuth2 — Módulo de autenticação isolado
+//
+// Arquitetura:
+//   • Estado único em BFAuth2.state (sem variáveis globais espalhadas)
+//   • Uma única tela (tela-auth-v2) com renderização por função
+//   • Roteamento de magic link com tokens próprios
+//   • Saída única: chama window.fazerLogin(guardiaoId)
+//
+// API pública:
+//   • BFAuth2.init()      — chama na carga da página
+//   • BFAuth2.start()     — abre fluxo welcome
+//   • BFAuth2.state       — read-only, inspeção
+// ═══════════════════════════════════════════════════════════════════════
+
+window.BFAuth2 = (function() {
+  'use strict';
+
+  // ─── Configuração ─────────────────────────────────────────────────────
+  // INTEGRADO ao app legado: usa as mesmas chaves de storage
+  const LS_KEYS = {
+    guardioes:     'babyforce_guardioes_v1',       // mesmo de GUARDIOES_KEY do app
+    session:       'babyforce_session_v1',          // mesmo de SESSION_KEY
+    babyConfig:    'babyforce_baby_v1',             // mesmo de BABY_CONFIG_KEY
+    appConfig:     'babyforce_app_v1',              // mesmo de APP_CONFIG_KEY
+    pendingVerify: 'bfauth2_pending_verify_v1',     // exclusivo do BFAuth2
+    pendingReset:  'bfauth2_pending_reset_v1',      // exclusivo do BFAuth2
+  };
+
+  const MIN_SENHA = 8;
+  const PIN_LEN   = 6;
+  const EMOJIS    = ['🧑','👩','🧔','👨','🦸‍♀️','🦸','👸','🤴','🧕','👳','🧙‍♀️','🧙','🦹','🤵','👼','🧑‍🍼','👨‍🎨','👩‍🚀'];
+
+  // ─── Estado ───────────────────────────────────────────────────────────
+  const state = {
+    screen: 'welcome',   // welcome | signup | signin | forgot | reset_password | new_device
+    signupStep: null,    // admin | bebe | pin | emoji
+    signup: {
+      admin: { nome:'', email:'', senha:'', nascimento:'', genero:'', senhaHash:null, senhaSalt:null },
+      bebe:  { nome:'', nascimento:'', genero:'' },
+      pin:   { p1:'', p2:'', atual:1 },  // atual=1 → digitando p1, atual=2 → digitando p2
+      emoji: '🧑',
+      modoTeste: false,
+    },
+    signin: { email:'', senha:'', guardiaoId:null },
+    forgot: { email:'' },
+    reset:  { guardiaoId:null, email:'', token:null, origem:null },
+    error: '',
+    loading: false,
+  };
+
+  // ─── Utils ────────────────────────────────────────────────────────────
+  const log = (...args) => { if (window.BFAUTH2_DEBUG) console.log('[BFAuth2]', ...args); };
+  const err = (...args) => console.error('[BFAuth2]', ...args);
+
+  function esc(s) { return String(s||'').replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'})[c]); }
+
+  async function sha256(txt) {
+    const data = new TextEncoder().encode(txt);
+    const buf = await crypto.subtle.digest('SHA-256', data);
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+  }
+  function randomToken(bytes) {
+    const arr = new Uint8Array(bytes || 24);
+    crypto.getRandomValues(arr);
+    return Array.from(arr).map(b => b.toString(16).padStart(2,'0')).join('');
+  }
+  function emailValido(e) { return !!(e && e.includes('@') && e.length >= 5 && /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(e)); }
+  function senhaValida(s) { return s.length >= MIN_SENHA && /[a-zA-Z]/.test(s) && /[0-9]/.test(s); }
+  function dataNascValida(d) {
+    if (!d) return false;
+    const dt = new Date(d + 'T00:00:00');
+    if (isNaN(dt.getTime())) return false;
+    const hoje = new Date();
+    if (dt > hoje) return false;
+    const idadeAnos = (hoje - dt) / (365.25 * 24 * 3600 * 1000);
+    return idadeAnos >= 12 && idadeAnos <= 120;
+  }
+
+  // ─── Persistência ─────────────────────────────────────────────────────
+  function loadGuardioes() {
+    // Se app legado está disponível, usa sua variável em memória (fonte de verdade)
+    if (typeof window.GUARDIOES === 'object' && window.GUARDIOES !== null) {
+      return window.GUARDIOES;
+    }
+    try { return JSON.parse(localStorage.getItem(LS_KEYS.guardioes) || '{}'); }
+    catch { return {}; }
+  }
+  function saveGuardioes(obj) {
+    // Sincroniza memória do app legado
+    if (typeof window.GUARDIOES !== 'undefined') {
+      // Reseta referências preservando o mesmo objeto (alguns pontos do legado fazem ref direta)
+      Object.keys(window.GUARDIOES).forEach(k => delete window.GUARDIOES[k]);
+      Object.assign(window.GUARDIOES, obj);
+    }
+    // Usa saveGuardioes legado se existe (propaga pro Firebase também)
+    if (typeof window.saveGuardioesLegado === 'function') {
+      try { window.saveGuardioesLegado(obj); return; } catch (e) { err('saveGuardioes legado', e); }
+    }
+    // Fallback: só localStorage
+    localStorage.setItem(LS_KEYS.guardioes, JSON.stringify(obj));
+  }
+  function findGuardiaoByEmail(email) {
+    const e = (email || '').trim().toLowerCase();
+    if (!e) return null;
+    const guardioes = loadGuardioes();
+    for (const [id, g] of Object.entries(guardioes)) {
+      if (g && g.email && g.email.toLowerCase() === e) return { id, guardiao:g };
+    }
+    return null;
+  }
+
+  // ─── Render ───────────────────────────────────────────────────────────
+  function $(id) { return document.getElementById(id); }
+  function setError(msg) { state.error = msg || ''; renderError(); }
+  function renderError() {
+    const e = $('bf-error-inline');
+    if (e) e.innerHTML = state.error || '&nbsp;';
+  }
+  function toast(msg, type) {
+    const t = $('bf-toast');
+    if (!t) return;
+    t.textContent = msg;
+    t.className = 'show ' + (type || '');
+    setTimeout(() => { t.className = ''; }, 2600);
+  }
+
+  function render() {
+    const root = $('bf-auth-card-root');
+    if (!root) { err('root não encontrado'); return; }
+    state.error = '';
+    const showBack = !['welcome', 'reset_password'].includes(state.screen);
+    const backBtn = showBack
+      ? '<button class="bf-back" onclick="BFAuth2._go(\'welcome\')">← Voltar</button>'
+      : '';
+    root.className = 'bf-auth-card' + (showBack ? ' has-back' : '');
+
+    let body = '';
+    if      (state.screen === 'welcome')         body = renderWelcome();
+    else if (state.screen === 'signin')          body = renderSignin();
+    else if (state.screen === 'signup')          body = renderSignup();
+    else if (state.screen === 'forgot')          body = renderForgot();
+    else if (state.screen === 'reset_password')  body = renderResetPassword();
+    else if (state.screen === 'new_device')      body = renderNewDevice();
+    else                                         body = '<p>Estado inválido: ' + esc(state.screen) + '</p>';
+
+    root.innerHTML = backBtn + renderHeader() + body;
+
+    // Pós-render: focus no primeiro input visível
+    setTimeout(() => {
+      const focusable = root.querySelector('input:not([type=hidden]), select');
+      if (focusable && state.screen !== 'welcome') {
+        try { focusable.focus(); } catch (_) {}
+      }
+    }, 50);
+
+    if (window.BFAUTH2_DEBUG) _debugRender();
+  }
+
+  function renderHeader() {
+    return ''
+      + '<div class="bf-auth-header">'
+      +   '<div class="bf-auth-logo">🛸</div>'
+      +   '<div class="bf-auth-brand"><span class="b">Baby</span><span class="p">Force</span></div>'
+      +   '<div class="bf-auth-tagline">Diário Galáctico do Bebê</div>'
+      + '</div>';
+  }
+
+  // ─── Tela: WELCOME ────────────────────────────────────────────────────
+  function renderWelcome() {
+    return ''
+      + '<div class="bf-auth-step-title">BEM-VINDO À GALÁXIA</div>'
+      + '<div class="bf-auth-step-sub">Escolha como deseja começar</div>'
+      + '<button class="bf-btn bf-btn-gold" onclick="BFAuth2._go(\'signin\')">👤 Entrar na minha conta</button>'
+      + '<button class="bf-btn bf-btn-primary" onclick="BFAuth2._go(\'signup\')">✨ Criar conta nova</button>'
+      + '<div class="bf-divider"></div>'
+      + '<button class="bf-btn bf-btn-ghost" onclick="BFAuth2._startModoTeste()">🧪 Modo teste (sem cadastro)</button>'
+      + '<p style="font-size:0.66rem;color:var(--text-muted);text-align:center;margin-top:6px;line-height:1.55;font-style:italic">No modo teste os dados ficam só neste dispositivo.</p>';
+  }
+
+  // ─── Tela: SIGNIN ─────────────────────────────────────────────────────
+  function renderSignin() {
+    return ''
+      + '<div class="bf-auth-step-title">ENTRAR</div>'
+      + '<div class="bf-auth-step-sub">Use seu e-mail e senha cadastrados</div>'
+      + '<div class="bf-field">'
+      +   '<label class="bf-label">E-mail</label>'
+      +   '<input type="email" id="bf-signin-email" class="bf-input" placeholder="seu@email.com" autocomplete="email" inputmode="email" autocapitalize="off" spellcheck="false" value="' + esc(state.signin.email) + '">'
+      + '</div>'
+      + '<div class="bf-field">'
+      +   '<label class="bf-label">Senha</label>'
+      +   '<input type="password" id="bf-signin-senha" class="bf-input" placeholder="sua senha" autocomplete="current-password">'
+      + '</div>'
+      + '<div class="bf-error-inline" id="bf-error-inline"></div>'
+      + '<button class="bf-btn bf-btn-gold" id="bf-signin-submit" onclick="BFAuth2._onSignin()">ENTRAR</button>'
+      + '<div class="bf-btns-row">'
+      +   '<button class="bf-btn-link" onclick="BFAuth2._go(\'forgot\')">Esqueci minha senha</button>'
+      +   '<button class="bf-btn-link" onclick="BFAuth2._go(\'signup\')">Criar conta nova</button>'
+      + '</div>';
+  }
+
+  // ─── Tela: SIGNUP (wizard) ────────────────────────────────────────────
+  function renderSignup() {
+    if (!state.signupStep) state.signupStep = 'admin';
+    const progress = ['admin','bebe','pin','emoji'];
+    const idx = progress.indexOf(state.signupStep);
+    const dots = progress.map((_, i) => {
+      const cls = i < idx ? 'done' : i === idx ? 'active' : '';
+      return '<div class="bf-auth-dot ' + cls + '"></div>';
+    }).join('');
+
+    let body = '';
+    if      (state.signupStep === 'admin') body = renderSignupAdmin();
+    else if (state.signupStep === 'bebe')  body = renderSignupBebe();
+    else if (state.signupStep === 'pin')   body = renderSignupPin();
+    else if (state.signupStep === 'emoji') body = renderSignupEmoji();
+
+    return '<div class="bf-auth-progress">' + dots + '</div>' + body;
+  }
+
+  function renderSignupAdmin() {
+    const a = state.signup.admin;
+    const modoTesteBanner = state.signup.modoTeste
+      ? '<div class="bf-alert warn">🧪 <strong>Modo teste ativo.</strong> Preencha apenas os dados do bebê (passo seguinte). Você pode pular agora.</div>'
+      : '';
+    if (state.signup.modoTeste) {
+      // No modo teste, pula esta etapa automaticamente
+      setTimeout(() => _goSignupStep('bebe'), 50);
+      return modoTesteBanner;
+    }
+    return ''
+      + '<div class="bf-auth-step-title">SEUS DADOS</div>'
+      + '<div class="bf-auth-step-sub">Você será o administrador da família</div>'
+      + '<div class="bf-field">'
+      +   '<label class="bf-label">Nome completo</label>'
+      +   '<input type="text" id="bf-su-nome" class="bf-input" placeholder="Ex: Ana Silva" autocomplete="name" value="' + esc(a.nome) + '" maxlength="80">'
+      + '</div>'
+      + '<div class="bf-field">'
+      +   '<label class="bf-label">E-mail</label>'
+      +   '<input type="email" id="bf-su-email" class="bf-input" placeholder="seu@email.com" autocomplete="email" inputmode="email" autocapitalize="off" spellcheck="false" value="' + esc(a.email) + '">'
+      +   '<div class="bf-hint">Usado para entrar e recuperar senha</div>'
+      + '</div>'
+      + '<div class="bf-field">'
+      +   '<label class="bf-label">Senha</label>'
+      +   '<input type="password" id="bf-su-senha" class="bf-input" placeholder="mínimo 8 caracteres" autocomplete="new-password" minlength="8">'
+      +   '<div class="bf-hint">Use 8+ caracteres, com letras E números</div>'
+      + '</div>'
+      + '<div class="bf-row">'
+      +   '<div class="bf-field">'
+      +     '<label class="bf-label">Nascimento</label>'
+      +     '<input type="date" id="bf-su-nasc" class="bf-input" autocomplete="bday" value="' + esc(a.nascimento) + '">'
+      +   '</div>'
+      +   '<div class="bf-field">'
+      +     '<label class="bf-label">Gênero</label>'
+      +     '<select id="bf-su-gen" class="bf-select">'
+      +       '<option value="">— escolha —</option>'
+      +       '<option value="feminino"' + (a.genero==='feminino'?' selected':'') + '>Feminino</option>'
+      +       '<option value="masculino"' + (a.genero==='masculino'?' selected':'') + '>Masculino</option>'
+      +       '<option value="nao-binario"' + (a.genero==='nao-binario'?' selected':'') + '>Não-binário</option>'
+      +       '<option value="prefere-nao-dizer"' + (a.genero==='prefere-nao-dizer'?' selected':'') + '>Prefiro não dizer</option>'
+      +     '</select>'
+      +   '</div>'
+      + '</div>'
+      + '<div class="bf-error-inline" id="bf-error-inline"></div>'
+      + '<button class="bf-btn bf-btn-primary" onclick="BFAuth2._onSignupAdmin()">Continuar →</button>';
+  }
+
+  function renderSignupBebe() {
+    const b = state.signup.bebe;
+    const hoje = new Date().toISOString().slice(0,10);
+    return ''
+      + '<div class="bf-auth-step-title">' + (state.signup.modoTeste ? 'DADOS DO BEBÊ (TESTE)' : 'DADOS DO BEBÊ') + '</div>'
+      + '<div class="bf-auth-step-sub">Vamos conhecer quem você vai acompanhar</div>'
+      + '<div class="bf-field">'
+      +   '<label class="bf-label">Nome do bebê</label>'
+      +   '<input type="text" id="bf-bb-nome" class="bf-input" placeholder="Ex: Arthur, Sofia" value="' + esc(b.nome) + '" maxlength="40">'
+      + '</div>'
+      + '<div class="bf-field">'
+      +   '<label class="bf-label">Data de nascimento</label>'
+      +   '<input type="date" id="bf-bb-nasc" class="bf-input" max="' + hoje + '" value="' + esc(b.nascimento || hoje) + '">'
+      + '</div>'
+      + '<div class="bf-field">'
+      +   '<label class="bf-label">Gênero</label>'
+      +   '<div class="bf-chips" id="bf-bb-chips">'
+      +     '<div class="bf-chip' + (b.genero==='F'?' active':'') + '" data-gen="F" onclick="BFAuth2._selectBebeGen(\'F\')">👧 Menina</div>'
+      +     '<div class="bf-chip' + (b.genero==='M'?' active':'') + '" data-gen="M" onclick="BFAuth2._selectBebeGen(\'M\')">👦 Menino</div>'
+      +     '<div class="bf-chip' + (b.genero==='I'?' active':'') + '" data-gen="I" onclick="BFAuth2._selectBebeGen(\'I\')">🌈 Intersexo / Prefiro não dizer</div>'
+      +   '</div>'
+      + '</div>'
+      + '<div class="bf-error-inline" id="bf-error-inline"></div>'
+      + '<button class="bf-btn bf-btn-primary" onclick="BFAuth2._onSignupBebe()">Continuar →</button>';
+  }
+
+  function renderSignupPin() {
+    const p = state.signup.pin;
+    const qual = p.atual === 1 ? 'p1' : 'p2';
+    const valor = p.atual === 1 ? p.p1 : p.p2;
+    const label = p.atual === 1 ? 'Crie um PIN de 6 dígitos' : 'Digite o PIN novamente';
+    const sub = p.atual === 1
+      ? 'Use um PIN fácil de lembrar para você, difícil para outros'
+      : 'Confirmação de segurança';
+    const dots = [];
+    for (let i = 0; i < PIN_LEN; i++) {
+      const preenchido = i < valor.length ? 'filled' : '';
+      const show = i < valor.length ? '•' : '';
+      dots.push('<div class="bf-pin-dot ' + preenchido + '">' + show + '</div>');
+    }
+    return ''
+      + '<div class="bf-auth-step-title">' + label.toUpperCase() + '</div>'
+      + '<div class="bf-auth-step-sub">' + sub + '</div>'
+      + '<div class="bf-pin-dots" onclick="document.getElementById(\'bf-pin-input\').focus()">' + dots.join('') + '</div>'
+      + '<div class="bf-pin-hint">Toque acima para abrir o teclado</div>'
+      + '<input type="tel" id="bf-pin-input" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="off" oninput="BFAuth2._onPinInput(this.value)" value="' + valor + '">'
+      + '<div class="bf-error-inline" id="bf-error-inline"></div>'
+      + (p.atual === 2
+          ? '<button class="bf-btn bf-btn-ghost" onclick="BFAuth2._pinVoltar()">← Redigitar primeiro</button>'
+          : '');
+  }
+
+  function renderSignupEmoji() {
+    const grid = EMOJIS.map(e =>
+      '<button class="bf-emoji-btn' + (state.signup.emoji === e ? ' active' : '') + '" onclick="BFAuth2._selectEmoji(\'' + e + '\')">' + e + '</button>'
+    ).join('');
+    return ''
+      + '<div class="bf-auth-step-title">ESCOLHA SEU AVATAR</div>'
+      + '<div class="bf-auth-step-sub">Seu emblema como Guardião da Força</div>'
+      + '<div class="bf-emoji-grid">' + grid + '</div>'
+      + '<div class="bf-error-inline" id="bf-error-inline"></div>'
+      + '<button class="bf-btn bf-btn-green" onclick="BFAuth2._onSignupFinalizar()">🛸 Entrar na Galáxia</button>';
+  }
+
+  // ─── Tela: FORGOT ─────────────────────────────────────────────────────
+  function renderForgot() {
+    return ''
+      + '<div class="bf-auth-step-title">RECUPERAR SENHA</div>'
+      + '<div class="bf-auth-step-sub">Enviaremos um link para redefinir sua senha</div>'
+      + '<div class="bf-field">'
+      +   '<label class="bf-label">E-mail da conta</label>'
+      +   '<input type="email" id="bf-forgot-email" class="bf-input" placeholder="seu@email.com" autocomplete="email" inputmode="email" autocapitalize="off" spellcheck="false" value="' + esc(state.forgot.email) + '">'
+      + '</div>'
+      + '<div class="bf-error-inline" id="bf-error-inline"></div>'
+      + '<button class="bf-btn bf-btn-gold" id="bf-forgot-submit" onclick="BFAuth2._onForgot()">📧 Enviar link de redefinição</button>';
+  }
+
+  // ─── Tela: RESET_PASSWORD (vindo do magic link) ───────────────────────
+  function renderResetPassword() {
+    const r = state.reset;
+    const guardioes = loadGuardioes();
+    const g = r.guardiaoId ? guardioes[r.guardiaoId] : null;
+    const nome = g ? (g.emoji + ' ' + esc(g.nome)) : esc(r.email || 'sua conta');
+    return ''
+      + '<div class="bf-auth-step-title">DEFINIR NOVA SENHA</div>'
+      + '<div class="bf-auth-step-sub">Para: <strong style="color:var(--blue-bright)">' + nome + '</strong></div>'
+      + '<div class="bf-alert ok">✓ Identidade confirmada via e-mail. Agora defina sua nova senha.</div>'
+      + '<div class="bf-field">'
+      +   '<label class="bf-label">Nova senha</label>'
+      +   '<input type="password" id="bf-rs-senha" class="bf-input" placeholder="mínimo 8 caracteres" autocomplete="new-password" minlength="8">'
+      +   '<div class="bf-hint">Use 8+ caracteres, com letras E números</div>'
+      + '</div>'
+      + '<div class="bf-field">'
+      +   '<label class="bf-label">Confirmar nova senha</label>'
+      +   '<input type="password" id="bf-rs-senha2" class="bf-input" placeholder="digite novamente" autocomplete="new-password" minlength="8">'
+      + '</div>'
+      + '<div class="bf-error-inline" id="bf-error-inline"></div>'
+      + '<button class="bf-btn bf-btn-green" onclick="BFAuth2._onResetPassword()">✓ SALVAR NOVA SENHA</button>';
+  }
+
+  // ─── Tela: NEW_DEVICE ─────────────────────────────────────────────────
+  function renderNewDevice() {
+    const email = esc(state.reset.email || '');
+    return ''
+      + '<div class="bf-auth-step-title">DISPOSITIVO NOVO</div>'
+      + '<div class="bf-alert info">E-mail confirmado: <strong>' + email + '</strong><br><br>Este dispositivo ainda não tem sua conta. Para continuar aqui, use <strong>Criar conta nova</strong> com o mesmo e-mail.</div>'
+      + '<button class="bf-btn bf-btn-primary" onclick="BFAuth2._go(\'signup\')">✨ Criar conta neste dispositivo</button>'
+      + '<button class="bf-btn bf-btn-ghost" onclick="BFAuth2._go(\'welcome\')">Voltar</button>';
+  }
+
+  // ─── Handlers: Signin ─────────────────────────────────────────────────
+  async function _onSignin() {
+    const emailEl = $('bf-signin-email');
+    const senhaEl = $('bf-signin-senha');
+    const btn = $('bf-signin-submit');
+    if (!emailEl || !senhaEl) return;
+
+    const email = emailEl.value.trim().toLowerCase();
+    const senha = senhaEl.value;
+    setError('');
+
+    if (!emailValido(email)) { setError('⚠ E-mail inválido'); emailEl.focus(); return; }
+    if (!senha) { setError('⚠ Digite sua senha'); senhaEl.focus(); return; }
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="bf-spinner"></span> VERIFICANDO';
+
+    const match = findGuardiaoByEmail(email);
+    if (!match) {
+      btn.disabled = false;
+      btn.textContent = 'ENTRAR';
+      setError('⚠ E-mail não cadastrado neste dispositivo.<br>Use <a href="#" onclick="event.preventDefault();BFAuth2._go(\'signup\')">Criar conta nova</a> para este dispositivo.');
+      return;
+    }
+
+    const g = match.guardiao;
+    if (!g.senhaHash || !g.senhaSalt) {
+      btn.disabled = false;
+      btn.textContent = 'ENTRAR';
+      setError('⚠ Esta conta foi criada sem senha. Use <a href="#" onclick="event.preventDefault();BFAuth2._go(\'forgot\')">Esqueci minha senha</a>.');
+      return;
+    }
+
+    try {
+      const hashDigitado = await sha256(senha + g.senhaSalt);
+      if (hashDigitado !== g.senhaHash) {
+        btn.disabled = false;
+        btn.textContent = 'ENTRAR';
+        setError('⚠ Senha incorreta. Tente de novo ou clique em "Esqueci minha senha".');
+        senhaEl.focus(); senhaEl.select();
+        return;
+      }
+      log('signin ok', match.id);
+      _finalizarLogin(match.id, '🛸 Bem-vindo(a) de volta, ' + g.nome.split(' ')[0] + '!');
+    } catch (e) {
+      err('signin hash', e);
+      btn.disabled = false;
+      btn.textContent = 'ENTRAR';
+      setError('⚠ Erro ao validar senha. Tente novamente.');
+    }
+  }
+
+  // ─── Handlers: Signup ─────────────────────────────────────────────────
+  async function _onSignupAdmin() {
+    const nomeEl = $('bf-su-nome');
+    const emailEl = $('bf-su-email');
+    const senhaEl = $('bf-su-senha');
+    const nascEl = $('bf-su-nasc');
+    const genEl = $('bf-su-gen');
+    if (!nomeEl) return;
+
+    const nome = nomeEl.value.trim();
+    const email = emailEl.value.trim().toLowerCase();
+    const senha = senhaEl.value;
+    const nascimento = nascEl.value;
+    const genero = genEl.value;
+    setError('');
+
+    if (nome.length < 3) { setError('⚠ Nome completo (mínimo 3 caracteres)'); nomeEl.focus(); return; }
+    if (!emailValido(email)) { setError('⚠ E-mail inválido'); emailEl.focus(); return; }
+    if (!senhaValida(senha)) { setError('⚠ Senha: 8+ caracteres, com letras E números'); senhaEl.focus(); return; }
+    if (!dataNascValida(nascimento)) { setError('⚠ Data de nascimento inválida'); nascEl.focus(); return; }
+    if (!genero) { setError('⚠ Selecione seu gênero'); genEl.focus(); return; }
+
+    // Checar duplicidade
+    if (findGuardiaoByEmail(email)) {
+      setError('⚠ Este e-mail já está cadastrado neste dispositivo.<br><a href="#" onclick="event.preventDefault();BFAuth2._go(\'signin\')">Entrar com esta conta</a>');
+      emailEl.focus();
+      return;
+    }
+
+    // Hash da senha
+    try {
+      const salt = randomToken(16);
+      const hash = await sha256(senha + salt);
+      state.signup.admin = { nome, email, senha:null, nascimento, genero, senhaHash:hash, senhaSalt:salt };
+      log('admin preenchido', email);
+      _goSignupStep('bebe');
+    } catch (e) {
+      err('hash admin', e);
+      setError('⚠ Erro ao processar senha. Tente novamente.');
+    }
+  }
+
+  function _selectBebeGen(g) {
+    // Preserva inputs atuais antes do re-render (senão DOM reconstrói com value vazio)
+    try {
+      const nomeEl = $('bf-bb-nome');
+      const nascEl = $('bf-bb-nasc');
+      if (nomeEl) state.signup.bebe.nome = nomeEl.value;
+      if (nascEl) state.signup.bebe.nascimento = nascEl.value;
+    } catch (_) {}
+    state.signup.bebe.genero = g;
+    render();
+  }
+
+  function _onSignupBebe() {
+    const nomeEl = $('bf-bb-nome');
+    const nascEl = $('bf-bb-nasc');
+    if (!nomeEl) return;
+
+    const nome = nomeEl.value.trim();
+    const nasc = nascEl.value;
+    const gen = state.signup.bebe.genero;
+    setError('');
+
+    if (!nome) { setError('⚠ Informe o nome do bebê'); nomeEl.focus(); return; }
+    if (!nasc) { setError('⚠ Informe a data de nascimento'); nascEl.focus(); return; }
+    if (new Date(nasc) > new Date()) { setError('⚠ Data de nascimento não pode ser futura'); nascEl.focus(); return; }
+    if (!gen) { setError('⚠ Selecione o gênero do bebê'); return; }
+
+    state.signup.bebe = { nome, nascimento:nasc, genero:gen };
+    log('bebê preenchido', nome);
+
+    // Modo teste: pula PIN e emoji, vai direto pra finalizar com valores default
+    if (state.signup.modoTeste) {
+      state.signup.pin = { p1:'000000', p2:'000000', atual:2 };
+      state.signup.emoji = '🧪';
+      _onSignupFinalizar();
+      return;
+    }
+    _goSignupStep('pin');
+  }
+
+  function _onPinInput(val) {
+    const limpo = (val || '').replace(/\D/g, '').slice(0, PIN_LEN);
+    const p = state.signup.pin;
+    if (p.atual === 1) p.p1 = limpo;
+    else p.p2 = limpo;
+
+    // Atualiza dots sem re-renderizar tudo
+    const dots = document.querySelectorAll('.bf-pin-dots .bf-pin-dot');
+    dots.forEach((dot, i) => {
+      if (i < limpo.length) { dot.classList.add('filled'); dot.textContent = '•'; }
+      else { dot.classList.remove('filled'); dot.textContent = ''; }
+    });
+
+    if (limpo.length === PIN_LEN) {
+      setTimeout(() => _pinCompletou(), 200);
+    }
+  }
+
+  function _pinCompletou() {
+    const p = state.signup.pin;
+    if (p.atual === 1) {
+      // Valida PIN não trivial
+      if (/^(\d)\1{5}$/.test(p.p1)) {
+        setError('⚠ Evite PINs com dígitos repetidos (ex: 111111)');
+        p.p1 = '';
+        render();
+        return;
+      }
+      if (['123456','654321','012345','000000','111111'].includes(p.p1)) {
+        setError('⚠ PIN muito óbvio. Escolha outro.');
+        p.p1 = '';
+        render();
+        return;
+      }
+      p.atual = 2;
+      render();
+    } else {
+      if (p.p1 !== p.p2) {
+        setError('⚠ Os PINs não conferem. Tente de novo.');
+        p.p2 = '';
+        render();
+        return;
+      }
+      log('pin confirmado');
+      _goSignupStep('emoji');
+    }
+  }
+
+  function _pinVoltar() {
+    state.signup.pin = { p1:'', p2:'', atual:1 };
+    render();
+  }
+
+  function _selectEmoji(e) {
+    state.signup.emoji = e;
+    render();
+  }
+
+  async function _onSignupFinalizar() {
+    const s = state.signup;
+    const id = (s.modoTeste ? 'teste_' : 'g_') + Date.now();
+    const guardioes = loadGuardioes();
+    guardioes[id] = {
+      nome: s.admin.nome || 'Guardião Teste',
+      emoji: s.emoji || '🧪',
+      email: s.admin.email || 'teste@local',
+      papel: s.modoTeste ? 'Administrador (modo teste)' : 'Administrador da Família',
+      genero: s.admin.genero || '',
+      nascimento: s.admin.nascimento || '',
+      senhaHash: s.admin.senhaHash,
+      senhaSalt: s.admin.senhaSalt,
+      pin: s.pin.p1,
+      isAdmin: true,
+      modoTeste: !!s.modoTeste,
+      criadoEm: new Date().toISOString(),
+    };
+    saveGuardioes(guardioes);
+
+    // Salvar bebê e config do app (formato compatível com app legado quando integrar)
+    try {
+      const babyCfg = {
+        name: s.bebe.nome,
+        birthDate: s.bebe.nascimento,
+        genero: s.bebe.genero,
+        sexo: (s.bebe.genero === 'F' || s.bebe.genero === 'M') ? s.bebe.genero : undefined,
+      };
+      localStorage.setItem(LS_KEYS.babyConfig, JSON.stringify(babyCfg));
+      const appCfg = { pin: s.pin.p1, setupDone: true };
+      localStorage.setItem(LS_KEYS.appConfig, JSON.stringify(appCfg));
+    } catch (e) { err('save configs', e); }
+
+    // Marca sessão
+    try { sessionStorage.setItem(LS_KEYS.session, id); } catch (_) {}
+    log('conta criada, id=', id);
+
+    const nomeG = s.admin.nome ? s.admin.nome.split(' ')[0] : 'Guardião';
+    const nomeB = s.bebe.nome || 'seu bebê';
+    _finalizarLogin(id, '🛸 Bem-vindo(a), ' + nomeG + '! ' + nomeB + ' está pronto(a) para a jornada.');
+  }
+
+  // ─── Handlers: Forgot ─────────────────────────────────────────────────
+  async function _onForgot() {
+    const emailEl = $('bf-forgot-email');
+    const btn = $('bf-forgot-submit');
+    if (!emailEl) return;
+    const email = emailEl.value.trim().toLowerCase();
+    setError('');
+
+    if (!emailValido(email)) { setError('⚠ E-mail inválido'); emailEl.focus(); return; }
+    const match = findGuardiaoByEmail(email);
+    if (!match) {
+      setError('⚠ E-mail não cadastrado neste dispositivo.<br><a href="#" onclick="event.preventDefault();BFAuth2._go(\'signup\')">Criar conta nova</a>');
+      return;
+    }
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="bf-spinner"></span> ENVIANDO';
+
+    // Salva pendente ANTES de enviar, com token próprio
+    const token = randomToken(24);
+    const pendente = {
+      guardiaoId: match.id,
+      email,
+      token,
+      enviadoEm: Date.now(),
+    };
+    try { localStorage.setItem(LS_KEYS.pendingReset, JSON.stringify(pendente)); } catch (_) {}
+
+    // Envia magic link (real ou simulado)
+    try {
+      const qs = '?bf_reset=' + token;
+      if (window.BFAUTH2_USE_REAL_FIREBASE && typeof firebase !== 'undefined' && firebase.auth) {
+        const returnUrl = window.location.origin + window.location.pathname + qs;
+        await firebase.auth().sendSignInLinkToEmail(email, { url: returnUrl, handleCodeInApp: true });
+        log('reset link enviado via firebase para', email);
+      } else {
+        // MODO SIMULADO no standalone
+        log('SIMULADO: link de reset seria enviado para', email, '— query string:', qs);
+        log('Para simular o retorno, use o botão "Simular retorno de reset link" no painel DEBUG');
+        await new Promise(r => setTimeout(r, 600)); // delay pra UX simular
+      }
+
+      btn.disabled = false;
+      state.forgot.email = email;
+      _showMagicLinkSent(email);
+    } catch (e) {
+      err('sendMagicLink', e);
+      btn.disabled = false;
+      btn.innerHTML = '📧 Enviar link de redefinição';
+      setError('⚠ Não foi possível enviar o e-mail. Tente de novo.');
+      try { localStorage.removeItem(LS_KEYS.pendingReset); } catch (_) {}
+    }
+  }
+
+  function _showMagicLinkSent(email) {
+    const root = $('bf-auth-card-root');
+    if (!root) return;
+    const safe = esc(email);
+    const simulMsg = !window.BFAUTH2_USE_REAL_FIREBASE
+      ? '<div class="bf-alert warn" style="margin-top:10px">🧪 <strong>Modo simulado:</strong> nenhum e-mail real foi enviado. Abra o painel <strong>DEBUG</strong> e clique em <strong>"Simular retorno de reset link"</strong> para testar o próximo passo.</div>'
+      : '';
+    root.innerHTML = '<button class="bf-back" onclick="BFAuth2._go(\'welcome\')">← Voltar</button>'
+      + renderHeader()
+      + '<div class="bf-auth-step-title">LINK ENVIADO</div>'
+      + '<div class="bf-auth-step-sub">Verifique sua caixa de entrada</div>'
+      + '<div class="bf-alert ok">✉️ Enviamos um link para:<br><strong>' + safe + '</strong></div>'
+      + '<div class="bf-alert info">💡 <strong>Não chegou?</strong> Verifique spam/lixo eletrônico.<br>O link é válido por 1 hora.</div>'
+      + simulMsg
+      + '<button class="bf-btn bf-btn-ghost" onclick="BFAuth2._go(\'welcome\')">Voltar ao início</button>';
+  }
+
+  // ─── Handlers: Reset Password ─────────────────────────────────────────
+  async function _onResetPassword() {
+    const senhaEl = $('bf-rs-senha');
+    const senha2El = $('bf-rs-senha2');
+    if (!senhaEl) return;
+    const senha = senhaEl.value;
+    const senha2 = senha2El.value;
+    setError('');
+
+    if (!senhaValida(senha)) { setError('⚠ Senha: 8+ caracteres, com letras E números'); senhaEl.focus(); return; }
+    if (senha !== senha2) { setError('⚠ Senhas não conferem'); senha2El.focus(); return; }
+
+    const r = state.reset;
+    if (!r.guardiaoId) { setError('⚠ Erro: guardião não identificado'); return; }
+    const guardioes = loadGuardioes();
+    const g = guardioes[r.guardiaoId];
+    if (!g) { setError('⚠ Conta não encontrada'); return; }
+
+    try {
+      const salt = randomToken(16);
+      const hash = await sha256(senha + salt);
+      guardioes[r.guardiaoId].senhaHash = hash;
+      guardioes[r.guardiaoId].senhaSalt = salt;
+      guardioes[r.guardiaoId].senhaRedefinidaEm = new Date().toISOString();
+      saveGuardioes(guardioes);
+
+      // Limpa pendente e URL
+      try { localStorage.removeItem(LS_KEYS.pendingReset); } catch (_) {}
+      try { window.history.replaceState({}, document.title, window.location.pathname); } catch (_) {}
+
+      log('senha resetada', r.guardiaoId);
+      _finalizarLogin(r.guardiaoId, '🔑 Nova senha salva! Entrando...');
+    } catch (e) {
+      err('reset password', e);
+      setError('⚠ Erro ao salvar. Tente novamente.');
+    }
+  }
+
+  // ─── Finalização ──────────────────────────────────────────────────────
+  function _finalizarLogin(guardiaoId, toastMsg) {
+    log('finalizando login', guardiaoId);
+    try { sessionStorage.setItem(LS_KEYS.session, guardiaoId); } catch (_) {}
+
+    // Toast: prefere showToast do app legado (tem visual próprio)
+    if (toastMsg && typeof window.showToast === 'function') {
+      try { window.showToast(toastMsg); } catch (e) { toast(toastMsg, 'ok'); }
+    } else if (toastMsg) {
+      toast(toastMsg, 'ok');
+    }
+
+    // Esconde tela auth-v2
+    const tela = $('tela-auth-v2');
+    if (tela) tela.style.display = 'none';
+
+    // Esconde também telas legadas que possam estar ativas
+    ['tela-onboarding', 'tela-login'].forEach(tid => {
+      const el = document.getElementById(tid);
+      if (el) el.style.display = 'none';
+    });
+
+    // Se app legado não inicializou Firebase ainda (caso primeiro cadastro),
+    // inicializa agora antes do fazerLogin
+    if (typeof window.initFirebaseRefs === 'function') {
+      try { window.initFirebaseRefs(); } catch (e) { err('initFirebaseRefs', e); }
+    }
+
+    // Atualiza header do bebê se disponível
+    if (typeof window.atualizarHeaderBebe === 'function') {
+      try { window.atualizarHeaderBebe(); } catch (_) {}
+    }
+
+    // Chama fazerLogin do app legado
+    setTimeout(() => {
+      if (typeof window.fazerLogin === 'function') {
+        try { window.fazerLogin(guardiaoId); }
+        catch (e) {
+          err('fazerLogin legado', e);
+          if (typeof window.showToast === 'function') window.showToast('⚠ Erro no login. Recarregue a página.');
+          else alert('Erro ao entrar: ' + e.message);
+        }
+      } else {
+        err('window.fazerLogin não existe');
+        alert('[BFAuth2] fazerLogin não está disponível. Guardião criado com id ' + guardiaoId);
+      }
+    }, 400);
+  }
+
+
+  // ─── Navegação ────────────────────────────────────────────────────────
+  function _go(screen) {
+    setError('');
+    if (screen === 'signup' && state.screen !== 'signup') {
+      state.signupStep = 'admin';
+      state.signup.modoTeste = false;
+    }
+    state.screen = screen;
+    render();
+  }
+
+  function _goSignupStep(step) {
+    state.signupStep = step;
+    state.screen = 'signup';
+    render();
+  }
+
+  function _startModoTeste() {
+    // Confirma e inicia wizard em modo teste
+    const ok = confirm(
+      '🧪 MODO TESTE — SEM CADASTRO\n\n' +
+      '• Os dados ficam só neste dispositivo\n' +
+      '• Sem sincronização entre celulares\n' +
+      '• Sem recuperação se desinstalar o app\n\n' +
+      'Continuar em modo teste?'
+    );
+    if (!ok) return;
+    state.signup.modoTeste = true;
+    state.signup.admin = {
+      nome: 'Guardião Teste', email: 'teste.local@babyforce.local',
+      nascimento: '2000-01-01', genero: 'prefere-nao-dizer',
+      senhaHash: null, senhaSalt: null,
+    };
+    state.signupStep = 'bebe';
+    state.screen = 'signup';
+    render();
+  }
+
+  // ─── Boot: detecta retorno de magic link ──────────────────────────────
+  function _bootMagicLink() {
+    const qs = window.location.search;
+    if (!qs) return;
+
+    // Retorno do link de reset de senha: ?bf_reset=token
+    const matchReset = qs.match(/[?&]bf_reset=([a-f0-9]+)/i);
+    if (matchReset) {
+      log('detectado retorno de reset link');
+      _processResetLink(matchReset[1]);
+      return;
+    }
+
+    // (opcional) retorno de verificação de email: ?bf_verify=token
+    // não usado no fluxo inicial pois signup não exige verificação
+  }
+
+  async function _processResetLink(tokenDaUrl) {
+    // Compara com pending
+    let pendente = null;
+    try { pendente = JSON.parse(localStorage.getItem(LS_KEYS.pendingReset) || 'null'); }
+    catch (_) {}
+
+    if (pendente && pendente.token === tokenDaUrl) {
+      log('token do link bate com pending', pendente.guardiaoId);
+      // Sucesso: abre reset_password
+      state.reset = {
+        guardiaoId: pendente.guardiaoId,
+        email: pendente.email,
+        token: tokenDaUrl,
+        origem: 'magic_link',
+      };
+      state.screen = 'reset_password';
+      render();
+      return;
+    }
+
+    // Token não bate ou pendente expirou. Provavelmente dispositivo diferente OU sessão velha.
+    log('token não bate com pending — dispositivo novo ou pending expirado');
+    // Pede email para identificar guardião e usa o email como fonte de verdade
+    const emailDigitado = prompt(
+      'Para redefinir sua senha, confirme o e-mail da sua conta:\n\n' +
+      '(Este dispositivo não tem dados do pedido original. Precisamos confirmar sua identidade.)'
+    );
+    if (!emailDigitado) {
+      try { window.history.replaceState({}, document.title, window.location.pathname); } catch (_) {}
+      return;
+    }
+    const email = emailDigitado.trim().toLowerCase();
+    const match = findGuardiaoByEmail(email);
+    if (!match) {
+      state.reset = { guardiaoId:null, email, token:tokenDaUrl, origem:'new_device' };
+      state.screen = 'new_device';
+      render();
+      return;
+    }
+    state.reset = {
+      guardiaoId: match.id,
+      email,
+      token: tokenDaUrl,
+      origem: 'magic_link_outro_dispositivo',
+    };
+    state.screen = 'reset_password';
+    render();
+  }
+
+  // ─── DEBUG helpers (visíveis no standalone) ───────────────────────────
+  function _debugRender() {
+    try {
+      const s = $('dbg-state');
+      const g = $('dbg-guardioes');
+      const p = $('dbg-pendentes');
+      if (s) s.textContent = JSON.stringify(state, (k,v) => k === 'senha' ? '***' : v, 2);
+      if (g) g.textContent = JSON.stringify(loadGuardioes(), null, 2);
+      if (p) {
+        const pend = {
+          pendingReset: localStorage.getItem(LS_KEYS.pendingReset),
+          pendingVerify: localStorage.getItem(LS_KEYS.pendingVerify),
+          session: sessionStorage.getItem(LS_KEYS.session),
+        };
+        p.textContent = JSON.stringify(pend, null, 2);
+      }
+    } catch (e) { err('debug render', e); }
+  }
+
+  function _reset_all() {
+    if (!confirm('⚠ Apagar TODOS os dados de teste do BFAuth2?\n\n' +
+                 '• Guardiões cadastrados\n' +
+                 '• Sessão\n' +
+                 '• Configs\n' +
+                 '• Pendentes\n\n' +
+                 'Ação irreversível.')) return;
+    Object.values(LS_KEYS).forEach(k => {
+      try { localStorage.removeItem(k); } catch (_) {}
+    });
+    try { sessionStorage.clear(); } catch (_) {}
+    try { window.history.replaceState({}, document.title, window.location.pathname); } catch (_) {}
+    // Volta pro estado inicial
+    state.screen = 'welcome';
+    state.signupStep = null;
+    state.signup = {
+      admin: { nome:'', email:'', senha:'', nascimento:'', genero:'', senhaHash:null, senhaSalt:null },
+      bebe: { nome:'', nascimento:'', genero:'' },
+      pin: { p1:'', p2:'', atual:1 },
+      emoji: '🧑', modoTeste:false,
+    };
+    state.signin = { email:'', senha:'', guardiaoId:null };
+    state.forgot = { email:'' };
+    state.reset = { guardiaoId:null, email:'', token:null, origem:null };
+    const tela = $('tela-auth-v2');
+    if (tela) tela.style.display = 'flex';
+    render();
+    toast('🔴 Dados apagados', 'ok');
+  }
+
+  function _simulate_reset_link() {
+    const pend = localStorage.getItem(LS_KEYS.pendingReset);
+    if (!pend) {
+      alert('Nada pendente. Clique "Esqueci minha senha" primeiro.');
+      return;
+    }
+    const p = JSON.parse(pend);
+    const url = new URL(window.location.href);
+    url.search = '?bf_reset=' + p.token;
+    window.location.href = url.toString();
+  }
+
+  // ─── API pública ──────────────────────────────────────────────────────
+  function init() {
+    log('init');
+
+    // 1. Retorno de magic link de reset tem prioridade absoluta
+    if (/[?&]bf_reset=/.test(window.location.search)) {
+      log('init → retorno de reset link detectado');
+      _bootMagicLink();
+      // _bootMagicLink() altera state.screen e chama render()
+      return;
+    }
+
+    // 2. Verifica se já existe sessão ativa com guardião válido
+    let sessaoId = null;
+    try { sessaoId = sessionStorage.getItem(LS_KEYS.session); } catch (_) {}
+
+    const guardioes = loadGuardioes();
+    const temGuardioes = Object.keys(guardioes).length > 0;
+
+    if (sessaoId && guardioes[sessaoId]) {
+      // Sessão válida → tenta auto-login direto (usa fazerLogin do app legado)
+      log('init → sessão ativa, tentando auto-login', sessaoId);
+      // Esconde a tela de auth-v2 e delega pro fluxo legado
+      const tela = $('tela-auth-v2');
+      if (tela) tela.style.display = 'none';
+      // Chama fazerLogin direto; se der erro, cai no fallback abaixo
+      if (typeof window.fazerLogin === 'function') {
+        try {
+          // Inicializa Firebase refs se função legada existe
+          if (typeof window.initFirebaseRefs === 'function') {
+            try { window.initFirebaseRefs(); } catch (_) {}
+          }
+          // Atualiza header do bebê
+          if (typeof window.atualizarHeaderBebe === 'function') {
+            try { window.atualizarHeaderBebe(); } catch (_) {}
+          }
+          window.fazerLogin(sessaoId);
+          return;
+        } catch (e) {
+          err('auto-login falhou', e);
+          // Mostra tela de volta e continua o fluxo
+          if (tela) tela.style.display = 'flex';
+        }
+      }
+    }
+
+    // 3. Tem guardiões mas sem sessão → abre direto tela de signin
+    if (temGuardioes) {
+      log('init → tem guardiões, abrindo signin');
+      state.screen = 'signin';
+      // Pré-preenche email do primeiro guardião admin (UX)
+      for (const g of Object.values(guardioes)) {
+        if (g && g.email && g.isAdmin) {
+          state.signin.email = g.email;
+          break;
+        }
+      }
+      render();
+      return;
+    }
+
+    // 4. Zero guardiões → welcome (primeiro uso)
+    log('init → zero guardiões, abrindo welcome');
+    state.screen = 'welcome';
+    state.signupStep = null;
+    render();
+  }
+
+  function start() {
+    state.screen = 'welcome';
+    render();
+  }
+
+  return {
+    init, start, state,
+    _go, _goSignupStep,
+    _onSignin, _onSignupAdmin, _onSignupBebe, _onSignupFinalizar,
+    _onPinInput, _pinVoltar, _selectBebeGen, _selectEmoji,
+    _onForgot, _onResetPassword,
+    _startModoTeste,
+    _debugRender, _reset_all, _simulate_reset_link,
+  };
+})();
+
+// BFAuth2 NÃO auto-inicia no HTML integrado — quem chama é o iniciarApp() do app legado
+// quando detecta !isSetupDone() ou retorno de magic link.
+
+</script>
+
 </body>
 </html>
