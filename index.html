@@ -452,6 +452,12 @@ html.bf-tema-claro [style*="color: var(--white)"] { color: var(--white) !importa
 .ob-btn{width:100%;padding:15px;border-radius:12px;border:none;cursor:pointer;font-family:'Orbitron',monospace;font-size:0.75rem;font-weight:700;letter-spacing:0.1em;transition:all 0.2s;-webkit-tap-highlight-color:transparent;touch-action:manipulation;margin-top:6px;}
 .ob-btn-primary{background:linear-gradient(135deg,#0056b3,var(--blue-neon));color:white;box-shadow:0 0 20px rgba(0,153,230,0.3);}
 .ob-btn-secondary{background:transparent;border:1px solid rgba(0,180,255,0.2);color:var(--text-dim);font-size:0.7rem;padding:10px;margin-top:8px;}
+/* ═══ Step 0 (boas-vindas) — variantes dos 3 botões ═══ */
+.ob-btn-entrar{background:linear-gradient(135deg,var(--gold-dim),var(--gold));color:var(--blue-deep);box-shadow:0 0 20px rgba(255,224,102,0.28);}
+.ob-btn-entrar:hover{filter:brightness(1.08);box-shadow:0 0 24px rgba(255,224,102,0.42);}
+.ob-btn-modo-teste{margin-top:14px;font-size:0.68rem;border-color:rgba(122,179,212,0.22);}
+.ob-btn-modo-teste:hover{border-color:rgba(0,180,255,0.45);color:var(--blue-neon);}
+.ob-teste-hint{font-size:0.6rem;color:var(--text-dim);text-align:center;margin-top:10px;line-height:1.55;font-family:'Exo 2',sans-serif;opacity:0.75;font-style:italic;padding:0 6px;}
 .ob-btn-done{background:linear-gradient(135deg,#6a0dad,var(--purple-glow));color:white;box-shadow:0 0 20px rgba(157,78,221,0.35);}
 .ob-icon-wrap{font-size:3.5rem;margin-bottom:14px;animation:splash-pulse 2s ease-in-out infinite;}
 .ob-photo-circle{width:80px;height:80px;border-radius:50%;background:rgba(0,30,70,0.6);border:2px dashed rgba(0,180,255,0.4);display:flex;align-items:center;justify-content:center;font-size:2.2rem;overflow:hidden;cursor:pointer;margin:0 auto 10px;transition:border-color 0.2s;}
@@ -722,7 +728,10 @@ html.bf-tema-claro [style*="color: var(--white)"] { color: var(--white) !importa
       <div class="ob-title">BEM-VINDO À GALÁXIA</div>
       <div class="ob-sub">O diário inteligente do seu bebê com a temática mais épica da galáxia.<br><br>Vamos configurar em menos de 2 minutos.</div>
       <div class="ob-divider"></div>
-      <button class="ob-btn ob-btn-primary" onclick="obProximo(0)">⚡ Iniciar Configuração</button>
+      <button class="ob-btn ob-btn-entrar" onclick="obBemVindoEntrar()">👤 Entrar</button>
+      <button class="ob-btn ob-btn-primary" onclick="obBemVindoCriarConta()">✨ Criar Conta</button>
+      <button class="ob-btn ob-btn-secondary ob-btn-modo-teste" onclick="obBemVindoModoTeste()">🧪 Modo teste (sem cadastro)</button>
+      <div class="ob-teste-hint">No modo teste os dados ficam só neste dispositivo. Sem sincronização entre celulares e sem recuperação se desinstalar o app.</div>
       <div class="ob-version">BABYFORCE · v1.0 · ORDEM BABYFORCE</div>
     </div>
 
@@ -12994,6 +13003,179 @@ function obProximo(fromStep, skip) {
     return;
   }
 }
+
+// ═══════════════════════════════════════════════════════════════
+// TELA DE BOAS-VINDAS (step 0) — 3 caminhos: Entrar / Criar Conta / Modo Teste
+// Substitui o antigo botão único "Iniciar Configuração"
+// ═══════════════════════════════════════════════════════════════
+
+// CRIAR CONTA — mantém o fluxo original (step 0 → step 1 admin email+senha)
+function obBemVindoCriarConta() {
+  obProximo(0);
+}
+window.obBemVindoCriarConta = obBemVindoCriarConta;
+
+// ENTRAR — envia magic link passwordless para usuário já cadastrado
+// NOTA: em dispositivo novo sem guardião local, o link ao retornar cai no onboarding normal.
+// TODO (próxima iteração): criar handler de '?bemvindoLogin=1' no boot que consulte
+// Firestore por email e hidrate GUARDIOES local antes de mostrar a tela de login.
+async function obBemVindoEntrar() {
+  const existente = document.getElementById('modal-bemvindo-entrar');
+  if (existente) existente.remove();
+
+  const modal = document.createElement('div');
+  modal.id = 'modal-bemvindo-entrar';
+  modal.setAttribute('role', 'dialog');
+  modal.setAttribute('aria-modal', 'true');
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(2,11,24,0.92);z-index:99990;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(10px);';
+  modal.innerHTML = ''
+    + '<div style="background:linear-gradient(135deg,#0a2a4a,#030f1f);border:1px solid rgba(255,224,102,0.3);border-radius:16px;padding:28px 22px;max-width:400px;width:100%;box-shadow:0 0 40px rgba(255,224,102,0.15);font-family:\'Exo 2\',sans-serif;color:#e8f4fd">'
+    +   '<div style="text-align:center;font-size:2.2rem;margin-bottom:10px">👤</div>'
+    +   '<div style="font-family:\'Orbitron\',monospace;font-size:0.82rem;font-weight:700;letter-spacing:0.08em;text-align:center;margin-bottom:6px;color:#ffe066">ENTRAR NA SUA CONTA</div>'
+    +   '<div style="font-size:0.75rem;color:#7ab3d4;text-align:center;margin-bottom:20px;line-height:1.55">Enviaremos um link por e-mail para você entrar sem precisar de senha.</div>'
+    +   '<label style="font-family:\'Orbitron\',monospace;font-size:0.62rem;letter-spacing:0.1em;color:#7ab3d4;display:block;margin-bottom:6px">E-MAIL *</label>'
+    +   '<input id="modal-bv-entrar-email" type="email" inputmode="email" autocomplete="email" autocapitalize="off" spellcheck="false" placeholder="seu@email.com" style="width:100%;padding:12px 14px;background:rgba(0,30,60,0.5);border:1px solid rgba(0,180,255,0.25);border-radius:10px;color:#e8f4fd;font-size:0.9rem;font-family:\'Exo 2\',sans-serif;box-sizing:border-box;margin-bottom:6px">'
+    +   '<div id="modal-bv-entrar-error" role="alert" aria-live="polite" style="color:#ff8080;font-size:0.72rem;min-height:18px;margin-bottom:10px;line-height:1.4"></div>'
+    +   '<button id="modal-bv-entrar-send" style="width:100%;padding:13px;border-radius:10px;border:none;background:linear-gradient(135deg,#c9a227,#ffe066);color:#020b18;font-family:\'Orbitron\',monospace;font-size:0.72rem;font-weight:700;letter-spacing:0.1em;cursor:pointer;box-shadow:0 0 20px rgba(255,224,102,0.28)">📧 ENVIAR LINK DE ACESSO</button>'
+    +   '<button id="modal-bv-entrar-cancel" style="width:100%;padding:10px;margin-top:10px;border-radius:10px;border:1px solid rgba(0,180,255,0.2);background:transparent;color:#7ab3d4;font-family:\'Orbitron\',monospace;font-size:0.7rem;letter-spacing:0.08em;cursor:pointer">Cancelar</button>'
+    +   '<div style="font-size:0.62rem;color:#7ab3d4;opacity:0.72;text-align:center;margin-top:14px;line-height:1.5;font-style:italic">Se você nunca criou conta ou está em dispositivo novo, prefira <strong style="color:#00d4ff;font-style:normal">Criar Conta</strong>.</div>'
+    + '</div>';
+  document.body.appendChild(modal);
+
+  const input = modal.querySelector('#modal-bv-entrar-email');
+  const errEl = modal.querySelector('#modal-bv-entrar-error');
+  const btnSend = modal.querySelector('#modal-bv-entrar-send');
+  const btnCancel = modal.querySelector('#modal-bv-entrar-cancel');
+
+  setTimeout(() => { try { input.focus(); } catch (_) {} }, 100);
+  btnCancel.onclick = () => modal.remove();
+
+  const enviar = async () => {
+    const email = (input.value || '').trim().toLowerCase();
+    errEl.textContent = '';
+    if (!email || !email.includes('@') || email.length < 5) {
+      errEl.textContent = '⚠ Digite um e-mail válido';
+      try { input.focus(); } catch (_) {}
+      return;
+    }
+    btnSend.disabled = true;
+    btnSend.style.opacity = '0.6';
+    btnSend.textContent = '⏳ ENVIANDO...';
+    try {
+      if (typeof BF_AUTH === 'undefined' || !BF_AUTH.sendSignInLink) {
+        throw new Error('BF_AUTH indisponível');
+      }
+      await BF_AUTH.sendSignInLink(email, '?bemvindoLogin=1', 'login_bemvindo');
+      try { localStorage.setItem('babyforce_email_pending_login_v1', email); } catch (_) {}
+      if (typeof BFAudit !== 'undefined' && BFAudit.log) {
+        try { BFAudit.log('bemvindo_entrar_link_enviado', { emailPrefix: email.substring(0, 3) }); } catch (_) {}
+      }
+      modal.innerHTML = ''
+        + '<div style="background:linear-gradient(135deg,#0a2a4a,#030f1f);border:1px solid rgba(57,255,20,0.4);border-radius:16px;padding:32px 22px;max-width:400px;width:100%;text-align:center;color:#e8f4fd;font-family:\'Exo 2\',sans-serif">'
+        +   '<div style="font-size:2.6rem;margin-bottom:12px">✉️</div>'
+        +   '<div style="font-family:\'Orbitron\',monospace;font-size:0.82rem;font-weight:700;letter-spacing:0.08em;color:#39ff14;margin-bottom:14px">LINK ENVIADO</div>'
+        +   '<div style="font-size:0.82rem;color:#e8f4fd;margin-bottom:8px;line-height:1.6">Enviamos um link de acesso para:<br><strong style="color:#00d4ff">' + email.replace(/[<>&"]/g, '') + '</strong></div>'
+        +   '<div style="font-size:0.72rem;color:#7ab3d4;margin-top:14px;line-height:1.55">Abra seu e-mail e clique no link para entrar.<br><br>💡 Se não chegar em 1 minuto, confira <strong style="color:#ffe066">spam/lixo eletrônico</strong>.</div>'
+        +   '<button id="modal-bv-ok" style="margin-top:20px;width:100%;padding:12px;border-radius:10px;border:1px solid rgba(0,180,255,0.3);background:transparent;color:#7ab3d4;font-family:\'Orbitron\',monospace;font-size:0.7rem;letter-spacing:0.08em;cursor:pointer">Entendi</button>'
+        + '</div>';
+      const btnOk = modal.querySelector('#modal-bv-ok');
+      if (btnOk) btnOk.onclick = () => modal.remove();
+    } catch (e) {
+      btnSend.disabled = false;
+      btnSend.style.opacity = '1';
+      btnSend.textContent = '📧 ENVIAR LINK DE ACESSO';
+      const code = (e && e.code) || '';
+      const msg = (code === 'bf/firebase-unavailable' || /firebase/i.test(String(e && e.message || '')))
+        ? '⚠ Sem conexão com servidor. Tente mais tarde ou use Criar Conta.'
+        : (code === 'bf/invalid-email' || code === 'auth/invalid-email')
+        ? '⚠ E-mail inválido'
+        : (code === 'auth/user-not-found')
+        ? '⚠ E-mail não cadastrado. Use Criar Conta.'
+        : '⚠ Não foi possível enviar o link. Tente novamente em instantes.';
+      errEl.textContent = msg;
+      console.warn('[obBemVindoEntrar]', e);
+    }
+  };
+
+  btnSend.onclick = enviar;
+  input.onkeydown = (ev) => { if (ev.key === 'Enter') enviar(); };
+}
+window.obBemVindoEntrar = obBemVindoEntrar;
+
+// MODO TESTE — cria guardião local sem email/senha e pula pra step 3 (bebê)
+async function obBemVindoModoTeste() {
+  // Confirmação: usa BFModal se disponível, senão confirm nativo
+  let confirmado = false;
+  const msgConfirm = 'Seus dados ficarão somente neste dispositivo:\n\n• Sem sincronização entre celulares\n• Sem recuperação se o app for desinstalado\n• Sem convites para outros guardiões\n\nRecomendado apenas para experimentar. Você pode converter em conta real depois.\n\nContinuar em modo teste?';
+  if (typeof BFModal !== 'undefined' && BFModal.confirm) {
+    try {
+      confirmado = await BFModal.confirm({
+        title: 'Modo teste — sem cadastro',
+        icon: '🧪',
+        variant: 'warning',
+        message: msgConfirm,
+        confirmText: 'Sim, modo teste',
+        cancelText: 'Voltar'
+      });
+    } catch (e) {
+      console.warn('[obBemVindoModoTeste BFModal]', e);
+      confirmado = confirm(msgConfirm);
+    }
+  } else {
+    confirmado = confirm(msgConfirm);
+  }
+  if (!confirmado) return;
+
+  // Cria guardião local com flag modoTeste
+  const id = 'teste_' + Date.now();
+  if (typeof GUARDIOES === 'undefined' || !GUARDIOES) {
+    console.error('[obBemVindoModoTeste] GUARDIOES indisponível');
+    if (typeof showToast === 'function') showToast('⚠ Erro ao iniciar modo teste');
+    return;
+  }
+  GUARDIOES[id] = {
+    nome: 'Guardião Teste',
+    emoji: '🧪',
+    papel: 'Administrador (modo teste)',
+    genero: '',
+    email: 'teste.local@babyforce.local',
+    nascimento: '',
+    parentesco: 'responsavel',
+    senhaHash: null,
+    senhaSalt: null,
+    emailValidado: true,
+    isAdmin: true,
+    modoTeste: true,
+    criadoEm: new Date().toISOString(),
+    convidadoPor: null
+  };
+  try { if (typeof saveGuardioes === 'function') saveGuardioes(GUARDIOES); } catch (e) { console.warn('[modoTeste saveGuardioes]', e); }
+
+  // Marca sessão
+  try {
+    const chaveSessao = (typeof SESSION_KEY !== 'undefined') ? SESSION_KEY : 'babyforce_session_v1';
+    sessionStorage.setItem(chaveSessao, id);
+  } catch (_) {}
+
+  // Auditoria (se disponível)
+  if (typeof BFAudit !== 'undefined' && BFAudit.log) {
+    try { BFAudit.log('modo_teste_ativado', { guardiaoId: id }); } catch (_) {}
+  }
+
+  // Define _guardiaoPendente para o restante do fluxo onboarding saber qual guardião é
+  try { if (typeof _guardiaoPendente !== 'undefined') window._guardiaoPendente = id; } catch (_) {}
+
+  // Pula para step 3 (bebê) — pulando admin email (step 1) e verify email (step 2)
+  try { if (typeof _obCurrentStep !== 'undefined') window._obCurrentStep = 3; } catch (_) {}
+  const step0 = document.getElementById('ob-step-0');
+  if (step0) step0.classList.remove('active');
+  const step3 = document.getElementById('ob-step-3-bebe');
+  if (step3) step3.classList.add('active');
+  try { if (typeof obAtualizarDots === 'function') obAtualizarDots(3); } catch (_) {}
+  setTimeout(() => { const el = document.getElementById('ob-nome-bebe'); if (el) el.focus(); }, 300);
+}
+window.obBemVindoModoTeste = obBemVindoModoTeste;
+
 function obPin1Input(input){
   const val=input.value.replace(/\D/g,'').slice(0,6);input.value=val;_obPin1=val;
   for(let i=0;i<6;i++){const d=document.getElementById('op1-'+i);if(d)d.className='pin-dot'+(i<val.length?' filled':'');}
@@ -13047,6 +13229,19 @@ function obConfirmarPin(){
   obRenderEmojiGrid();
 }
 function obFinalizar() {
+  // ATALHO MODO TESTE: se já existe guardião com flag modoTeste criado via
+  // obBemVindoModoTeste, não recria nada — só conclui o onboarding.
+  try {
+    const jaTemTeste = Object.values(GUARDIOES || {}).some(g => g && g.modoTeste === true);
+    if (jaTemTeste) {
+      if (typeof BFAudit !== 'undefined' && BFAudit.log) {
+        try { BFAudit.log('modo_teste_onboarding_concluido'); } catch (_) {}
+      }
+      obConcluir();
+      return;
+    }
+  } catch (e) { console.warn('[obFinalizar modoTeste check]', e); }
+
   // Tenta recuperar dados persistidos se _obAdminDados está null (reload após magic link)
   if (!_obAdminDados) {
     try {
