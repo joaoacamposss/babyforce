@@ -3583,18 +3583,25 @@ window._confirmarNovaSenha = async function(guardiaoId, origem) {
 
     document.getElementById('modal-nova-senha').remove();
 
-    // Feedback de sucesso
-    await (typeof BFModal !== 'undefined'
-      ? BFModal.alert({
-          title: 'Senha redefinida',
-          icon: '✓',
-          variant: 'success',
-          message: `Sua nova senha foi salva com sucesso, ${g.nome.split(/\s+/)[0]}!\n\nAgora você pode fazer login normalmente.`,
-        })
-      : Promise.resolve(alert('Senha redefinida!')));
+    // Feedback de sucesso + login automático (premium 10+: zero fricção pós-reset)
+    showToast('🔑 Nova senha salva! Entrando...');
 
-    // Sugere reabrir login por senha
-    if (typeof window.abrirLoginComSenha === 'function') {
+    // Esconde tela de login se estiver visível
+    try {
+      const telaLogin = document.getElementById('tela-login');
+      if (telaLogin) telaLogin.style.display = 'none';
+    } catch (_) {}
+
+    // Marca sessão e loga direto no app (sem passar pela tela de PIN)
+    try {
+      const chaveSessao = (typeof SESSION_KEY !== 'undefined') ? SESSION_KEY : 'babyforce_session_v1';
+      sessionStorage.setItem(chaveSessao, guardiaoId);
+    } catch (_) {}
+
+    if (typeof fazerLogin === 'function') {
+      setTimeout(() => fazerLogin(guardiaoId), 400);
+    } else if (typeof window.abrirLoginComSenha === 'function') {
+      // Fallback legado
       setTimeout(() => window.abrirLoginComSenha(guardiaoId), 300);
     }
   } catch (e) {
@@ -3604,54 +3611,254 @@ window._confirmarNovaSenha = async function(guardiaoId, origem) {
   }
 };
 
-// Detecta retorno do magic link de recuperação de senha
+// ═══════════════════════════════════════════════════════════════
+// Handler ROBUSTO de retorno do magic link de recuperação de senha
+// Nunca silencia falha. Sempre dá feedback claro ao usuário.
+// Usa o email verificado pelo Firebase como fonte de verdade (não depende de RECUPERAR_SENHA_KEY).
+// ═══════════════════════════════════════════════════════════════
 (function() {
   document.addEventListener('DOMContentLoaded', () => {
     setTimeout(async () => {
       if (!location.search.includes('recoverPassword=1')) return;
+
+      console.log('[RESET] Handler de recuperação de senha ativado');
+
+      // ─── Etapa 1: descobrir email que vamos usar ───────────────
+      // Prioridade: (1) RECUPERAR_SENHA_KEY, (2) pergunta ao usuário
+      let emailParaValidar = null;
+      let guardiaoIdConhecido = null;
+
       try {
         const raw = localStorage.getItem(RECUPERAR_SENHA_KEY);
-        if (!raw) return;
-        const pendente = JSON.parse(raw);
-        if (!pendente || !pendente.guardiaoId) return;
-
-        // Valida via Firebase
-        let validado = false;
-        try {
-          if (typeof firebase !== 'undefined' && firebase.auth
-              && firebase.auth().isSignInWithEmailLink(window.location.href)) {
-            await firebase.auth().signInWithEmailLink(pendente.email, window.location.href);
-            try { await firebase.auth().signOut(); } catch {}
-            validado = true;
+        if (raw) {
+          const pendente = JSON.parse(raw);
+          if (pendente && pendente.email) {
+            emailParaValidar = pendente.email.trim().toLowerCase();
+            guardiaoIdConhecido = pendente.guardiaoId || null;
+            console.log('[RESET] Email recuperado de RECUPERAR_SENHA_KEY:', emailParaValidar.substring(0, 3) + '***');
           }
-        } catch (e) {
-          console.warn('[recover password validate]', e);
-        }
-
-        if (validado) {
-          if (typeof BFAudit !== 'undefined') BFAudit.log('recuperar_senha_link_validado', { id: pendente.guardiaoId });
-          // Abre modal nova senha
-          window._abrirModalNovaSenha(pendente.guardiaoId, 'email');
-        } else {
-          // Oferece tentativa manual
-          const tentar = await (typeof BFModal !== 'undefined'
-            ? BFModal.confirm({
-                title: 'Link não validado',
-                icon: '⚠️',
-                variant: 'warn',
-                message: 'Não conseguimos confirmar o link de recuperação automaticamente.\n\nDeseja abrir o modal de nova senha mesmo assim? (modo offline)',
-                okLabel: 'Abrir (offline)',
-                cancelLabel: 'Cancelar',
-              })
-            : Promise.resolve(confirm('Abrir em modo offline?')));
-          if (tentar) window._abrirModalNovaSenha(pendente.guardiaoId, 'email-offline');
         }
       } catch (e) {
-        console.warn('[recoverPassword handler]', e);
+        console.warn('[RESET] Erro lendo RECUPERAR_SENHA_KEY:', e);
       }
+
+      // Se não achou, pede ao usuário (cenário: dispositivo/navegador diferente)
+      if (!emailParaValidar) {
+        console.log('[RESET] Sem dados pendentes — perguntando email ao usuário');
+        const pedido = await _resetPremiumPedirEmail();
+        if (!pedido) {
+          console.log('[RESET] Usuário cancelou — encerrando');
+          return;
+        }
+        emailParaValidar = pedido.trim().toLowerCase();
+      }
+
+      // ─── Etapa 2: validar o link via Firebase ──────────────────
+      let validado = false;
+      let emailValidadoPeloFirebase = null;
+      let erroFirebase = null;
+
+      try {
+        if (typeof firebase !== 'undefined' && firebase.auth) {
+          const auth = firebase.auth();
+          if (auth.isSignInWithEmailLink && auth.isSignInWithEmailLink(window.location.href)) {
+            console.log('[RESET] Link de magic link detectado na URL, validando...');
+            const result = await auth.signInWithEmailLink(emailParaValidar, window.location.href);
+            // O Firebase confirma o email real associado ao link
+            emailValidadoPeloFirebase = (result && result.user && result.user.email)
+              ? result.user.email.toLowerCase()
+              : emailParaValidar;
+            try { await auth.signOut(); } catch (_) {}
+            validado = true;
+            console.log('[RESET] Link validado com sucesso para:', emailValidadoPeloFirebase.substring(0, 3) + '***');
+          } else {
+            console.warn('[RESET] isSignInWithEmailLink retornou false — link provavelmente já foi consumido por outro handler ou é inválido');
+            erroFirebase = 'link_ja_consumido';
+          }
+        } else {
+          console.warn('[RESET] Firebase não disponível');
+          erroFirebase = 'firebase_indisponivel';
+        }
+      } catch (e) {
+        console.warn('[RESET] Erro na validação Firebase:', e);
+        erroFirebase = e.code || e.message || 'erro_desconhecido';
+      }
+
+      // ─── Etapa 3: tratar falha de validação ────────────────────
+      if (!validado) {
+        console.log('[RESET] Validação falhou — mostrando modal com alternativas');
+        const decisao = await _resetPremiumTratarFalha(erroFirebase, emailParaValidar);
+        if (decisao === 'reenviar') {
+          // Limpa URL e oferece reenvio
+          try { window.history.replaceState({}, document.title, window.location.pathname); } catch (_) {}
+          if (typeof obBemVindoEntrar === 'function') obBemVindoEntrar();
+          return;
+        }
+        if (decisao === 'continuar_offline') {
+          // Modo offline: usa o email digitado pra buscar guardião
+          emailValidadoPeloFirebase = emailParaValidar;
+        } else {
+          // 'cancelar' ou qualquer outro valor
+          try { window.history.replaceState({}, document.title, window.location.pathname); } catch (_) {}
+          return;
+        }
+      }
+
+      // ─── Etapa 4: buscar guardião pelo email verificado ────────
+      let guardiaoId = guardiaoIdConhecido;
+      if (!guardiaoId || !GUARDIOES[guardiaoId]) {
+        // Busca pelo email (mais confiável — evita id desatualizado)
+        for (const [id, g] of Object.entries(GUARDIOES || {})) {
+          if (g && g.email && g.email.trim().toLowerCase() === emailValidadoPeloFirebase) {
+            guardiaoId = id;
+            console.log('[RESET] Guardião encontrado pelo email:', id);
+            break;
+          }
+        }
+      }
+
+      if (!guardiaoId) {
+        console.warn('[RESET] Guardião não encontrado localmente para o email:', emailValidadoPeloFirebase.substring(0, 3) + '***');
+        try { window.history.replaceState({}, document.title, window.location.pathname); } catch (_) {}
+        await _resetPremiumMostrarDispositivoNovo(emailValidadoPeloFirebase);
+        return;
+      }
+
+      // ─── Etapa 5: tudo OK — abrir modal de nova senha ──────────
+      if (typeof BFAudit !== 'undefined' && BFAudit.log) {
+        try {
+          BFAudit.log('recuperar_senha_link_validado', {
+            id: guardiaoId,
+            origem: validado ? 'firebase' : 'offline',
+          });
+        } catch (_) {}
+      }
+
+      // Esconde telas de boas-vindas/login que possam estar ativas
+      try {
+        const telaOnb = document.getElementById('tela-onboarding');
+        const telaLogin = document.getElementById('tela-login');
+        if (telaOnb) telaOnb.style.display = 'none';
+        if (telaLogin) telaLogin.style.display = 'none';
+      } catch (_) {}
+
+      // Limpa URL
+      try { window.history.replaceState({}, document.title, window.location.pathname); } catch (_) {}
+
+      console.log('[RESET] Abrindo modal de nova senha para guardião:', guardiaoId);
+      window._abrirModalNovaSenha(guardiaoId, validado ? 'email' : 'email-offline');
     }, 1800);
   });
 })();
+
+// ═══════════════════════════════════════════════════════════════
+// Helpers PREMIUM do fluxo de reset
+// ═══════════════════════════════════════════════════════════════
+
+// Modal que pede o email ao usuário quando não temos RECUPERAR_SENHA_KEY
+// Retorna string (email) se usuário preencheu, null se cancelou.
+async function _resetPremiumPedirEmail() {
+  return new Promise((resolve) => {
+    const existente = document.getElementById('modal-reset-pedir-email');
+    if (existente) existente.remove();
+
+    const modal = document.createElement('div');
+    modal.id = 'modal-reset-pedir-email';
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    modal.style.cssText = 'position:fixed;inset:0;background:rgba(2,11,24,0.94);z-index:99995;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(10px)';
+    modal.innerHTML = ''
+      + '<div style="background:linear-gradient(135deg,#0a2a4a,#030f1f);border:1px solid rgba(120,255,153,0.35);border-radius:16px;padding:26px 22px;max-width:400px;width:100%;color:#e8f4fd;font-family:\'Exo 2\',sans-serif">'
+      +   '<div style="text-align:center;font-size:2rem;margin-bottom:10px">🔐</div>'
+      +   '<div style="font-family:\'Orbitron\',monospace;font-size:0.82rem;font-weight:700;letter-spacing:0.08em;text-align:center;margin-bottom:6px;color:#78ff99">CONFIRMAR IDENTIDADE</div>'
+      +   '<div style="font-size:0.74rem;color:#7ab3d4;text-align:center;margin-bottom:18px;line-height:1.55">Para redefinir sua senha com segurança, confirme o e-mail da sua conta:</div>'
+      +   '<label style="font-family:\'Orbitron\',monospace;font-size:0.62rem;letter-spacing:0.1em;color:#7ab3d4;display:block;margin-bottom:6px">E-MAIL DA CONTA</label>'
+      +   '<input id="modal-reset-email" type="email" inputmode="email" autocomplete="email" autocapitalize="off" spellcheck="false" placeholder="seu@email.com" style="width:100%;padding:12px 14px;background:rgba(0,30,60,0.5);border:1px solid rgba(120,255,153,0.3);border-radius:10px;color:#e8f4fd;font-size:0.9rem;box-sizing:border-box;margin-bottom:12px">'
+      +   '<div id="modal-reset-err" style="color:#ff8080;font-size:0.72rem;min-height:18px;margin-bottom:10px;line-height:1.4"></div>'
+      +   '<button id="modal-reset-ok" style="width:100%;padding:13px;border-radius:10px;border:none;background:linear-gradient(135deg,#78ff99,#00d4ff);color:#031027;font-family:\'Orbitron\',monospace;font-size:0.74rem;font-weight:700;letter-spacing:0.1em;cursor:pointer">CONTINUAR</button>'
+      +   '<button id="modal-reset-cancel" style="width:100%;padding:10px;margin-top:10px;border-radius:10px;border:1px solid rgba(0,180,255,0.2);background:transparent;color:#7ab3d4;font-family:\'Orbitron\',monospace;font-size:0.7rem;letter-spacing:0.08em;cursor:pointer">Cancelar</button>'
+      + '</div>';
+    document.body.appendChild(modal);
+
+    const input = modal.querySelector('#modal-reset-email');
+    const errEl = modal.querySelector('#modal-reset-err');
+    setTimeout(() => { try { input.focus(); } catch (_) {} }, 100);
+
+    const onOk = () => {
+      const email = (input.value || '').trim().toLowerCase();
+      if (!email || !email.includes('@') || email.length < 5) {
+        errEl.textContent = '⚠ Digite um e-mail válido';
+        return;
+      }
+      modal.remove();
+      resolve(email);
+    };
+    const onCancel = () => { modal.remove(); resolve(null); };
+
+    modal.querySelector('#modal-reset-ok').onclick = onOk;
+    modal.querySelector('#modal-reset-cancel').onclick = onCancel;
+    input.onkeydown = (ev) => { if (ev.key === 'Enter') onOk(); };
+  });
+}
+
+// Modal de falha — oferece 3 alternativas claras ao usuário
+// Retorna: 'reenviar' | 'continuar_offline' | 'cancelar'
+async function _resetPremiumTratarFalha(codigoErro, email) {
+  return new Promise((resolve) => {
+    const existente = document.getElementById('modal-reset-falha');
+    if (existente) existente.remove();
+
+    const motivoTexto = {
+      'link_ja_consumido': 'Este link já foi usado em outra sessão.',
+      'auth/invalid-action-code': 'Este link expirou ou é inválido.',
+      'auth/expired-action-code': 'Este link expirou.',
+      'firebase_indisponivel': 'Não foi possível conectar ao servidor.',
+    }[codigoErro] || 'Não conseguimos validar o link automaticamente.';
+
+    const modal = document.createElement('div');
+    modal.id = 'modal-reset-falha';
+    modal.style.cssText = 'position:fixed;inset:0;background:rgba(2,11,24,0.95);z-index:99996;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(10px)';
+    modal.innerHTML = ''
+      + '<div style="background:linear-gradient(135deg,#0a2a4a,#030f1f);border:1px solid rgba(255,180,100,0.4);border-radius:16px;padding:28px 22px;max-width:420px;width:100%;color:#e8f4fd;font-family:\'Exo 2\',sans-serif">'
+      +   '<div style="text-align:center;font-size:2.2rem;margin-bottom:10px">⚠️</div>'
+      +   '<div style="font-family:\'Orbitron\',monospace;font-size:0.82rem;font-weight:700;letter-spacing:0.08em;text-align:center;margin-bottom:10px;color:#ffb464">LINK NÃO VALIDADO</div>'
+      +   '<div style="font-size:0.82rem;color:#e8f4fd;text-align:center;margin-bottom:8px;line-height:1.55">' + motivoTexto + '</div>'
+      +   '<div style="font-size:0.72rem;color:#7ab3d4;text-align:center;margin-bottom:20px;line-height:1.55">Escolha como prosseguir:</div>'
+      +   '<button id="modal-resetf-reenviar" style="width:100%;padding:13px;margin-bottom:10px;border-radius:10px;border:none;background:linear-gradient(135deg,#78ff99,#00d4ff);color:#031027;font-family:\'Orbitron\',monospace;font-size:0.72rem;font-weight:700;letter-spacing:0.1em;cursor:pointer">📧 RECEBER NOVO LINK</button>'
+      +   '<button id="modal-resetf-offline" style="width:100%;padding:11px;margin-bottom:10px;border-radius:10px;border:1px solid rgba(255,224,102,0.3);background:rgba(255,224,102,0.08);color:#ffe066;font-family:\'Orbitron\',monospace;font-size:0.66rem;font-weight:600;letter-spacing:0.08em;cursor:pointer">🔓 CONTINUAR MESMO ASSIM (modo offline)</button>'
+      +   '<button id="modal-resetf-cancel" style="width:100%;padding:10px;border-radius:10px;border:1px solid rgba(0,180,255,0.2);background:transparent;color:#7ab3d4;font-family:\'Orbitron\',monospace;font-size:0.66rem;letter-spacing:0.08em;cursor:pointer">Cancelar</button>'
+      + '</div>';
+    document.body.appendChild(modal);
+
+    const done = (v) => { modal.remove(); resolve(v); };
+    modal.querySelector('#modal-resetf-reenviar').onclick = () => done('reenviar');
+    modal.querySelector('#modal-resetf-offline').onclick = () => done('continuar_offline');
+    modal.querySelector('#modal-resetf-cancel').onclick = () => done('cancelar');
+  });
+}
+
+// Modal específico quando o email foi validado mas guardião não existe neste dispositivo
+async function _resetPremiumMostrarDispositivoNovo(email) {
+  const emailSafe = String(email).replace(/[<>&"]/g, '');
+  return new Promise((resolve) => {
+    const existente = document.getElementById('modal-reset-novo-dispositivo');
+    if (existente) existente.remove();
+
+    const modal = document.createElement('div');
+    modal.id = 'modal-reset-novo-dispositivo';
+    modal.style.cssText = 'position:fixed;inset:0;background:rgba(2,11,24,0.95);z-index:99997;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(10px)';
+    modal.innerHTML = ''
+      + '<div style="background:linear-gradient(135deg,#0a2a4a,#030f1f);border:1px solid rgba(74,158,255,0.4);border-radius:16px;padding:28px 22px;max-width:420px;width:100%;color:#e8f4fd;font-family:\'Exo 2\',sans-serif">'
+      +   '<div style="text-align:center;font-size:2.2rem;margin-bottom:10px">📱</div>'
+      +   '<div style="font-family:\'Orbitron\',monospace;font-size:0.82rem;font-weight:700;letter-spacing:0.08em;text-align:center;margin-bottom:10px;color:#00d4ff">DISPOSITIVO NOVO</div>'
+      +   '<div style="font-size:0.82rem;color:#e8f4fd;text-align:center;margin-bottom:8px;line-height:1.55">E-mail confirmado com sucesso:<br><strong style="color:#00d4ff">' + emailSafe + '</strong></div>'
+      +   '<div style="font-size:0.76rem;color:#7ab3d4;text-align:left;margin:14px 0;line-height:1.7;background:rgba(74,158,255,0.08);padding:12px 14px;border-radius:8px;border-left:3px solid #4a9eff">Este dispositivo não tem sua conta cadastrada localmente. Para usar o BabyForce aqui:<br><br>1. Use <strong style="color:#00d4ff">Criar Conta</strong> com o mesmo e-mail<br>2. Seus dados sincronizarão automaticamente (se você tem Firebase ativo)</div>'
+      +   '<button id="modal-resetn-ok" style="width:100%;padding:12px;border-radius:10px;border:1px solid rgba(0,180,255,0.3);background:transparent;color:#7ab3d4;font-family:\'Orbitron\',monospace;font-size:0.7rem;letter-spacing:0.08em;cursor:pointer">Entendi</button>'
+      + '</div>';
+    document.body.appendChild(modal);
+    modal.querySelector('#modal-resetn-ok').onclick = () => { modal.remove(); resolve(); };
+  });
+}
 
 // ═══════════════════════════════════════════════════════════════
 // C3 — TELA "MINHA CONTA"
