@@ -769,7 +769,7 @@ html.bf-tema-claro [style*="color: var(--white)"] { color: var(--white) !importa
         </select>
       </div>
       <div class="ob-pin-status" id="ob-admin-error"></div>
-      <button class="ob-btn ob-btn-primary" id="ob-btn-enviar-codigo" onclick="obEnviarCodigoVerificacao()">📧 Enviar código de verificação</button>
+      <button class="ob-btn ob-btn-primary" id="ob-btn-enviar-codigo" onclick="obContinuarDoAdmin()">Continuar →</button>
       <button class="ob-btn ob-btn-secondary" onclick="obProximo(-1)" style="font-size:0.7rem;margin-top:8px">← Voltar</button>
     </div>
 
@@ -12421,6 +12421,134 @@ let _obReenviarTimestamp = 0;  // rate limit de reenvio (60s)
  * Valida dados do admin, gera hash da senha, envia magic link e avança para step 2.
  * Chamado pelo botão "📧 Enviar código de verificação" no step-1.
  */
+// ═══════════════════════════════════════════════════════════════
+// FLUXO SIMPLIFICADO — Admin Step 1 → Bebê (Step 3) direto
+// Sem validação de email por magic link durante criar conta.
+// O email fica salvo em GUARDIOES[id].email e pode ser validado depois
+// via "Esqueci minha senha" ou reverificação opcional em Minha Conta.
+// ═══════════════════════════════════════════════════════════════
+async function obContinuarDoAdmin() {
+  const errEl = document.getElementById('ob-admin-error');
+  if (errEl) errEl.textContent = '';
+
+  // 1. Coleta e valida campos (mesma lógica do fluxo antigo)
+  const nome = document.getElementById('ob-admin-nome').value.trim();
+  const email = document.getElementById('ob-admin-email').value.trim().toLowerCase();
+  const senha = document.getElementById('ob-admin-senha').value;
+  const nascimento = document.getElementById('ob-admin-nascimento').value;
+  const genero = document.getElementById('ob-admin-genero').value;
+
+  if (!nome || nome.length < 3) {
+    if (errEl) errEl.textContent = '⚠️ Informe seu nome completo (mínimo 3 caracteres)';
+    document.getElementById('ob-admin-nome').focus();
+    return;
+  }
+  if (!email || !validarEmail(email)) {
+    if (errEl) errEl.textContent = '⚠️ E-mail inválido';
+    document.getElementById('ob-admin-email').focus();
+    return;
+  }
+  if (!senha || senha.length < OB_ADMIN_SENHA_MIN) {
+    if (errEl) errEl.textContent = `⚠️ Senha deve ter ao menos ${OB_ADMIN_SENHA_MIN} caracteres`;
+    document.getElementById('ob-admin-senha').focus();
+    return;
+  }
+  if (!/[a-zA-Z]/.test(senha) || !/[0-9]/.test(senha)) {
+    if (errEl) errEl.textContent = '⚠️ Senha deve conter letras E números';
+    document.getElementById('ob-admin-senha').focus();
+    return;
+  }
+  if (!nascimento) {
+    if (errEl) errEl.textContent = '⚠️ Informe sua data de nascimento';
+    document.getElementById('ob-admin-nascimento').focus();
+    return;
+  }
+  if (!validarDataNascimento(nascimento)) {
+    if (errEl) errEl.textContent = '⚠️ Data de nascimento inválida';
+    document.getElementById('ob-admin-nascimento').focus();
+    return;
+  }
+
+  // Detecta email já cadastrado neste dispositivo e sugere Entrar
+  try {
+    if (typeof GUARDIOES !== 'undefined' && GUARDIOES) {
+      const emailExistente = Object.values(GUARDIOES).some(g =>
+        g && g.email && g.email.trim().toLowerCase() === email
+      );
+      if (emailExistente) {
+        if (errEl) {
+          errEl.innerHTML = '⚠️ Este e-mail já está cadastrado neste dispositivo.<br>' +
+            '<a href="#" onclick="event.preventDefault();' +
+            'const step0=document.getElementById(\'ob-step-0\');' +
+            'const step1=document.getElementById(\'ob-step-1\');' +
+            'if(step1)step1.classList.remove(\'active\');' +
+            'if(step0)step0.classList.add(\'active\');' +
+            'if(typeof obAtualizarDots===\'function\')obAtualizarDots(0);' +
+            'setTimeout(()=>{if(typeof obBemVindoEntrar===\'function\')obBemVindoEntrar();},200);' +
+            'return false;" ' +
+            'style="color:var(--blue-neon);text-decoration:underline;cursor:pointer">Voltar e usar o botão Entrar</a>';
+        }
+        document.getElementById('ob-admin-email').focus();
+        return;
+      }
+    }
+  } catch (e) { console.warn('[email duplicado check]', e); }
+
+  // 2. Gerar hash da senha com salt (SHA-256 + salt aleatório)
+  let senhaHash = null, senhaSalt = null;
+  try {
+    if (typeof BFSec !== 'undefined' && BFSec.sha256) {
+      const saltBytes = crypto.getRandomValues(new Uint8Array(16));
+      senhaSalt = btoa(String.fromCharCode(...saltBytes));
+      senhaHash = await BFSec.sha256(senha + senhaSalt);
+    } else {
+      const saltBytes = crypto.getRandomValues(new Uint8Array(16));
+      senhaSalt = btoa(String.fromCharCode(...saltBytes));
+      const data = new TextEncoder().encode(senha + senhaSalt);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+      senhaHash = Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+  } catch (e) {
+    console.error('[obContinuarDoAdmin] Hash falhou:', e);
+    if (errEl) errEl.textContent = '⚠️ Erro ao processar senha. Tente novamente.';
+    return;
+  }
+
+  // 3. Salvar dados pendentes (em memória + localStorage)
+  _obAdminDados = {
+    nome, email, genero, nascimento,
+    senhaHash, senhaSalt,
+    emailVerificado: false,      // e-mail não validado (usuário pode verificar depois se quiser)
+    verificadoRealmente: false,
+    criadoEm: Date.now(),
+  };
+  try { localStorage.setItem(OB_ADMIN_PENDING_KEY, JSON.stringify(_obAdminDados)); } catch {}
+
+  if (typeof BFAudit !== 'undefined' && BFAudit.log) {
+    try { BFAudit.log('ob_admin_continuar_direto', { emailPrefix: email.substring(0, 3) }); } catch (_) {}
+  }
+
+  // 4. Avançar direto para step 3 (bebê) — PULA verificação de email
+  _obCurrentStep = 3;
+  const step1 = document.getElementById('ob-step-1');
+  const step3 = document.getElementById('ob-step-3-bebe');
+  if (step1) step1.classList.remove('active');
+  if (step3) step3.classList.add('active');
+  // Dots: fluxo agora tem 5 passos visíveis (welcome=0, admin=1, bebê=2, PIN=3, emoji=4)
+  obAtualizarDots(2);
+  // Focar no primeiro campo do step 3
+  setTimeout(() => {
+    const el = document.getElementById('ob-nome-bebe');
+    if (el) el.focus();
+    // Preencher data com hoje se estiver vazia (comodidade)
+    const inp = document.getElementById('ob-nasc-bebe');
+    if (inp && !inp.value && typeof todayISO === 'function') inp.value = todayISO();
+  }, 300);
+}
+window.obContinuarDoAdmin = obContinuarDoAdmin;
+
+// [LEGADO] obEnviarCodigoVerificacao — não mais usada no fluxo principal,
+// mantida caso algum outro caminho ainda a chame (recuperação, reverificação futura).
 async function obEnviarCodigoVerificacao() {
   const errEl = document.getElementById('ob-admin-error');
   if (errEl) errEl.textContent = '';
@@ -13136,12 +13264,13 @@ function obProximo(fromStep, skip) {
     return;
   }
 
-  // VOLTAR: step 3 (bebê) → step 2 (email)
+  // VOLTAR: step 3 (bebê) → step 1 (admin) — novo fluxo pula email verify
   if (fromStep === -3) {
-    _obCurrentStep = 2;
+    _obCurrentStep = 1;
     document.getElementById('ob-step-3-bebe').classList.remove('active');
-    document.getElementById('ob-step-2-email').classList.add('active');
-    obAtualizarDots(2);
+    document.getElementById('ob-step-1').classList.add('active');
+    obAtualizarDots(1);
+    setTimeout(() => { const el = document.getElementById('ob-admin-nome'); if (el) el.focus(); }, 300);
     return;
   }
 
@@ -13150,7 +13279,7 @@ function obProximo(fromStep, skip) {
     _obCurrentStep = 3;
     document.getElementById('ob-step-4-pin').classList.remove('active');
     document.getElementById('ob-step-3-bebe').classList.add('active');
-    obAtualizarDots(3);
+    obAtualizarDots(2);  // novo: bebê = dot 2
     setTimeout(() => { const el = document.getElementById('ob-nome-bebe'); if (el) el.focus(); }, 300);
     return;
   }
@@ -13160,7 +13289,7 @@ function obProximo(fromStep, skip) {
     _obCurrentStep = 4;
     document.getElementById('ob-step-5-emoji').classList.remove('active');
     document.getElementById('ob-step-4-pin').classList.add('active');
-    obAtualizarDots(4);
+    obAtualizarDots(3);  // novo: PIN = dot 3
     return;
   }
 
@@ -13198,7 +13327,7 @@ function obProximo(fromStep, skip) {
     _obCurrentStep = 4;
     document.getElementById('ob-step-3-bebe').classList.remove('active');
     document.getElementById('ob-step-4-pin').classList.add('active');
-    obAtualizarDots(3);
+    obAtualizarDots(3);  // novo: PIN = dot 3
     setTimeout(() => { const el = document.getElementById('ob-pin1-oculto'); if (el) el.focus(); }, 300);
     return;
   }
@@ -13365,7 +13494,9 @@ async function obBemVindoEntrar() {
   emailInput.onkeydown = (ev) => { if (ev.key === 'Enter') senhaInput.focus(); };
   senhaInput.onkeydown = (ev) => { if (ev.key === 'Enter') submitLogin(); };
 
-  // Link "Esqueci minha senha" — envia magic link de recuperação
+  // Link "Esqueci minha senha" — envia magic link de RESET REAL de senha
+  // Popula RECUPERAR_SENHA_KEY pra que o handler global existente (linha ~3611)
+  // abra _abrirModalNovaSenha automaticamente ao retornar do link.
   linkEsqueci.onclick = async (ev) => {
     ev.preventDefault();
     const email = (emailInput.value || '').trim().toLowerCase();
@@ -13375,14 +13506,61 @@ async function obBemVindoEntrar() {
       try { emailInput.focus(); } catch (_) {}
       return;
     }
+
+    // Busca guardião com esse email
+    let guardiaoId = null;
+    try {
+      if (typeof GUARDIOES !== 'undefined' && GUARDIOES) {
+        for (const [id, g] of Object.entries(GUARDIOES)) {
+          if (g && g.email && g.email.trim().toLowerCase() === email) {
+            guardiaoId = id;
+            break;
+          }
+        }
+      }
+    } catch (e) { console.warn('[esqueci senha buscar guardião]', e); }
+
+    if (!guardiaoId) {
+      errEl.innerHTML = '⚠ E-mail não cadastrado neste dispositivo.<br>' +
+        '<span style="color:#7ab3d4;opacity:0.85">Se você está em dispositivo novo, use <strong style="color:#00d4ff">Criar Conta</strong>.</span>';
+      return;
+    }
+
+    // Gera token e salva estado pendente (formato usado pelo handler na linha ~3611)
+    let token = null;
+    try {
+      if (typeof _gerarTokenRecuperacao === 'function') {
+        token = _gerarTokenRecuperacao();
+      } else {
+        // Fallback: token aleatório manual
+        const bytes = new Uint8Array(24);
+        crypto.getRandomValues(bytes);
+        token = Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
+      }
+    } catch (e) { console.warn('[esqueci senha token]', e); token = String(Date.now()); }
+
+    const pendente = {
+      guardiaoId,
+      email,
+      token,
+      enviadoEm: Date.now(),
+    };
+    const CHAVE = (typeof RECUPERAR_SENHA_KEY !== 'undefined') ? RECUPERAR_SENHA_KEY : 'babyforce_recuperar_senha_v1';
+    try { localStorage.setItem(CHAVE, JSON.stringify(pendente)); } catch (_) {}
+
+    // Envia magic link de reset
     try {
       if (typeof BF_AUTH === 'undefined' || !BF_AUTH.sendSignInLink) throw new Error('BF_AUTH indisponível');
       await BF_AUTH.sendSignInLink(email, '?recoverPassword=1', 'recuperar_senha_bemvindo');
-      try { localStorage.setItem('babyforce_email_pending_login_v1', email); } catch (_) {}
-      _mostrarTelaMagicLinkEnviado(modal, email, 'recuperação de senha');
+      if (typeof BFAudit !== 'undefined' && BFAudit.log) {
+        try { BFAudit.log('bemvindo_recuperar_senha_enviado', { guardiaoId }); } catch (_) {}
+      }
+      _mostrarTelaMagicLinkEnviado(modal, email, 'redefinir senha');
     } catch (e) {
-      errEl.textContent = '⚠ Não foi possível enviar o link de recuperação. Tente novamente.';
+      errEl.textContent = '⚠ Não foi possível enviar o link de redefinição. Tente novamente.';
       console.warn('[esqueci senha]', e);
+      // Limpa o pendente pra não ficar lixo no localStorage
+      try { localStorage.removeItem(CHAVE); } catch (_) {}
     }
   };
 
