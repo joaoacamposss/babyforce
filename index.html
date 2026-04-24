@@ -1318,24 +1318,9 @@ html.bf-tema-claro [style*="color: var(--white)"] { color: var(--white) !importa
        Baseado em: SBP (Soc. Bras. Pediatria) · rBLH/FIOCRUZ (Rede Bras. Bancos de Leite Humano) · Ministério da Saúde
        ═══════════════════════════════════════════════════════════════ -->
   <div id="nutricao-panel-estoque-leite" class="nutricao-panel" style="display:none">
-    <!-- Card intro com referências -->
-    <div class="card" style="background:linear-gradient(135deg,rgba(0,180,255,0.14),rgba(120,220,255,0.08));border:1px solid rgba(0,180,255,0.35);margin-bottom:12px">
-      <div class="section-title" style="display:flex;align-items:center;gap:8px">
-        <span>🏦 Banco de Leite Pessoal</span>
-        <span style="font-family:'Orbitron',monospace;font-size:0.52rem;color:var(--blue-neon);background:rgba(0,180,255,0.14);padding:2px 7px;border-radius:8px;letter-spacing:0.08em;font-weight:600">SBP · rBLH · MS</span>
-      </div>
-      <div style="font-size:0.72rem;color:var(--text-dim);line-height:1.55">
-        Registre ordenhas, monitore a <strong style="color:var(--white)">validade</strong> de cada frasco e receba orientações de armazenamento conforme <strong style="color:var(--blue-neon)">Sociedade Brasileira de Pediatria</strong>, <strong style="color:var(--blue-neon)">Rede Brasileira de Bancos de Leite Humano (rBLH/FIOCRUZ)</strong> e <strong style="color:var(--blue-neon)">Ministério da Saúde</strong>.
-      </div>
-      <button onclick="_estLeiteAbrirGuia()" style="margin-top:10px;padding:8px 14px;background:rgba(0,180,255,0.1);border:1px solid rgba(0,180,255,0.4);border-radius:20px;color:var(--blue-neon);font-family:'Orbitron',monospace;font-size:0.62rem;letter-spacing:0.06em;cursor:pointer;font-weight:600">📚 Ver guia completo de armazenamento</button>
-    </div>
-
-    <!-- Resumo de estoque ativo -->
-    <div id="est-leite-resumo" style="margin-bottom:12px"></div>
-
-    <!-- Form: registrar ordenha -->
+    <!-- 1. Form: registrar extração (AGORA NO TOPO) -->
     <div class="card">
-      <div class="section-title">🍼 Registrar Ordenha</div>
+      <div class="section-title">🍼 Registrar Extração</div>
       <div class="row-2">
         <div class="form-group"><label>Data</label><input type="date" id="el-data"></div>
         <div class="form-group"><label>Local de armazenamento</label>
@@ -1369,9 +1354,23 @@ html.bf-tema-claro [style*="color: var(--white)"] { color: var(--white) !importa
       </div>
       <!-- Hint dinâmico de validade -->
       <div id="el-validade-hint" style="background:rgba(0,180,255,0.08);border-left:3px solid rgba(0,180,255,0.5);padding:8px 12px;border-radius:6px;font-size:0.7rem;color:var(--text-dim);line-height:1.4;margin-bottom:12px"></div>
-      <button class="btn btn-primary btn-full" onclick="salvarEstoqueLeite()">❄️ Registrar Ordenha</button>
+      <button class="btn btn-primary btn-full" onclick="salvarEstoqueLeite()">❄️ Registrar Extração</button>
     </div>
 
+    <!-- 2. Quadro explicativo de armazenamento (AGORA NO MEIO) -->
+    <div class="card" style="background:linear-gradient(135deg,rgba(0,180,255,0.14),rgba(120,220,255,0.08));border:1px solid rgba(0,180,255,0.35);margin-top:12px;margin-bottom:12px">
+      <div class="section-title" style="display:flex;align-items:center;gap:8px">
+        <span>🏦 Banco de Leite Pessoal</span>
+        <span style="font-family:'Orbitron',monospace;font-size:0.52rem;color:var(--blue-neon);background:rgba(0,180,255,0.14);padding:2px 7px;border-radius:8px;letter-spacing:0.08em;font-weight:600">SBP · rBLH · MS</span>
+      </div>
+      <div style="font-size:0.72rem;color:var(--text-dim);line-height:1.55">
+        Monitore a <strong style="color:var(--white)">validade</strong> de cada frasco e receba orientações de armazenamento conforme <strong style="color:var(--blue-neon)">Sociedade Brasileira de Pediatria</strong>, <strong style="color:var(--blue-neon)">Rede Brasileira de Bancos de Leite Humano (rBLH/FIOCRUZ)</strong> e <strong style="color:var(--blue-neon)">Ministério da Saúde</strong>.
+      </div>
+      <button onclick="_estLeiteAbrirGuia()" style="margin-top:10px;padding:8px 14px;background:rgba(0,180,255,0.1);border:1px solid rgba(0,180,255,0.4);border-radius:20px;color:var(--blue-neon);font-family:'Orbitron',monospace;font-size:0.62rem;letter-spacing:0.06em;cursor:pointer;font-weight:600">📚 Ver guia completo de armazenamento</button>
+    </div>
+
+    <!-- 3. Resumo e lista dos registros (AGORA POR ÚLTIMO) -->
+    <div id="est-leite-resumo" style="margin-bottom:12px"></div>
     <!-- Filtros -->
     <div class="filter-bar" style="margin-top:12px">
       <button class="filter-btn active" id="elf-todos" onclick="_estLeiteFiltrar('todos', this)">❄️ Todos</button>
@@ -2589,6 +2588,224 @@ html.bf-tema-claro [style*="color: var(--white)"] { color: var(--white) !importa
 
 const IS_CAPACITOR=window.Capacitor!==undefined;
 
+// ═══════════════════════════════════════════════════════════════
+// BF_AUTH — Helper centralizado de URLs de retorno do Firebase Auth
+// ═══════════════════════════════════════════════════════════════
+// Normaliza a URL de retorno dos magic links para SEMPRE apontar para
+// o domínio canônico (app.babyforce.com.br), independente de onde o
+// usuário está acessando. Isso resolve bugs comuns:
+// 1. Usuário abre via babyforce-app.web.app → link volta lá (OK, está nos authorized)
+// 2. Usuário abre via file:// (preview local) → link DEVE voltar pro prod, não pra file://
+// 3. Usuário está em outro subdomínio → normaliza pro canônico
+const BF_AUTH = {
+  // Domínio canônico em produção
+  CANONICAL_HOST: 'app.babyforce.com.br',
+
+  // Domínios ACEITÁVEIS como origem (não precisam ser normalizados)
+  ACCEPTED_HOSTS: [
+    'app.babyforce.com.br',
+    'www.babyforce.com.br',
+    'babyforce.com.br',
+    'padawan-arthur.web.app',
+    'padawan-arthur.firebaseapp.com',
+    'babyforce-app.web.app',
+    'localhost',
+    '127.0.0.1'
+  ],
+
+  /**
+   * Retorna a URL base (origin + pathname) para usar em actionCodeSettings.url.
+   * Se o usuário estiver em file:// ou em um host não aceitável, força CANONICAL_HOST.
+   * Caso contrário, usa window.location (comportamento original preservado).
+   */
+  getReturnBaseUrl() {
+    try {
+      const origin = window.location.origin;
+      const pathname = window.location.pathname || '/';
+      const host = window.location.hostname;
+
+      // Caso 1: file:// protocol ou host vazio — força canônico
+      if (!origin || origin === 'null' || origin.startsWith('file://')) {
+        return 'https://' + this.CANONICAL_HOST + '/';
+      }
+
+      // Caso 2: host não está na whitelist — força canônico
+      if (host && !this.ACCEPTED_HOSTS.includes(host)) {
+        console.warn('[BF_AUTH] Host não reconhecido:', host, '— forçando canônico');
+        return 'https://' + this.CANONICAL_HOST + '/';
+      }
+
+      // Caso 3 (padrão): usa o próprio origin + pathname
+      return origin + pathname;
+    } catch (e) {
+      console.error('[BF_AUTH] getReturnBaseUrl falhou:', e);
+      return 'https://' + this.CANONICAL_HOST + '/';
+    }
+  },
+
+  /**
+   * Monta actionCodeSettings prontos para sendSignInLinkToEmail.
+   * @param {string} queryString — ex: '?recoverPassword=1' ou '?verifyOnboarding=1'
+   * @returns {object} actionCodeSettings
+   */
+  buildActionCodeSettings(queryString) {
+    const base = this.getReturnBaseUrl();
+    // Garante que queryString começa com '?' se não vazio
+    const qs = queryString ? (queryString.startsWith('?') ? queryString : '?' + queryString) : '';
+    return {
+      url: base + qs,
+      handleCodeInApp: true
+    };
+  },
+
+  /**
+   * Wrapper de sendSignInLinkToEmail com logging + diagnóstico detalhado.
+   * Sempre use esta função no lugar de firebase.auth().sendSignInLinkToEmail direto
+   * (para fluxos CRÍTICOS — convite, recuperação, onboarding).
+   */
+  async sendSignInLink(email, queryString, contexto) {
+    const ctx = contexto || 'login';
+    if (!email || !email.includes('@')) {
+      const err = new Error('Email inválido');
+      err.code = 'bf/invalid-email';
+      throw err;
+    }
+    if (typeof firebase === 'undefined' || !firebase.auth) {
+      const err = new Error('Firebase não disponível');
+      err.code = 'bf/firebase-unavailable';
+      throw err;
+    }
+
+    const settings = this.buildActionCodeSettings(queryString);
+    const diagEntry = {
+      ts: new Date().toISOString(),
+      contexto: ctx,
+      email: email.substring(0, 3) + '***' + email.substring(email.indexOf('@')),
+      returnUrl: settings.url,
+      host: window.location.hostname,
+      origin: window.location.origin
+    };
+
+    try {
+      await firebase.auth().sendSignInLinkToEmail(email, settings);
+      diagEntry.status = 'success';
+      this._pushDiag(diagEntry);
+      return true;
+    } catch (e) {
+      diagEntry.status = 'error';
+      diagEntry.errorCode = e.code || 'unknown';
+      diagEntry.errorMessage = e.message || '';
+      this._pushDiag(diagEntry);
+      console.error('[BF_AUTH] sendSignInLink falhou:', {
+        contexto: ctx,
+        returnUrl: settings.url,
+        code: e.code,
+        message: e.message
+      });
+      throw e;
+    }
+  },
+
+  /**
+   * Armazena histórico de tentativas (últimas 20) para diagnóstico.
+   */
+  _pushDiag(entry) {
+    try {
+      const key = 'babyforce_auth_diag_v1';
+      const arr = JSON.parse(localStorage.getItem(key) || '[]');
+      arr.push(entry);
+      while (arr.length > 20) arr.shift();
+      localStorage.setItem(key, JSON.stringify(arr));
+    } catch {}
+  }
+};
+window.BF_AUTH = BF_AUTH;
+
+// ═══════════════════════════════════════════════════════════════
+// BF_LOGIN_DEBUG — Diagnóstico rápido via console
+// ═══════════════════════════════════════════════════════════════
+// Uso no console do navegador:
+//   BF_LOGIN_DEBUG.check()          → resumo do estado atual
+//   BF_LOGIN_DEBUG.history()        → últimas 20 tentativas
+//   BF_LOGIN_DEBUG.testLink(email)  → envia link de teste
+//   BF_LOGIN_DEBUG.clear()          → limpa histórico
+const BF_LOGIN_DEBUG = {
+  check() {
+    console.group('%c🔍 BabyForce · Diagnóstico de Login', 'font-weight:bold;color:#4a9eff');
+    console.log('Host atual:', window.location.hostname);
+    console.log('Origin:', window.location.origin);
+    console.log('Pathname:', window.location.pathname);
+    console.log('URL canônica:', 'https://' + BF_AUTH.CANONICAL_HOST);
+    console.log('Host está na whitelist?', BF_AUTH.ACCEPTED_HOSTS.includes(window.location.hostname) ? '✅' : '❌');
+    console.log('URL que será usada em actionCodeSettings:', BF_AUTH.getReturnBaseUrl());
+
+    // Firebase status
+    const fbOk = typeof firebase !== 'undefined' && firebase.auth;
+    console.log('Firebase carregado?', fbOk ? '✅' : '❌');
+    if (fbOk) {
+      try {
+        const opts = firebase.app().options;
+        console.log('authDomain configurado:', opts.authDomain);
+        console.log('projectId:', opts.projectId);
+      } catch (e) { console.warn('Erro lendo opts:', e); }
+    }
+
+    // Navigator
+    console.log('navigator.onLine:', navigator.onLine);
+
+    // Email link detect
+    try {
+      const isLink = fbOk && firebase.auth().isSignInWithEmailLink
+        ? firebase.auth().isSignInWithEmailLink(window.location.href)
+        : false;
+      console.log('URL atual é magic link?', isLink);
+    } catch (e) { console.warn('Erro detect link:', e); }
+
+    console.groupEnd();
+
+    console.log('\n%cAções:', 'font-weight:bold');
+    console.log('  BF_LOGIN_DEBUG.history()        — ver últimas tentativas');
+    console.log('  BF_LOGIN_DEBUG.testLink("seu@email.com") — enviar link de teste');
+    console.log('  BF_LOGIN_DEBUG.clear()          — limpar histórico\n');
+  },
+
+  history() {
+    try {
+      const arr = JSON.parse(localStorage.getItem('babyforce_auth_diag_v1') || '[]');
+      console.group('%c📋 Últimas ' + arr.length + ' tentativas', 'font-weight:bold;color:#b968ff');
+      if (arr.length === 0) {
+        console.log('(vazio — ainda não houve tentativas registradas)');
+      } else {
+        arr.forEach((e, i) => {
+          const icon = e.status === 'success' ? '✅' : '❌';
+          console.log(`${icon} [${i+1}] ${e.contexto} @ ${e.ts}`, e);
+        });
+      }
+      console.groupEnd();
+      return arr;
+    } catch (e) {
+      console.error('Erro lendo histórico:', e);
+    }
+  },
+
+  async testLink(email) {
+    if (!email) { console.error('Uso: BF_LOGIN_DEBUG.testLink("seu@email.com")'); return; }
+    console.log('Enviando link de teste para', email, '...');
+    try {
+      await BF_AUTH.sendSignInLink(email, '?diagTest=1', 'diagnostico');
+      console.log('%c✅ Link enviado com sucesso! Confira sua caixa de entrada.', 'color:#78ff99;font-weight:bold');
+    } catch (e) {
+      console.error('%c❌ Falhou:', 'color:#ff8080;font-weight:bold', e.code, '-', e.message);
+      console.log('Veja BF_LOGIN_DEBUG.history() para detalhes.');
+    }
+  },
+
+  clear() {
+    try { localStorage.removeItem('babyforce_auth_diag_v1'); console.log('✅ Histórico limpo'); } catch {}
+  }
+};
+window.BF_LOGIN_DEBUG = BF_LOGIN_DEBUG;
+
 // ── PWA ──
 if(!IS_CAPACITOR){
   function gerarIconePNG(size){
@@ -3127,11 +3344,8 @@ window._enviarMagicLinkRecuperarSenha = async function(guardiaoId) {
       throw new Error('Firebase indisponível — use recuperação offline');
     }
     if (typeof initFirebaseRefs === 'function') initFirebaseRefs();
-    const actionCodeSettings = {
-      url: window.location.origin + window.location.pathname + '?recoverPassword=1',
-      handleCodeInApp: true,
-    };
-    await firebase.auth().sendSignInLinkToEmail(g.email, actionCodeSettings);
+    const actionCodeSettings = BF_AUTH.buildActionCodeSettings('?recoverPassword=1');
+    await BF_AUTH.sendSignInLink(g.email, '?recoverPassword=1', 'recuperar_senha');
     if (typeof BFRateLimit !== 'undefined' && BFRateLimit.registrarFalha) BFRateLimit.registrarFalha('recuperar_senha_' + guardiaoId);
     if (typeof BFAudit !== 'undefined') BFAudit.log('recuperar_senha_link_enviado', { id: guardiaoId });
     if (statusEl) statusEl.innerHTML = '<span style="color:#78ff99">✓ Link enviado! Confira seu e-mail.</span>';
@@ -3846,11 +4060,8 @@ window._mcEnviarReverificacao = async function() {
       return;
     }
     if (typeof initFirebaseRefs === 'function') initFirebaseRefs();
-    const actionCodeSettings = {
-      url: window.location.origin + window.location.pathname + '?reverifyEmail=1',
-      handleCodeInApp: true,
-    };
-    await firebase.auth().sendSignInLinkToEmail(g.email, actionCodeSettings);
+    const actionCodeSettings = BF_AUTH.buildActionCodeSettings('?reverifyEmail=1');
+    await BF_AUTH.sendSignInLink(g.email, '?reverifyEmail=1', 'reverify_email');
 
     try { localStorage.setItem('babyforce_reverify_email_v1', JSON.stringify({
       guardiaoId: usuarioAtual,
@@ -4630,11 +4841,8 @@ window._confirmarConvite = async function() {
     const acceptParam = payload
       ? '?acceptInviteData=' + payload
       : '?acceptInvite=' + encodeURIComponent(token);  // fallback legacy (não deveria cair aqui)
-    const actionCodeSettings = {
-      url: window.location.origin + window.location.pathname + acceptParam,
-      handleCodeInApp: true,
-    };
-    await firebase.auth().sendSignInLinkToEmail(email, actionCodeSettings);
+    const actionCodeSettings = BF_AUTH.buildActionCodeSettings(acceptParam);
+    await BF_AUTH.sendSignInLink(email, acceptParam, 'convite_principal');
     envioOk = true;
     if (typeof BFRateLimit !== 'undefined' && BFRateLimit.registrarFalha) BFRateLimit.registrarFalha('convite');
     if (typeof BFAudit !== 'undefined') BFAudit.log('convite_enviado', { token: token.substring(0, 6), email: email.substring(0, 3) + '***', comoAdmin });
@@ -5502,11 +5710,8 @@ window._reenviarConvite = async function(token) {
     const acceptParam = payload
       ? '?acceptInviteData=' + payload
       : '?acceptInvite=' + encodeURIComponent(token);
-    const actionCodeSettings = {
-      url: window.location.origin + window.location.pathname + acceptParam,
-      handleCodeInApp: true,
-    };
-    await firebase.auth().sendSignInLinkToEmail(c.email, actionCodeSettings);
+    const actionCodeSettings = BF_AUTH.buildActionCodeSettings(acceptParam);
+    await BF_AUTH.sendSignInLink(c.email, acceptParam, 'convite_reenvio');
     _saveConvitesPendentes(convites);
     if (typeof BFAudit !== 'undefined') BFAudit.log('convite_reenviado', { token: token.substring(0, 6) });
     if (typeof showToast === 'function') showToast(`🔄 Convite reenviado para ${c.email}`);
@@ -6895,10 +7100,7 @@ const FirebaseAuthDiag = {
     try {
       const auth = firebase.auth();
       const emailTeste = 'diag_' + Date.now() + '@exemplo-diagnostico.invalid';
-      const actionCodeSettings = {
-        url: window.location.origin + '/?diag=1',
-        handleCodeInApp: true,
-      };
+      const actionCodeSettings = BF_AUTH.buildActionCodeSettings('?diag=1');
 
       try {
         await auth.sendSignInLinkToEmail(emailTeste, actionCodeSettings);
@@ -8730,11 +8932,9 @@ async function _enviarValidacaoEmailCadastro(guardiaoId, email) {
     }
     if (typeof initFirebaseRefs === 'function') initFirebaseRefs();
 
-    const actionCodeSettings = {
-      url: window.location.origin + window.location.pathname + '?validateEmail=' + encodeURIComponent(guardiaoId),
-      handleCodeInApp: true,
-    };
-    await firebase.auth().sendSignInLinkToEmail(email, actionCodeSettings);
+    const validateParam = '?validateEmail=' + encodeURIComponent(guardiaoId);
+    const actionCodeSettings = BF_AUTH.buildActionCodeSettings(validateParam);
+    await BF_AUTH.sendSignInLink(email, validateParam, 'validar_email_guardiao');
     try { localStorage.setItem('babyforce_email_validation_pending_v1', JSON.stringify({ guardiaoId, email })); } catch {}
     _mostrarTelaAguardandoValidacao(email, guardiaoId);
     if (typeof BFAudit !== 'undefined') BFAudit.log('email_validacao_enviada', { guardiaoId });
@@ -12279,11 +12479,8 @@ async function obEnviarCodigoVerificacao() {
 
     if (typeof initFirebaseRefs === 'function') initFirebaseRefs();
 
-    const actionCodeSettings = {
-      url: window.location.origin + window.location.pathname + '?verifyOnboarding=1',
-      handleCodeInApp: true,
-    };
-    await firebase.auth().sendSignInLinkToEmail(email, actionCodeSettings);
+    const actionCodeSettings = BF_AUTH.buildActionCodeSettings('?verifyOnboarding=1');
+    await BF_AUTH.sendSignInLink(email, '?verifyOnboarding=1', 'onboarding_primeiro_envio');
     if (typeof BFAudit !== 'undefined') BFAudit.log('ob_magic_link_enviado', { email: email.substring(0, 3) + '***' });
 
     if (statusEl) {
@@ -12463,11 +12660,8 @@ async function obReenviarCodigo() {
   try {
     if (typeof firebase === 'undefined' || !firebase.auth) throw new Error('Firebase não disponível');
     if (typeof initFirebaseRefs === 'function') initFirebaseRefs();
-    const actionCodeSettings = {
-      url: window.location.origin + window.location.pathname + '?verifyOnboarding=1',
-      handleCodeInApp: true,
-    };
-    await firebase.auth().sendSignInLinkToEmail(_obAdminDados.email, actionCodeSettings);
+    const actionCodeSettings = BF_AUTH.buildActionCodeSettings('?verifyOnboarding=1');
+    await BF_AUTH.sendSignInLink(_obAdminDados.email, '?verifyOnboarding=1', 'onboarding_reenvio');
     _obReenviarTimestamp = agora;
     if (typeof BFAudit !== 'undefined') BFAudit.log('ob_magic_link_reenviado');
 
@@ -22314,7 +22508,7 @@ function salvarEstoqueLeite() {
   document.getElementById('el-volume').value = '';
   document.getElementById('el-obs').value = '';
 
-  if (typeof showToast === 'function') showToast('❄️ Ordenha registrada!');
+  if (typeof showToast === 'function') showToast('❄️ Extração registrada!');
   renderEstoqueLeite();
 }
 
@@ -22374,7 +22568,7 @@ function renderEstoqueLeite() {
   }
 
   if (!lista.length) {
-    el.innerHTML = '<div class="empty"><div class="empty-icon">❄️</div><p>Nenhuma ordenha registrada</p><div style="font-size:0.7rem;color:var(--text-dim);margin-top:8px;line-height:1.5">Registre sua primeira ordenha acima para começar a acompanhar o estoque.</div></div>';
+    el.innerHTML = '<div class="empty"><div class="empty-icon">❄️</div><p>Nenhuma extração registrada</p><div style="font-size:0.7rem;color:var(--text-dim);margin-top:8px;line-height:1.5">Registre sua primeira extração acima para começar a acompanhar o estoque.</div></div>';
     return;
   }
 
@@ -22440,7 +22634,7 @@ function deleteEstoqueLeite(id) {
   const lista = _estLeiteLoad().filter(r => r.id !== id);
   _estLeiteSave(lista);
   renderEstoqueLeite();
-  if (typeof showToast === 'function') showToast('🗑 Ordenha removida');
+  if (typeof showToast === 'function') showToast('🗑 Extração removida');
 }
 
 // Guia completo de armazenamento
@@ -22463,7 +22657,7 @@ function _estLeiteAbrirGuia() {
 
       <!-- Passo 1: Higiene -->
       <div style="background:rgba(120,255,153,0.08);border:1px solid rgba(120,255,153,0.3);border-radius:10px;padding:12px 14px;margin-bottom:10px">
-        <div style="font-family:'Orbitron',monospace;font-size:0.66rem;color:#78ff99;letter-spacing:0.06em;margin-bottom:6px;font-weight:700">1. HIGIENE ANTES DA ORDENHA</div>
+        <div style="font-family:'Orbitron',monospace;font-size:0.66rem;color:#78ff99;letter-spacing:0.06em;margin-bottom:6px;font-weight:700">1. HIGIENE ANTES DA EXTRAÇÃO</div>
         <ul style="font-size:0.72rem;color:var(--white);line-height:1.6;padding-left:18px;margin:0">
           <li>Lavar mãos e antebraços até o cotovelo com água e sabão</li>
           <li>Prender cabelos; usar máscara ou pano cobrindo boca/nariz</li>
@@ -22480,7 +22674,7 @@ function _estLeiteAbrirGuia() {
           <li>Sem borracha na tampa</li>
           <li>Ferver o recipiente por <strong>15 minutos</strong> antes do uso, depois escorrer de boca para baixo sobre pano limpo</li>
           <li>Completar até ¾ da capacidade (leite expande ao congelar)</li>
-          <li>Rotular com <strong>nome, data e hora</strong> da ordenha</li>
+          <li>Rotular com <strong>nome, data e hora</strong> da extração</li>
         </ul>
       </div>
 
@@ -24108,11 +24302,8 @@ window._enviarMagicLinkRecuperacao = async function() {
     // Garante que o firebase foi inicializado
     if (typeof initFirebaseRefs === 'function') initFirebaseRefs();
 
-    const actionCodeSettings = {
-      url: window.location.origin + window.location.pathname + '?recoverPin=1',
-      handleCodeInApp: true,
-    };
-    await firebase.auth().sendSignInLinkToEmail(email, actionCodeSettings);
+    const actionCodeSettings = BF_AUTH.buildActionCodeSettings('?recoverPin=1');
+    await BF_AUTH.sendSignInLink(email, '?recoverPin=1', 'recover_pin');
     // Salva email pendente para verificação quando usuário clica no link
     try { localStorage.setItem(MAGIC_LINK_PENDING_KEY, email); } catch {}
     if (typeof BFRateLimit !== 'undefined' && BFRateLimit.registrarFalha) BFRateLimit.registrarFalha('magic_link');
