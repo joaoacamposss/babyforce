@@ -62,43 +62,60 @@ body{background:#020b18;margin:0;}
 
 /* ═══════════════════════════════════════════════════════════════
    BFAuth2 — estilos do módulo isolado de autenticação
+   IMPORTANTE: TODAS as regras escopadas em #tela-auth-v2 ou
+   .bfauth2-active para NÃO vazar pro app legado.
    ═══════════════════════════════════════════════════════════════ */
 
-  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-  :root {
-    --bg-deep:#050814; --bg-dark:#0a1626; --bg-mid:#0a2a4a;
-    --blue:#4a9eff; --blue-bright:#7ad3ff; --blue-neon:#00d4ff;
-    --purple:#b968ff; --pink:#ff6ec7;
-    --gold:#ffe066; --gold-warm:#ffe89a; --gold-dim:#c9a227;
-    --green:#78ff99;
-    --red:#ff6b6b; --orange:#ffb464;
-    --text:#e8f4fd; --text-dim:#a8b5d1; --text-muted:#7ab3d4;
+  /* Variáveis CSS isoladas no escopo do auth-v2 (não polui :root global) */
+  #tela-auth-v2 {
+    --bfa-bg-deep:#050814; --bfa-bg-dark:#0a1626; --bfa-bg-mid:#0a2a4a;
+    --bfa-blue:#4a9eff; --bfa-blue-bright:#7ad3ff; --bfa-blue-neon:#00d4ff;
+    --bfa-purple:#b968ff; --bfa-pink:#ff6ec7;
+    --bfa-gold:#ffe066; --bfa-gold-warm:#ffe89a; --bfa-gold-dim:#c9a227;
+    --bfa-green:#78ff99;
+    --bfa-red:#ff6b6b; --bfa-orange:#ffb464;
+    --bfa-text:#e8f4fd; --bfa-text-dim:#a8b5d1; --bfa-text-muted:#7ab3d4;
   }
-  html, body { height:100%; }
-  body {
+
+  /* Reset escopado: só dentro do auth-v2 */
+  #tela-auth-v2,
+  #tela-auth-v2 * {
+    margin:0; padding:0; box-sizing:border-box;
+    -webkit-tap-highlight-color:transparent;
+  }
+
+  /* Quando a tela auth-v2 está ativa, esconde TUDO do app legado */
+  body.bfauth2-active > *:not(#tela-auth-v2):not(#bf-toast):not(#bf-debug-toggle):not(#bf-debug-panel):not(script):not(style):not(link):not(noscript) {
+    display:none !important;
+  }
+
+  /* ─── Tela principal ─── */
+  #tela-auth-v2 {
+    position:fixed;  /* fixed em vez de relative — garante isolamento */
+    inset:0;
+    z-index:99000;   /* acima do app legado */
+    background:var(--bfa-bg-deep);
+    color:var(--bfa-text);
     font-family:'Outfit', sans-serif;
-    background:var(--bg-deep);
-    color:var(--text);
     line-height:1.5;
+    overflow-y:auto;
     overflow-x:hidden;
+    display:flex; flex-direction:column;
+    align-items:center; justify-content:flex-start;
+    padding:24px 16px; gap:24px;
+    -webkit-overflow-scrolling:touch;
   }
-  body::before {
+  #tela-auth-v2::before {
     content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
     background:
       radial-gradient(ellipse 80% 60% at 20% 20%, rgba(74,158,255,0.13), transparent 55%),
       radial-gradient(ellipse 70% 50% at 80% 40%, rgba(185,104,255,0.10), transparent 55%),
       radial-gradient(ellipse 90% 60% at 50% 100%, rgba(255,110,199,0.08), transparent 60%);
   }
+  #tela-auth-v2 > * { position:relative; z-index:1; }
 
-  /* ─── Tela principal ─── */
-  #tela-auth-v2 {
-    position:relative; z-index:1;
-    min-height:100vh;
-    display:flex; flex-direction:column;
-    align-items:center; justify-content:center;
-    padding:24px 16px; gap:24px;
-  }
-  .bf-auth-card {
+  /* Wrappers internos só com prefixo */
+  #tela-auth-v2 .bf-auth-card {
     width:100%; max-width:420px;
     background:linear-gradient(135deg, rgba(10,42,74,0.7), rgba(3,15,31,0.8));
     border:1px solid rgba(74,158,255,0.25);
@@ -107,8 +124,8 @@ body{background:#020b18;margin:0;}
     -webkit-backdrop-filter:blur(16px);
     box-shadow:0 20px 60px rgba(0,0,0,0.5), 0 0 60px rgba(74,158,255,0.08);
   }
-  .bf-auth-header { text-align:center; margin-bottom:24px; }
-  .bf-auth-logo {
+  #tela-auth-v2 .bf-auth-header { text-align:center; margin-bottom:24px; }
+  #tela-auth-v2 .bf-auth-logo {
     width:72px; height:72px; margin:0 auto 14px;
     border-radius:20px;
     background:radial-gradient(circle at 50% 40%, #1c2a6e 0%, #040724 80%);
@@ -117,119 +134,119 @@ body{background:#020b18;margin:0;}
     box-shadow:0 0 30px rgba(74,158,255,0.3);
     filter:drop-shadow(0 0 12px rgba(255,232,154,0.25));
   }
-  .bf-auth-brand {
+  #tela-auth-v2 .bf-auth-brand {
     font-family:'Orbitron', monospace;
     font-size:1.6rem; font-weight:900;
     letter-spacing:0.05em;
   }
-  .bf-auth-brand .b { color:var(--blue-bright); }
-  .bf-auth-brand .p { color:var(--purple); }
-  .bf-auth-tagline {
+  #tela-auth-v2 .bf-auth-brand .b { color:var(--bfa-blue-bright); }
+  #tela-auth-v2 .bf-auth-brand .p { color:var(--bfa-purple); }
+  #tela-auth-v2 .bf-auth-tagline {
     font-family:'Cormorant Garamond', serif;
     font-size:1.05rem; font-style:italic;
-    color:var(--text-muted); margin-top:4px;
+    color:var(--bfa-text-muted); margin-top:4px;
   }
-  .bf-auth-step-title {
+  #tela-auth-v2 .bf-auth-step-title {
     font-family:'Orbitron', monospace;
     font-size:0.78rem; letter-spacing:0.18em;
-    color:var(--blue-bright);
+    color:var(--bfa-blue-bright);
     text-align:center; margin-bottom:6px;
     font-weight:700;
   }
-  .bf-auth-step-sub {
-    font-size:0.82rem; color:var(--text-dim);
+  #tela-auth-v2 .bf-auth-step-sub {
+    font-size:0.82rem; color:var(--bfa-text-dim);
     text-align:center; margin-bottom:20px;
     line-height:1.55;
   }
-  .bf-auth-progress {
+  #tela-auth-v2 .bf-auth-progress {
     display:flex; justify-content:center; gap:6px; margin:16px 0 22px;
   }
-  .bf-auth-dot {
+  #tela-auth-v2 .bf-auth-dot {
     width:8px; height:8px; border-radius:50%;
     background:rgba(74,158,255,0.2); transition:all 0.25s;
   }
-  .bf-auth-dot.active { background:var(--gold); box-shadow:0 0 10px rgba(255,224,102,0.5); transform:scale(1.2); }
-  .bf-auth-dot.done { background:var(--blue-neon); }
+  #tela-auth-v2 .bf-auth-dot.active { background:var(--bfa-gold); box-shadow:0 0 10px rgba(255,224,102,0.5); transform:scale(1.2); }
+  #tela-auth-v2 .bf-auth-dot.done { background:var(--bfa-blue-neon); }
 
   /* ─── Campos ─── */
-  .bf-field { margin-bottom:14px; }
-  .bf-label {
+  #tela-auth-v2 .bf-field { margin-bottom:14px; }
+  #tela-auth-v2 .bf-label {
     display:block; font-family:'Orbitron', monospace;
     font-size:0.62rem; letter-spacing:0.1em;
-    color:var(--text-muted); margin-bottom:6px;
+    color:var(--bfa-text-muted); margin-bottom:6px;
     text-transform:uppercase;
   }
-  .bf-input, .bf-select {
+  #tela-auth-v2 .bf-input, .bf-select {
     width:100%; padding:13px 14px;
     background:rgba(0,30,60,0.45);
     border:1px solid rgba(74,158,255,0.25);
     border-radius:10px;
-    color:var(--text); font-size:0.95rem;
+    color:var(--bfa-text); font-size:0.95rem;
     font-family:'Exo 2', sans-serif;
     transition:border-color 0.2s, box-shadow 0.2s;
   }
-  .bf-input:focus, .bf-select:focus {
+  #tela-auth-v2 .bf-input:focus, .bf-select:focus {
     outline:none;
-    border-color:var(--blue-bright);
+    border-color:var(--bfa-blue-bright);
     box-shadow:0 0 0 3px rgba(122,211,255,0.15);
   }
-  .bf-hint {
-    font-size:0.68rem; color:var(--text-muted);
+  #tela-auth-v2 .bf-hint {
+    font-size:0.68rem; color:var(--bfa-text-muted);
     margin-top:4px; line-height:1.5;
     font-style:italic; opacity:0.85;
   }
-  .bf-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  #tela-auth-v2 .bf-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
   @media (max-width:380px) { .bf-row { grid-template-columns:1fr; } }
 
   /* ─── Gender chips ─── */
-  .bf-chips { display:flex; gap:8px; flex-wrap:wrap; }
-  .bf-chip {
+  #tela-auth-v2 .bf-chips { display:flex; gap:8px; flex-wrap:wrap; }
+  #tela-auth-v2 .bf-chip {
     flex:1; min-width:80px;
     padding:10px 12px; border-radius:10px;
     background:rgba(0,30,60,0.4);
     border:1px solid rgba(74,158,255,0.2);
-    color:var(--text-dim);
+    color:var(--bfa-text-dim);
     font-family:'Orbitron', monospace; font-size:0.68rem;
     letter-spacing:0.06em; cursor:pointer;
     transition:all 0.2s; text-align:center;
   }
-  .bf-chip:hover { border-color:rgba(74,158,255,0.5); color:var(--text); }
-  .bf-chip.active { background:rgba(122,211,255,0.15); border-color:var(--blue-bright); color:var(--blue-bright); }
+  #tela-auth-v2 .bf-chip:hover { border-color:rgba(74,158,255,0.5); color:var(--bfa-text); }
+  #tela-auth-v2 .bf-chip.active { background:rgba(122,211,255,0.15); border-color:var(--bfa-blue-bright); color:var(--bfa-blue-bright); }
 
   /* ─── PIN dots ─── */
-  .bf-pin-dots {
+  #tela-auth-v2 .bf-pin-dots {
     display:flex; justify-content:center; gap:12px;
     margin:20px 0;
     min-height:56px; align-items:center;
     cursor:pointer;
   }
-  .bf-pin-dot {
+  #tela-auth-v2 .bf-pin-dot {
     width:44px; height:44px; border-radius:50%;
     background:rgba(0,30,60,0.5);
     border:2px solid rgba(74,158,255,0.3);
     display:flex; align-items:center; justify-content:center;
     font-family:'Orbitron',monospace; font-size:1.2rem;
-    color:var(--text-dim);
+    color:var(--bfa-text-dim);
     transition:all 0.15s;
   }
-  .bf-pin-dot.filled { background:rgba(255,224,102,0.15); border-color:var(--gold); color:var(--gold); }
-  .bf-pin-hint { font-size:0.66rem; color:var(--text-muted); text-align:center; font-style:italic; margin-top:-8px; margin-bottom:8px; }
+  #tela-auth-v2 .bf-pin-dot.filled { background:rgba(255,224,102,0.15); border-color:var(--bfa-gold); color:var(--bfa-gold); }
+  #tela-auth-v2 .bf-pin-hint { font-size:0.66rem; color:var(--bfa-text-muted); text-align:center; font-style:italic; margin-top:-8px; margin-bottom:8px; }
   #bf-pin-input { position:absolute; opacity:0; width:1px; height:1px; pointer-events:none; left:-9999px; }
 
   /* ─── Emoji grid ─── */
-  .bf-emoji-grid { display:grid; grid-template-columns:repeat(6, 1fr); gap:8px; margin:16px 0; }
-  .bf-emoji-btn {
+  #tela-auth-v2 .bf-emoji-grid { display:grid; grid-template-columns:repeat(6, 1fr); gap:8px; margin:16px 0; }
+  #tela-auth-v2 .bf-emoji-btn {
     aspect-ratio:1; border-radius:10px;
     background:rgba(0,30,60,0.4);
     border:1px solid rgba(74,158,255,0.2);
     font-size:1.5rem; cursor:pointer;
     transition:all 0.2s;
   }
-  .bf-emoji-btn:hover { border-color:rgba(74,158,255,0.5); transform:scale(1.05); }
-  .bf-emoji-btn.active { background:rgba(255,224,102,0.2); border-color:var(--gold); box-shadow:0 0 15px rgba(255,224,102,0.3); }
+  #tela-auth-v2 .bf-emoji-btn:hover { border-color:rgba(74,158,255,0.5); transform:scale(1.05); }
+  #tela-auth-v2 .bf-emoji-btn.active { background:rgba(255,224,102,0.2); border-color:var(--bfa-gold); box-shadow:0 0 15px rgba(255,224,102,0.3); }
 
   /* ─── Botões ─── */
-  .bf-btn {
+  #tela-auth-v2 .bf-btn {
     width:100%; padding:14px;
     border:none; border-radius:12px;
     font-family:'Orbitron', monospace;
@@ -239,58 +256,58 @@ body{background:#020b18;margin:0;}
     margin-bottom:10px;
     display:flex; align-items:center; justify-content:center; gap:8px;
   }
-  .bf-btn:disabled { opacity:0.5; cursor:wait; }
+  #tela-auth-v2 .bf-btn:disabled { opacity:0.5; cursor:wait; }
   .bf-btn-primary {
-    background:linear-gradient(135deg, #0056b3, var(--blue-neon));
+    background:linear-gradient(135deg, #0056b3, var(--bfa-blue-neon));
     color:#fff;
     box-shadow:0 0 20px rgba(0,180,255,0.3);
   }
   .bf-btn-primary:hover:not(:disabled) { box-shadow:0 0 30px rgba(0,180,255,0.5); transform:translateY(-1px); }
   .bf-btn-gold {
-    background:linear-gradient(135deg, var(--gold-dim), var(--gold));
+    background:linear-gradient(135deg, var(--bfa-gold-dim), var(--bfa-gold));
     color:#031027;
     box-shadow:0 0 20px rgba(255,224,102,0.28);
   }
   .bf-btn-gold:hover:not(:disabled) { filter:brightness(1.08); box-shadow:0 0 30px rgba(255,224,102,0.45); }
   .bf-btn-green {
-    background:linear-gradient(135deg, var(--green), var(--blue-neon));
+    background:linear-gradient(135deg, var(--bfa-green), var(--bfa-blue-neon));
     color:#031027;
   }
   .bf-btn-ghost {
     background:transparent;
     border:1px solid rgba(74,158,255,0.3);
-    color:var(--text-muted); font-size:0.68rem;
+    color:var(--bfa-text-muted); font-size:0.68rem;
   }
-  .bf-btn-ghost:hover { border-color:var(--blue-bright); color:var(--blue-bright); }
+  .bf-btn-ghost:hover { border-color:var(--bfa-blue-bright); color:var(--bfa-blue-bright); }
   .bf-btn-link {
-    background:none; border:none; color:var(--blue-bright);
+    background:none; border:none; color:var(--bfa-blue-bright);
     font-family:'Outfit', sans-serif;
     font-size:0.82rem; font-weight:500;
     text-decoration:underline; cursor:pointer;
     padding:6px; letter-spacing:0;
     display:inline; margin:0;
   }
-  .bf-btn-link:hover { color:var(--gold); }
-  .bf-btns-row { display:flex; gap:10px; flex-wrap:wrap; justify-content:space-between; font-size:0.78rem; margin-top:12px; }
+  .bf-btn-link:hover { color:var(--bfa-gold); }
+  #tela-auth-v2 .bf-btns-row { display:flex; gap:10px; flex-wrap:wrap; justify-content:space-between; font-size:0.78rem; margin-top:12px; }
 
   /* ─── Alerts / feedback ─── */
-  .bf-alert {
+  #tela-auth-v2 .bf-alert {
     padding:12px 14px; border-radius:10px;
     font-size:0.82rem; line-height:1.55;
     margin-bottom:14px;
   }
-  .bf-alert.error { background:rgba(255,107,107,0.1); border:1px solid rgba(255,107,107,0.3); color:#ffb4b4; }
-  .bf-alert.warn  { background:rgba(255,180,100,0.1); border:1px solid rgba(255,180,100,0.3); color:#ffd599; }
-  .bf-alert.ok    { background:rgba(120,255,153,0.1); border:1px solid rgba(120,255,153,0.3); color:#a6ffbc; }
-  .bf-alert.info  { background:rgba(74,158,255,0.1); border:1px solid rgba(74,158,255,0.3); color:var(--blue-bright); }
-  .bf-alert a { color:inherit; font-weight:600; text-decoration:underline; }
-  .bf-error-inline {
-    color:var(--red); font-size:0.78rem;
+  #tela-auth-v2 .bf-alert.error { background:rgba(255,107,107,0.1); border:1px solid rgba(255,107,107,0.3); color:#ffb4b4; }
+  #tela-auth-v2 .bf-alert.warn  { background:rgba(255,180,100,0.1); border:1px solid rgba(255,180,100,0.3); color:#ffd599; }
+  #tela-auth-v2 .bf-alert.ok    { background:rgba(120,255,153,0.1); border:1px solid rgba(120,255,153,0.3); color:#a6ffbc; }
+  #tela-auth-v2 .bf-alert.info  { background:rgba(74,158,255,0.1); border:1px solid rgba(74,158,255,0.3); color:var(--bfa-blue-bright); }
+  #tela-auth-v2 .bf-alert a { color:inherit; font-weight:600; text-decoration:underline; }
+  #tela-auth-v2 .bf-error-inline {
+    color:var(--bfa-red); font-size:0.78rem;
     min-height:20px; margin-bottom:10px; line-height:1.4;
   }
 
   /* ─── Divider ─── */
-  .bf-divider {
+  #tela-auth-v2 .bf-divider {
     height:1px; background:linear-gradient(90deg, transparent, rgba(74,158,255,0.25), transparent);
     margin:18px 0;
   }
@@ -299,7 +316,7 @@ body{background:#020b18;margin:0;}
   #bf-toast {
     position:fixed; bottom:24px; left:50%;
     transform:translateX(-50%) translateY(20px);
-    background:linear-gradient(135deg, #0056b3, var(--blue-neon));
+    background:linear-gradient(135deg, #0056b3, var(--bfa-blue-neon));
     color:#fff;
     padding:12px 22px; border-radius:24px;
     font-family:'Orbitron', monospace; font-size:0.78rem;
@@ -311,11 +328,11 @@ body{background:#020b18;margin:0;}
     max-width:calc(100vw - 32px);
   }
   #bf-toast.show { opacity:1; transform:translateX(-50%) translateY(0); pointer-events:auto; }
-  #bf-toast.ok { background:linear-gradient(135deg, var(--green), var(--blue-neon)); color:#031027; }
-  #bf-toast.error { background:linear-gradient(135deg, #c62828, var(--red)); }
+  #bf-toast.ok { background:linear-gradient(135deg, var(--bfa-green), var(--bfa-blue-neon)); color:#031027; }
+  #bf-toast.error { background:linear-gradient(135deg, #c62828, var(--bfa-red)); }
 
   /* ─── Loading spinner ─── */
-  .bf-spinner {
+  #tela-auth-v2 .bf-spinner {
     display:inline-block;
     width:14px; height:14px;
     border:2px solid rgba(255,255,255,0.3);
@@ -331,7 +348,7 @@ body{background:#020b18;margin:0;}
     padding:6px 10px; border-radius:6px;
     background:rgba(185,104,255,0.2);
     border:1px solid rgba(185,104,255,0.4);
-    color:var(--purple);
+    color:var(--bfa-purple);
     font-family:'Orbitron', monospace; font-size:0.6rem;
     cursor:pointer;
   }
@@ -343,13 +360,13 @@ body{background:#020b18;margin:0;}
     border:1px solid rgba(185,104,255,0.4);
     border-radius:12px; padding:14px;
     font-family:'Consolas', 'Menlo', monospace;
-    font-size:0.72rem; color:var(--text);
+    font-size:0.72rem; color:var(--bfa-text);
     display:none;
   }
   #bf-debug-panel.show { display:block; }
   #bf-debug-panel h4 {
     font-family:'Orbitron', monospace; font-size:0.64rem;
-    color:var(--purple); letter-spacing:0.12em;
+    color:var(--bfa-purple); letter-spacing:0.12em;
     margin:8px 0 4px; padding-top:6px; border-top:1px solid rgba(185,104,255,0.2);
   }
   #bf-debug-panel h4:first-child { border-top:none; padding-top:0; }
@@ -367,14 +384,14 @@ body{background:#020b18;margin:0;}
   }
 
   /* ─── Nav back ─── */
-  .bf-back {
+  #tela-auth-v2 .bf-back {
     position:absolute; top:16px; left:16px;
-    background:transparent; border:none; color:var(--text-muted);
+    background:transparent; border:none; color:var(--bfa-text-muted);
     font-family:'Orbitron', monospace; font-size:0.66rem;
     cursor:pointer; padding:8px;
   }
-  .bf-back:hover { color:var(--blue-bright); }
-  .bf-auth-card.has-back { position:relative; padding-top:40px; }
+  #tela-auth-v2 .bf-back:hover { color:var(--bfa-blue-bright); }
+  #tela-auth-v2 .bf-auth-card.has-back { position:relative; padding-top:40px; }
 
 </style>
 <style>
@@ -10428,11 +10445,35 @@ function iniciarApp(){
   // ═══════════════════════════════════════════════════════════════
   if (typeof BFAuth2 !== 'undefined' && BFAuth2.init) {
     removerSplash();
-    // Esconde todas as telas legadas
-    ['tela-onboarding', 'tela-login'].forEach(tid => {
+
+    // ─── Sanitização: se há baby/app config mas ZERO guardiões, limpa resíduos
+    // Cenário típico: testes anteriores, downgrade, ou reset incompleto.
+    // Isso evita que o app exiba "1 mês e 12 dias" antes do usuário criar conta.
+    try {
+      const guardioesLocais = (typeof GUARDIOES === 'object' && GUARDIOES) ? GUARDIOES : {};
+      const temGuardioes = Object.keys(guardioesLocais).length > 0;
+      if (!temGuardioes) {
+        // Sem guardiões = sem identidade = baby/app config são lixo
+        console.log('[iniciarApp] Sem guardiões — limpando configs residuais');
+        try { localStorage.removeItem('babyforce_baby_v1'); } catch (_) {}
+        try { localStorage.removeItem('babyforce_app_v1'); } catch (_) {}
+        try { localStorage.removeItem('babyforce_autologin_v1'); } catch (_) {}
+        // Reset variáveis em memória
+        try { if (typeof babyConfig !== 'undefined') babyConfig = {}; } catch(_){}
+      }
+    } catch (e) { console.warn('[iniciarApp sanitização]', e); }
+
+    // ─── Marca body como auth-active (CSS esconde resto do app via classe)
+    document.body.classList.add('bfauth2-active');
+
+    // ─── Esconde explicitamente containers principais do app legado
+    // (defesa em profundidade caso o CSS de body.bfauth2-active falhe)
+    ['tela-onboarding', 'tela-login', 'header-bebe', 'main-content',
+     'tab-bar', 'navigation', 'splash'].forEach(tid => {
       const el = document.getElementById(tid);
       if (el) el.style.display = 'none';
     });
+
     // Mostra tela nova
     const telaAuthV2 = document.getElementById('tela-auth-v2');
     if (telaAuthV2) telaAuthV2.style.display = 'flex';
@@ -10441,6 +10482,7 @@ function iniciarApp(){
     catch(e){
       console.error('[BFAuth2 init]', e);
       // Fallback crítico: volta pro fluxo legado
+      document.body.classList.remove('bfauth2-active');
       if (telaAuthV2) telaAuthV2.style.display = 'none';
       if (!isSetupDone()) {
         document.getElementById('tela-onboarding').style.display='flex';
@@ -36574,11 +36616,18 @@ window.BFAuth2 = (function() {
       toast(toastMsg, 'ok');
     }
 
-    // Esconde tela auth-v2
+    // Esconde tela auth-v2 e remove classe global que escondia o resto do app
     const tela = $('tela-auth-v2');
     if (tela) tela.style.display = 'none';
+    document.body.classList.remove('bfauth2-active');
 
-    // Esconde também telas legadas que possam estar ativas
+    // Restaura visibility de containers do app legado que iniciarApp tinha escondido
+    ['header-bebe', 'main-content', 'tab-bar', 'navigation'].forEach(tid => {
+      const el = document.getElementById(tid);
+      if (el) el.style.display = ''; // volta ao default do CSS
+    });
+
+    // Esconde explicitamente telas legadas (caso ainda apareçam)
     ['tela-onboarding', 'tela-login'].forEach(tid => {
       const el = document.getElementById(tid);
       if (el) el.style.display = 'none';
