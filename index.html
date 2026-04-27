@@ -10449,12 +10449,21 @@ function iniciarApp(){
     // ─── Sanitização: se há baby/app config mas ZERO guardiões, limpa resíduos
     // Cenário típico: testes anteriores, downgrade, ou reset incompleto.
     // Isso evita que o app exiba "1 mês e 12 dias" antes do usuário criar conta.
+    // IMPORTANTE: consulta diretamente o localStorage (fonte de verdade), NÃO a variável GUARDIOES
+    // que pode estar dessincronizada com o storage durante boot.
     try {
-      const guardioesLocais = (typeof GUARDIOES === 'object' && GUARDIOES) ? GUARDIOES : {};
-      const temGuardioes = Object.keys(guardioesLocais).length > 0;
+      let temGuardioes = false;
+      try {
+        const raw = localStorage.getItem('babyforce_guardioes_v1');
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          temGuardioes = parsed && typeof parsed === 'object' && Object.keys(parsed).length > 0;
+        }
+      } catch (_) { temGuardioes = false; }
+
       if (!temGuardioes) {
         // Sem guardiões = sem identidade = baby/app config são lixo
-        console.log('[iniciarApp] Sem guardiões — limpando configs residuais');
+        console.log('[iniciarApp] Sem guardiões no storage — limpando configs residuais');
         try { localStorage.removeItem('babyforce_baby_v1'); } catch (_) {}
         try { localStorage.removeItem('babyforce_app_v1'); } catch (_) {}
         try { localStorage.removeItem('babyforce_autologin_v1'); } catch (_) {}
@@ -35929,7 +35938,7 @@ window.BFAuth2 = (function() {
       modoTeste: false,
     },
     signin: { email:'', senha:'', guardiaoId:null },
-    forgot: { email:'' },
+    forgot: { email:'', codigoEnviado:false, otpId:null, guardiaoId:null, tentativas:0, expiraEm:0 },
     reset:  { guardiaoId:null, email:'', token:null, origem:null },
     error: '',
     loading: false,
@@ -35965,12 +35974,21 @@ window.BFAuth2 = (function() {
 
   // ─── Persistência ─────────────────────────────────────────────────────
   function loadGuardioes() {
-    // Se app legado está disponível, usa sua variável em memória (fonte de verdade)
-    if (typeof window.GUARDIOES === 'object' && window.GUARDIOES !== null) {
-      return window.GUARDIOES;
-    }
-    try { return JSON.parse(localStorage.getItem(LS_KEYS.guardioes) || '{}'); }
-    catch { return {}; }
+    // SEMPRE lê do localStorage (fonte de verdade). Não confia em window.GUARDIOES
+    // que pode estar dessincronizada após reload (let GUARDIOES do app legado pode
+    // não estar exposta como window.GUARDIOES).
+    try {
+      const raw = localStorage.getItem(LS_KEYS.guardioes);
+      const parsed = raw ? JSON.parse(raw) : {};
+      // Sincroniza window.GUARDIOES também, pra benefício do app legado
+      try {
+        if (typeof window.GUARDIOES === 'object' && window.GUARDIOES !== null) {
+          Object.keys(window.GUARDIOES).forEach(k => delete window.GUARDIOES[k]);
+          Object.assign(window.GUARDIOES, parsed);
+        }
+      } catch (_) {}
+      return parsed;
+    } catch { return {}; }
   }
   function saveGuardioes(obj) {
     // Sincroniza memória do app legado
@@ -36217,15 +36235,47 @@ window.BFAuth2 = (function() {
 
   // ─── Tela: FORGOT ─────────────────────────────────────────────────────
   function renderForgot() {
+    // Estado: 'request' = pedindo email, 'verify' = digitando código
+    const sub = state.forgot.codigoEnviado
+      ? 'Digite o código de 6 dígitos que enviamos para:<br><strong style="color:var(--bfa-blue-bright)">' + esc(state.forgot.email) + '</strong>'
+      : 'Enviaremos um código de 6 dígitos por e-mail';
+
+    if (state.forgot.codigoEnviado) {
+      // ETAPA 2: digitar código + nova senha em uma tela só (premium UX)
+      return ''
+        + '<div class="bf-auth-step-title">CÓDIGO DE VERIFICAÇÃO</div>'
+        + '<div class="bf-auth-step-sub">' + sub + '</div>'
+        + '<div class="bf-field">'
+        +   '<label class="bf-label">Código de 6 dígitos</label>'
+        +   '<input type="tel" id="bf-otp-code" class="bf-input" placeholder="000000" autocomplete="one-time-code" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" style="font-size:1.4rem;text-align:center;letter-spacing:0.5em;font-family:Orbitron,monospace">'
+        +   '<div class="bf-hint">Válido por 10 minutos. Verifique também a caixa de spam.</div>'
+        + '</div>'
+        + '<div class="bf-field">'
+        +   '<label class="bf-label">Nova senha</label>'
+        +   '<input type="password" id="bf-otp-senha" class="bf-input" placeholder="mínimo 8 caracteres" autocomplete="new-password" minlength="8">'
+        +   '<div class="bf-hint">Use 8+ caracteres, com letras E números</div>'
+        + '</div>'
+        + '<div class="bf-field">'
+        +   '<label class="bf-label">Confirmar nova senha</label>'
+        +   '<input type="password" id="bf-otp-senha2" class="bf-input" placeholder="digite novamente" autocomplete="new-password" minlength="8">'
+        + '</div>'
+        + '<div class="bf-error-inline" id="bf-error-inline"></div>'
+        + '<button class="bf-btn bf-btn-green" id="bf-otp-submit" onclick="BFAuth2._onVerifyOtp()">✓ VERIFICAR E REDEFINIR SENHA</button>'
+        + '<div class="bf-btns-row">'
+        +   '<button class="bf-btn-link" onclick="BFAuth2._reenviarOtp()">Reenviar código</button>'
+        +   '<button class="bf-btn-link" onclick="BFAuth2._go(\'forgot\')">Trocar e-mail</button>'
+        + '</div>';
+    }
+    // ETAPA 1: pedir email
     return ''
       + '<div class="bf-auth-step-title">RECUPERAR SENHA</div>'
-      + '<div class="bf-auth-step-sub">Enviaremos um link para redefinir sua senha</div>'
+      + '<div class="bf-auth-step-sub">' + sub + '</div>'
       + '<div class="bf-field">'
       +   '<label class="bf-label">E-mail da conta</label>'
       +   '<input type="email" id="bf-forgot-email" class="bf-input" placeholder="seu@email.com" autocomplete="email" inputmode="email" autocapitalize="off" spellcheck="false" value="' + esc(state.forgot.email) + '">'
       + '</div>'
       + '<div class="bf-error-inline" id="bf-error-inline"></div>'
-      + '<button class="bf-btn bf-btn-gold" id="bf-forgot-submit" onclick="BFAuth2._onForgot()">📧 Enviar link de redefinição</button>';
+      + '<button class="bf-btn bf-btn-gold" id="bf-forgot-submit" onclick="BFAuth2._onForgot()">📧 Enviar código por e-mail</button>';
   }
 
   // ─── Tela: RESET_PASSWORD (vindo do magic link) ───────────────────────
@@ -36263,22 +36313,41 @@ window.BFAuth2 = (function() {
 
   // ─── Handlers: Signin ─────────────────────────────────────────────────
   async function _onSignin() {
+    // DEBUG: log visível na tela enquanto está em produção
+    function _dbg(msg) {
+      try { console.log('[BFAuth2 SIGNIN]', msg); } catch(_){}
+      try {
+        let dbgEl = document.getElementById('bf-debug-signin');
+        if (!dbgEl) {
+          dbgEl = document.createElement('div');
+          dbgEl.id = 'bf-debug-signin';
+          dbgEl.style.cssText = 'position:fixed;bottom:8px;left:8px;right:8px;max-height:200px;overflow:auto;background:rgba(0,0,0,0.85);color:#7af;font:11px/1.4 monospace;padding:8px;z-index:99999;border-radius:6px;border:1px solid #4af';
+          document.body.appendChild(dbgEl);
+        }
+        const t = new Date().toISOString().substring(11, 23);
+        dbgEl.innerHTML += `<div>${t} ${msg}</div>`;
+        dbgEl.scrollTop = dbgEl.scrollHeight;
+      } catch(_){}
+    }
+
     const emailEl = $('bf-signin-email');
     const senhaEl = $('bf-signin-senha');
     const btn = $('bf-signin-submit');
-    if (!emailEl || !senhaEl) return;
+    if (!emailEl || !senhaEl) { _dbg('❌ inputs não encontrados'); return; }
 
     const email = emailEl.value.trim().toLowerCase();
     const senha = senhaEl.value;
     setError('');
+    _dbg(`▶ email="${email}" senha.length=${senha.length}`);
 
-    if (!emailValido(email)) { setError('⚠ E-mail inválido'); emailEl.focus(); return; }
-    if (!senha) { setError('⚠ Digite sua senha'); senhaEl.focus(); return; }
+    if (!emailValido(email)) { _dbg('❌ email inválido'); setError('⚠ E-mail inválido'); emailEl.focus(); return; }
+    if (!senha) { _dbg('❌ senha vazia'); setError('⚠ Digite sua senha'); senhaEl.focus(); return; }
 
     btn.disabled = true;
     btn.innerHTML = '<span class="bf-spinner"></span> VERIFICANDO';
 
     const match = findGuardiaoByEmail(email);
+    _dbg(`match=${match ? 'sim id=' + match.id.substring(0,15) : 'NÃO ACHOU'}`);
     if (!match) {
       btn.disabled = false;
       btn.textContent = 'ENTRAR';
@@ -36287,6 +36356,7 @@ window.BFAuth2 = (function() {
     }
 
     const g = match.guardiao;
+    _dbg(`guardião: hash=${g.senhaHash ? 'sim' : 'NÃO'} salt=${g.senhaSalt ? 'sim' : 'NÃO'}`);
     if (!g.senhaHash || !g.senhaSalt) {
       btn.disabled = false;
       btn.textContent = 'ENTRAR';
@@ -36295,7 +36365,11 @@ window.BFAuth2 = (function() {
     }
 
     try {
+      _dbg('calculando hash...');
       const hashDigitado = await sha256(senha + g.senhaSalt);
+      _dbg(`hash calc =${hashDigitado.substring(0, 16)}...`);
+      _dbg(`hash salvo=${g.senhaHash.substring(0, 16)}...`);
+      _dbg(`bate? ${hashDigitado === g.senhaHash ? '✅ SIM' : '❌ NÃO'}`);
       if (hashDigitado !== g.senhaHash) {
         btn.disabled = false;
         btn.textContent = 'ENTRAR';
@@ -36303,9 +36377,12 @@ window.BFAuth2 = (function() {
         senhaEl.focus(); senhaEl.select();
         return;
       }
+      _dbg('✅ chamando _finalizarLogin...');
       log('signin ok', match.id);
       _finalizarLogin(match.id, '🛸 Bem-vindo(a) de volta, ' + g.nome.split(' ')[0] + '!');
+      _dbg('✅ _finalizarLogin retornou');
     } catch (e) {
+      _dbg('❌ EXCEPTION: ' + (e.message || e));
       err('signin hash', e);
       btn.disabled = false;
       btn.textContent = 'ENTRAR';
@@ -36495,7 +36572,10 @@ window.BFAuth2 = (function() {
     _finalizarLogin(id, '🛸 Bem-vindo(a), ' + nomeG + '! ' + nomeB + ' está pronto(a) para a jornada.');
   }
 
-  // ─── Handlers: Forgot ─────────────────────────────────────────────────
+  // ─── Handlers: Forgot (OTP 6 dígitos — Fase 2) ─────────────────────────
+  // Endpoint da Cloud Function — pode ser sobrescrito via window.BFAUTH2_OTP_ENDPOINT
+  // Caminho A (recomendado): Firebase Cloud Function própria com Resend
+  // Caminho B (fallback dev): simulação com prompt no console
   async function _onForgot() {
     const emailEl = $('bf-forgot-email');
     const btn = $('bf-forgot-submit');
@@ -36513,57 +36593,197 @@ window.BFAuth2 = (function() {
     btn.disabled = true;
     btn.innerHTML = '<span class="bf-spinner"></span> ENVIANDO';
 
-    // Salva pendente ANTES de enviar, com token próprio
-    const token = randomToken(24);
-    const pendente = {
-      guardiaoId: match.id,
-      email,
-      token,
-      enviadoEm: Date.now(),
-    };
-    try { localStorage.setItem(LS_KEYS.pendingReset, JSON.stringify(pendente)); } catch (_) {}
-
-    // Envia magic link (real ou simulado)
     try {
-      const qs = '?bf_reset=' + token;
-      if (window.BFAUTH2_USE_REAL_FIREBASE && typeof firebase !== 'undefined' && firebase.auth) {
-        const returnUrl = window.location.origin + window.location.pathname + qs;
-        await firebase.auth().sendSignInLinkToEmail(email, { url: returnUrl, handleCodeInApp: true });
-        log('reset link enviado via firebase para', email);
-      } else {
-        // MODO SIMULADO no standalone
-        log('SIMULADO: link de reset seria enviado para', email, '— query string:', qs);
-        log('Para simular o retorno, use o botão "Simular retorno de reset link" no painel DEBUG');
-        await new Promise(r => setTimeout(r, 600)); // delay pra UX simular
-      }
-
-      btn.disabled = false;
+      const result = await _enviarOtpReset(email, match.id);
+      if (!result.ok) throw new Error(result.error || 'falha ao enviar');
+      // Salvar estado pendente
       state.forgot.email = email;
-      _showMagicLinkSent(email);
+      state.forgot.codigoEnviado = true;
+      state.forgot.guardiaoId = match.id;
+      state.forgot.otpId = result.otpId || null;
+      state.forgot.tentativas = 0;
+      state.forgot.expiraEm = Date.now() + 10 * 60 * 1000; // 10 min
+      // Persistir pra sobreviver reload
+      try { localStorage.setItem(LS_KEYS.pendingReset, JSON.stringify({
+        email, guardiaoId: match.id, otpId: result.otpId,
+        expiraEm: state.forgot.expiraEm, modo: result.modo,
+      })); } catch (_) {}
+      log('OTP enviado, modo=', result.modo);
+      render();
     } catch (e) {
-      err('sendMagicLink', e);
+      err('enviarOtp', e);
       btn.disabled = false;
-      btn.innerHTML = '📧 Enviar link de redefinição';
-      setError('⚠ Não foi possível enviar o e-mail. Tente de novo.');
-      try { localStorage.removeItem(LS_KEYS.pendingReset); } catch (_) {}
+      btn.innerHTML = '📧 Enviar código por e-mail';
+      setError('⚠ Não foi possível enviar o código. Verifique sua conexão e tente novamente.');
     }
   }
 
-  function _showMagicLinkSent(email) {
-    const root = $('bf-auth-card-root');
-    if (!root) return;
-    const safe = esc(email);
-    const simulMsg = !window.BFAUTH2_USE_REAL_FIREBASE
-      ? '<div class="bf-alert warn" style="margin-top:10px">🧪 <strong>Modo simulado:</strong> nenhum e-mail real foi enviado. Abra o painel <strong>DEBUG</strong> e clique em <strong>"Simular retorno de reset link"</strong> para testar o próximo passo.</div>'
-      : '';
-    root.innerHTML = '<button class="bf-back" onclick="BFAuth2._go(\'welcome\')">← Voltar</button>'
-      + renderHeader()
-      + '<div class="bf-auth-step-title">LINK ENVIADO</div>'
-      + '<div class="bf-auth-step-sub">Verifique sua caixa de entrada</div>'
-      + '<div class="bf-alert ok">✉️ Enviamos um link para:<br><strong>' + safe + '</strong></div>'
-      + '<div class="bf-alert info">💡 <strong>Não chegou?</strong> Verifique spam/lixo eletrônico.<br>O link é válido por 1 hora.</div>'
-      + simulMsg
-      + '<button class="bf-btn bf-btn-ghost" onclick="BFAuth2._go(\'welcome\')">Voltar ao início</button>';
+  // Função interna que escolhe entre Cloud Function real ou simulação
+  async function _enviarOtpReset(email, guardiaoId) {
+    const endpoint = window.BFAUTH2_OTP_ENDPOINT;
+    if (endpoint && window.BFAUTH2_USE_REAL_FIREBASE !== false) {
+      // CAMINHO A: Cloud Function real
+      try {
+        const resp = await fetch(endpoint + '/enviarOtp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, locale: 'pt-BR' }),
+        });
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+        const data = await resp.json();
+        return { ok: true, otpId: data.otpId, modo: 'cloud_function' };
+      } catch (e) {
+        err('cloud function falhou', e);
+        // Fallback automático para modo dev abaixo
+      }
+    }
+    // CAMINHO B: simulação dev — gera código local, mostra no console + alert
+    const codigo = String(Math.floor(100000 + Math.random() * 900000));
+    // Hash do código pra comparar depois (não armazenar plaintext)
+    const salt = randomToken(8);
+    const hash = await sha256(codigo + salt);
+    const otpId = 'dev_' + Date.now();
+    // Armazena em sessionStorage (dev only)
+    try {
+      sessionStorage.setItem('bfauth2_otp_dev_' + otpId, JSON.stringify({
+        hash, salt, email, guardiaoId, expiraEm: Date.now() + 10*60*1000,
+      }));
+    } catch (_) {}
+    console.log('%c[BFAuth2 DEV MODE] Código OTP simulado: ' + codigo, 'background:#ffe066;color:#020b18;padding:8px 12px;font-size:14px;font-weight:bold;border-radius:4px');
+    setTimeout(() => {
+      alert('🧪 MODO DEV (sem Cloud Function configurada):\n\nO código que seria enviado por e-mail é:\n\n  ' + codigo + '\n\nDigite-o no campo "Código de verificação".\n\n(Em produção, este código chegaria por e-mail.)');
+    }, 200);
+    return { ok: true, otpId, modo: 'dev_simulado' };
+  }
+
+  async function _reenviarOtp() {
+    if (!state.forgot.email || !state.forgot.guardiaoId) {
+      _go('forgot');
+      return;
+    }
+    const email = state.forgot.email;
+    const guardiaoId = state.forgot.guardiaoId;
+    setError('');
+    showToast('📧 Reenviando código...');
+    try {
+      const result = await _enviarOtpReset(email, guardiaoId);
+      if (!result.ok) throw new Error('falha');
+      state.forgot.otpId = result.otpId || null;
+      state.forgot.tentativas = 0;
+      state.forgot.expiraEm = Date.now() + 10 * 60 * 1000;
+      try { localStorage.setItem(LS_KEYS.pendingReset, JSON.stringify({
+        email, guardiaoId, otpId: result.otpId,
+        expiraEm: state.forgot.expiraEm, modo: result.modo,
+      })); } catch (_) {}
+      showToast('✅ Código reenviado!');
+    } catch (e) {
+      setError('⚠ Erro ao reenviar. Tente novamente.');
+    }
+  }
+
+  async function _onVerifyOtp() {
+    const codigoEl = $('bf-otp-code');
+    const senhaEl = $('bf-otp-senha');
+    const senha2El = $('bf-otp-senha2');
+    const btn = $('bf-otp-submit');
+    if (!codigoEl || !senhaEl) return;
+
+    const codigo = (codigoEl.value || '').replace(/\D/g, '');
+    const senha = senhaEl.value;
+    const senha2 = senha2El.value;
+    setError('');
+
+    if (codigo.length !== 6) { setError('⚠ Digite os 6 dígitos do código'); codigoEl.focus(); return; }
+    if (!senhaValida(senha)) { setError('⚠ Senha: 8+ caracteres, com letras E números'); senhaEl.focus(); return; }
+    if (senha !== senha2) { setError('⚠ Senhas não conferem'); senha2El.focus(); return; }
+
+    // Limite de tentativas (lockout local — Cloud Function tem o seu)
+    state.forgot.tentativas = (state.forgot.tentativas || 0) + 1;
+    if (state.forgot.tentativas > 5) {
+      setError('⚠ Muitas tentativas. Solicite novo código.');
+      return;
+    }
+    if (Date.now() > (state.forgot.expiraEm || 0)) {
+      setError('⚠ Código expirado. Clique em "Reenviar código".');
+      return;
+    }
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="bf-spinner"></span> VERIFICANDO';
+
+    try {
+      const ok = await _verificarOtp(state.forgot.otpId, codigo, state.forgot.email);
+      if (!ok) {
+        btn.disabled = false;
+        btn.innerHTML = '✓ VERIFICAR E REDEFINIR SENHA';
+        setError('⚠ Código incorreto. Tente novamente. (' + state.forgot.tentativas + '/5)');
+        codigoEl.focus(); codigoEl.select();
+        return;
+      }
+
+      // Código OK → atualizar senha local
+      const guardioes = loadGuardioes();
+      const g = guardioes[state.forgot.guardiaoId];
+      if (!g) { setError('⚠ Conta não encontrada'); return; }
+      const salt = randomToken(16);
+      const hash = await sha256(senha + salt);
+      guardioes[state.forgot.guardiaoId].senhaHash = hash;
+      guardioes[state.forgot.guardiaoId].senhaSalt = salt;
+      guardioes[state.forgot.guardiaoId].senhaRedefinidaEm = new Date().toISOString();
+      saveGuardioes(guardioes);
+
+      // Limpar pendentes
+      try { localStorage.removeItem(LS_KEYS.pendingReset); } catch (_) {}
+      state.forgot = { email: '', codigoEnviado: false };
+
+      log('senha redefinida via OTP', state.forgot.guardiaoId);
+      _finalizarLogin(g === guardioes[state.forgot.guardiaoId] ? state.forgot.guardiaoId : Object.keys(guardioes).find(k => guardioes[k].email === state.forgot.email), '🔑 Nova senha salva! Entrando...');
+    } catch (e) {
+      err('verifyOtp', e);
+      btn.disabled = false;
+      btn.innerHTML = '✓ VERIFICAR E REDEFINIR SENHA';
+      setError('⚠ Erro ao verificar. Tente novamente.');
+    }
+  }
+
+  async function _verificarOtp(otpId, codigo, email) {
+    const endpoint = window.BFAUTH2_OTP_ENDPOINT;
+    if (endpoint && window.BFAUTH2_USE_REAL_FIREBASE !== false && otpId && !otpId.startsWith('dev_')) {
+      // CAMINHO A: validar via Cloud Function
+      try {
+        const resp = await fetch(endpoint + '/verificarOtp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ otpId, codigo, email }),
+        });
+        if (!resp.ok) return false;
+        const data = await resp.json();
+        return !!data.ok;
+      } catch (e) {
+        err('verificar OTP via cloud function', e);
+        return false;
+      }
+    }
+    // CAMINHO B: validação local (modo dev)
+    try {
+      const raw = sessionStorage.getItem('bfauth2_otp_dev_' + otpId);
+      if (!raw) return false;
+      const stored = JSON.parse(raw);
+      if (Date.now() > stored.expiraEm) {
+        sessionStorage.removeItem('bfauth2_otp_dev_' + otpId);
+        return false;
+      }
+      const hashTry = await sha256(codigo + stored.salt);
+      if (hashTry === stored.hash) {
+        // Sucesso: invalida o OTP
+        sessionStorage.removeItem('bfauth2_otp_dev_' + otpId);
+        return true;
+      }
+      return false;
+    } catch (e) {
+      err('verificar OTP dev', e);
+      return false;
+    }
   }
 
   // ─── Handlers: Reset Password ─────────────────────────────────────────
@@ -36667,6 +36887,10 @@ window.BFAuth2 = (function() {
     if (screen === 'signup' && state.screen !== 'signup') {
       state.signupStep = 'admin';
       state.signup.modoTeste = false;
+    }
+    if (screen === 'forgot') {
+      // Reset estado forgot ao reentrar (botão "Trocar e-mail")
+      state.forgot = { email: state.forgot.email || '', codigoEnviado: false, otpId: null, guardiaoId: null, tentativas: 0, expiraEm: 0 };
     }
     state.screen = screen;
     render();
@@ -36834,7 +37058,6 @@ window.BFAuth2 = (function() {
     if (/[?&]bf_reset=/.test(window.location.search)) {
       log('init → retorno de reset link detectado');
       _bootMagicLink();
-      // _bootMagicLink() altera state.screen e chama render()
       return;
     }
 
@@ -36846,29 +37069,19 @@ window.BFAuth2 = (function() {
     const temGuardioes = Object.keys(guardioes).length > 0;
 
     if (sessaoId && guardioes[sessaoId]) {
-      // Sessão válida → tenta auto-login direto (usa fazerLogin do app legado)
+      // Sessão válida → tenta auto-login direto via _finalizarLogin
+      // Importante: _finalizarLogin já cuida de Firebase + esconder telas + fazerLogin
+      // E se algo falhar, NÃO esconde a auth-v2 antes da hora.
       log('init → sessão ativa, tentando auto-login', sessaoId);
-      // Esconde a tela de auth-v2 e delega pro fluxo legado
-      const tela = $('tela-auth-v2');
-      if (tela) tela.style.display = 'none';
-      // Chama fazerLogin direto; se der erro, cai no fallback abaixo
-      if (typeof window.fazerLogin === 'function') {
-        try {
-          // Inicializa Firebase refs se função legada existe
-          if (typeof window.initFirebaseRefs === 'function') {
-            try { window.initFirebaseRefs(); } catch (_) {}
-          }
-          // Atualiza header do bebê
-          if (typeof window.atualizarHeaderBebe === 'function') {
-            try { window.atualizarHeaderBebe(); } catch (_) {}
-          }
-          window.fazerLogin(sessaoId);
-          return;
-        } catch (e) {
-          err('auto-login falhou', e);
-          // Mostra tela de volta e continua o fluxo
-          if (tela) tela.style.display = 'flex';
-        }
+      try {
+        const g = guardioes[sessaoId];
+        const nomeG = (g && g.nome) ? g.nome.split(' ')[0] : 'Guardião';
+        // Usa a mesma rota oficial — _finalizarLogin é robusto
+        _finalizarLogin(sessaoId, '🛸 Bem-vindo(a) de volta, ' + nomeG + '!');
+        return;
+      } catch (e) {
+        err('auto-login falhou — caindo em signin', e);
+        // Não esconde tela; continua para signin
       }
     }
 
@@ -36883,6 +37096,10 @@ window.BFAuth2 = (function() {
           break;
         }
       }
+      // GARANTIR que a tela está visível (caso algum código tenha escondido antes)
+      const tela = $('tela-auth-v2');
+      if (tela) tela.style.display = 'flex';
+      document.body.classList.add('bfauth2-active');
       render();
       return;
     }
@@ -36891,6 +37108,9 @@ window.BFAuth2 = (function() {
     log('init → zero guardiões, abrindo welcome');
     state.screen = 'welcome';
     state.signupStep = null;
+    const tela = $('tela-auth-v2');
+    if (tela) tela.style.display = 'flex';
+    document.body.classList.add('bfauth2-active');
     render();
   }
 
@@ -36905,6 +37125,7 @@ window.BFAuth2 = (function() {
     _onSignin, _onSignupAdmin, _onSignupBebe, _onSignupFinalizar,
     _onPinInput, _pinVoltar, _selectBebeGen, _selectEmoji,
     _onForgot, _onResetPassword,
+    _onVerifyOtp, _reenviarOtp,
     _startModoTeste,
     _debugRender, _reset_all, _simulate_reset_link,
   };
