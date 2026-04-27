@@ -633,7 +633,8 @@ textarea{resize:none;min-height:80px;}
 .foto-preview-circle img{width:100%;height:100%;object-fit:cover;}
 .foto-upload-btn{background:rgba(0,60,130,0.4);border:1px solid rgba(0,180,255,0.3);color:var(--blue-neon);padding:8px 18px;border-radius:20px;font-size:0.72rem;font-family:'Orbitron',monospace;cursor:pointer;letter-spacing:0.06em;transition:all 0.2s;}
 .foto-remove-btn{background:transparent;border:none;color:rgba(255,100,100,0.6);font-size:0.72rem;cursor:pointer;padding:4px;}
-#tela-login{position:fixed;inset:0;z-index:9000;display:flex;align-items:center;justify-content:center;background:var(--blue-deep);padding:20px;}
+#tela-login{position:fixed;inset:0;z-index:9000;display:flex;align-items:flex-start;justify-content:center;background:var(--blue-deep);padding:20px;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+@media (min-height:780px){#tela-login{align-items:center;}}
 .login-box{width:100%;max-width:320px;text-align:center;}
 .login-box.wide{max-width:420px;}
 .login-wordmark{font-family:'Orbitron',monospace;font-size:1.8rem;font-weight:900;letter-spacing:0.04em;color:var(--white);text-shadow:0 0 20px var(--blue-glow);margin-bottom:4px;}
@@ -660,7 +661,8 @@ textarea{resize:none;min-height:80px;}
 .lembrar-label{font-family:'Orbitron',monospace;font-size:0.58rem;color:var(--text-dim);letter-spacing:0.07em;}
 .btn-faceid{width:100%;padding:14px;background:linear-gradient(135deg,rgba(0,60,120,0.5),rgba(0,30,70,0.6));border:1px solid rgba(0,180,255,0.4);border-radius:12px;color:var(--white);font-family:'Orbitron',monospace;font-size:0.72rem;letter-spacing:0.08em;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:all 0.2s;margin-bottom:10px;}
 .btn-faceid .faceid-icon{font-size:1.4rem;filter:drop-shadow(0 0 6px var(--blue-neon));}
-.emoji-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;max-width:300px;margin:0 auto;max-height:280px;overflow-y:auto;padding:4px;scrollbar-width:thin;scrollbar-color:rgba(0,180,255,0.4) transparent;}
+.emoji-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;max-width:300px;margin:0 auto;max-height:180px;overflow-y:auto;padding:4px;scrollbar-width:thin;scrollbar-color:rgba(0,180,255,0.4) transparent;}
+@media (min-height:780px){.emoji-grid{max-height:280px;}}
 .emoji-grid::-webkit-scrollbar{width:6px;}
 .emoji-grid::-webkit-scrollbar-thumb{background:rgba(0,180,255,0.4);border-radius:3px;}
 .emoji-btn{font-size:1.4rem;padding:6px;border-radius:8px;border:2px solid transparent;background:rgba(0,20,50,0.6);cursor:pointer;transition:all 0.15s;text-align:center;line-height:1;-webkit-tap-highlight-color:transparent;min-width:40px;min-height:40px;}
@@ -36313,41 +36315,22 @@ window.BFAuth2 = (function() {
 
   // ─── Handlers: Signin ─────────────────────────────────────────────────
   async function _onSignin() {
-    // DEBUG: log visível na tela enquanto está em produção
-    function _dbg(msg) {
-      try { console.log('[BFAuth2 SIGNIN]', msg); } catch(_){}
-      try {
-        let dbgEl = document.getElementById('bf-debug-signin');
-        if (!dbgEl) {
-          dbgEl = document.createElement('div');
-          dbgEl.id = 'bf-debug-signin';
-          dbgEl.style.cssText = 'position:fixed;bottom:8px;left:8px;right:8px;max-height:200px;overflow:auto;background:rgba(0,0,0,0.85);color:#7af;font:11px/1.4 monospace;padding:8px;z-index:99999;border-radius:6px;border:1px solid #4af';
-          document.body.appendChild(dbgEl);
-        }
-        const t = new Date().toISOString().substring(11, 23);
-        dbgEl.innerHTML += `<div>${t} ${msg}</div>`;
-        dbgEl.scrollTop = dbgEl.scrollHeight;
-      } catch(_){}
-    }
-
     const emailEl = $('bf-signin-email');
     const senhaEl = $('bf-signin-senha');
     const btn = $('bf-signin-submit');
-    if (!emailEl || !senhaEl) { _dbg('❌ inputs não encontrados'); return; }
+    if (!emailEl || !senhaEl) return;
 
     const email = emailEl.value.trim().toLowerCase();
     const senha = senhaEl.value;
     setError('');
-    _dbg(`▶ email="${email}" senha.length=${senha.length}`);
 
-    if (!emailValido(email)) { _dbg('❌ email inválido'); setError('⚠ E-mail inválido'); emailEl.focus(); return; }
-    if (!senha) { _dbg('❌ senha vazia'); setError('⚠ Digite sua senha'); senhaEl.focus(); return; }
+    if (!emailValido(email)) { setError('⚠ E-mail inválido'); emailEl.focus(); return; }
+    if (!senha) { setError('⚠ Digite sua senha'); senhaEl.focus(); return; }
 
     btn.disabled = true;
     btn.innerHTML = '<span class="bf-spinner"></span> VERIFICANDO';
 
     const match = findGuardiaoByEmail(email);
-    _dbg(`match=${match ? 'sim id=' + match.id.substring(0,15) : 'NÃO ACHOU'}`);
     if (!match) {
       btn.disabled = false;
       btn.textContent = 'ENTRAR';
@@ -36356,7 +36339,6 @@ window.BFAuth2 = (function() {
     }
 
     const g = match.guardiao;
-    _dbg(`guardião: hash=${g.senhaHash ? 'sim' : 'NÃO'} salt=${g.senhaSalt ? 'sim' : 'NÃO'}`);
     if (!g.senhaHash || !g.senhaSalt) {
       btn.disabled = false;
       btn.textContent = 'ENTRAR';
@@ -36365,11 +36347,7 @@ window.BFAuth2 = (function() {
     }
 
     try {
-      _dbg('calculando hash...');
       const hashDigitado = await sha256(senha + g.senhaSalt);
-      _dbg(`hash calc =${hashDigitado.substring(0, 16)}...`);
-      _dbg(`hash salvo=${g.senhaHash.substring(0, 16)}...`);
-      _dbg(`bate? ${hashDigitado === g.senhaHash ? '✅ SIM' : '❌ NÃO'}`);
       if (hashDigitado !== g.senhaHash) {
         btn.disabled = false;
         btn.textContent = 'ENTRAR';
@@ -36377,12 +36355,9 @@ window.BFAuth2 = (function() {
         senhaEl.focus(); senhaEl.select();
         return;
       }
-      _dbg('✅ chamando _finalizarLogin...');
       log('signin ok', match.id);
       _finalizarLogin(match.id, '🛸 Bem-vindo(a) de volta, ' + g.nome.split(' ')[0] + '!');
-      _dbg('✅ _finalizarLogin retornou');
     } catch (e) {
-      _dbg('❌ EXCEPTION: ' + (e.message || e));
       err('signin hash', e);
       btn.disabled = false;
       btn.textContent = 'ENTRAR';
