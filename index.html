@@ -1120,12 +1120,12 @@ html.bf-tema-claro [style*="color: var(--white)"] { color: var(--white) !importa
       <button class="ob-btn ob-btn-secondary" onclick="obProximo(-1)" style="font-size:0.7rem;margin-top:8px">← Voltar</button>
     </div>
 
-    <!-- Step 2: Validação de email (refinado C1) -->
+    <!-- Step 2: Validação de email com OTP de 6 dígitos -->
     <div class="ob-step" id="ob-step-2-email">
       <div class="ob-icon-wrap">📧</div>
       <div class="ob-title">VERIFICAR E-MAIL</div>
       <div class="ob-sub" style="margin-bottom:14px">
-        Enviamos um link de verificação para:<br>
+        Enviamos um código de 6 dígitos para:<br>
         <strong style="color:var(--blue-neon)" id="ob-email-display">seu@email.com</strong>
       </div>
 
@@ -1133,9 +1133,15 @@ html.bf-tema-claro [style*="color: var(--white)"] { color: var(--white) !importa
       <div class="verify-status-bar waiting" id="ob-verify-status-bar" role="status" aria-live="polite">
         <span class="verify-spinner" aria-hidden="true"></span>
         <div style="flex:1">
-          <div style="color:var(--white);font-weight:600">Aguardando você clicar no link</div>
-          <div style="font-size:0.68rem;color:var(--text-dim);margin-top:2px">O app detecta automaticamente quando você volta</div>
+          <div style="color:var(--white);font-weight:600">Aguardando código</div>
+          <div style="font-size:0.68rem;color:var(--text-dim);margin-top:2px">Digite o código de 6 dígitos do e-mail</div>
         </div>
+      </div>
+
+      <!-- Input do código OTP -->
+      <div class="ob-field" style="margin-bottom:14px">
+        <label class="ob-label" for="ob-otp-input">CÓDIGO DE 6 DÍGITOS</label>
+        <input class="ob-input" type="text" id="ob-otp-input" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="000000" autocomplete="one-time-code" style="text-align:center;letter-spacing:0.4em;font-size:1.4rem;font-family:'Orbitron',monospace">
       </div>
 
       <div style="background:rgba(250,199,117,0.08);border-left:3px solid var(--gold);padding:10px 12px;border-radius:8px;margin-bottom:14px;text-align:left;font-size:0.7rem;color:var(--text-dim);line-height:1.5">
@@ -1145,8 +1151,8 @@ html.bf-tema-claro [style*="color: var(--white)"] { color: var(--white) !importa
       <!-- Mantido por compatibilidade (ob-verify-status ainda é referenciado pelas funções antigas) -->
       <div class="ob-pin-status" id="ob-verify-status" style="display:none"></div>
 
-      <button class="ob-btn ob-btn-primary" id="ob-btn-verificar" onclick="obVerificarEmailClicado()">✓ Já verifiquei — continuar</button>
-      <button class="ob-btn ob-btn-secondary" id="ob-btn-reenviar" onclick="obReenviarCodigo()">🔄 Reenviar link<span class="countdown-timer" id="ob-reenviar-countdown"></span></button>
+      <button class="ob-btn ob-btn-primary" id="ob-btn-verificar" onclick="obVerificarEmailClicado()">✓ Verificar código</button>
+      <button class="ob-btn ob-btn-secondary" id="ob-btn-reenviar" onclick="obReenviarCodigo()">🔄 Reenviar código<span class="countdown-timer" id="ob-reenviar-countdown"></span></button>
       <button class="ob-btn ob-btn-secondary" onclick="obProximo(-2)" style="font-size:0.7rem;margin-top:8px">← Voltar e corrigir e-mail</button>
     </div>
 
@@ -3633,11 +3639,11 @@ window.abrirRecuperarSenha = function(guardiaoId) {
 
       ${temEmail ? `
         <div style="background:rgba(0,180,255,0.08);border-left:3px solid var(--blue-neon);padding:12px 14px;border-radius:8px;margin-bottom:16px;text-align:left;font-size:0.76rem;line-height:1.55">
-          📧 Enviaremos um link para:<br>
+          📧 Enviaremos um código de 6 dígitos para:<br>
           <strong style="color:var(--blue-neon)">${_rcEsc(emailMasked)}</strong><br>
-          <span style="color:var(--text-dim);font-size:0.7rem">Clique no link e defina uma nova senha.</span>
+          <span style="color:var(--text-dim);font-size:0.7rem">Digite o código e defina uma nova senha.</span>
         </div>
-        <button id="rs-btn-enviar" onclick="window._enviarMagicLinkRecuperarSenha('${guardiaoId}')" style="width:100%;padding:13px;background:linear-gradient(135deg,#00d4ff,#c77dff);border:none;border-radius:10px;color:#fff;font-family:'Orbitron',monospace;font-size:0.74rem;letter-spacing:0.08em;cursor:pointer;font-weight:700;margin-bottom:10px">📧 ENVIAR LINK POR E-MAIL</button>
+        <button id="rs-btn-enviar" onclick="window._enviarMagicLinkRecuperarSenha('${guardiaoId}')" style="width:100%;padding:13px;background:linear-gradient(135deg,#00d4ff,#c77dff);border:none;border-radius:10px;color:#fff;font-family:'Orbitron',monospace;font-size:0.74rem;letter-spacing:0.08em;cursor:pointer;font-weight:700;margin-bottom:10px">📧 ENVIAR CÓDIGO POR E-MAIL</button>
       ` : `
         <div style="background:rgba(255,128,128,0.1);border:1px solid rgba(255,128,128,0.3);border-radius:8px;padding:12px;font-size:0.76rem;color:#ff8080;line-height:1.5;margin-bottom:14px;text-align:center">
           ⚠ Este guardião não tem e-mail cadastrado.<br>
@@ -3663,14 +3669,14 @@ window.abrirRecuperarSenha = function(guardiaoId) {
   if (typeof BFAudit !== 'undefined') BFAudit.log('recuperar_senha_aberto', { id: guardiaoId });
 };
 
-// Envia magic link para email do guardião (mesma infra de recuperação de PIN)
+// Envia OTP de 6 dígitos via Cloud Function (Resend) — substitui magic link Firebase.
 window._enviarMagicLinkRecuperarSenha = async function(guardiaoId) {
   const g = GUARDIOES[guardiaoId];
   if (!g || !g.email) return;
 
   const statusEl = document.getElementById('rs-status');
   const btnEl = document.getElementById('rs-btn-enviar');
-  if (statusEl) statusEl.innerHTML = '<span style="color:var(--blue-neon)">⏳ Enviando...</span>';
+  if (statusEl) statusEl.innerHTML = '<span style="color:var(--blue-neon)">⏳ Enviando código...</span>';
   if (btnEl) btnEl.disabled = true;
 
   // Rate limit: 3 tentativas/hora via BFRateLimit
@@ -3684,37 +3690,36 @@ window._enviarMagicLinkRecuperarSenha = async function(guardiaoId) {
     }
   }
 
-  // Gera token e grava estado pendente
-  const token = _gerarTokenRecuperacao();
-  const pendente = {
-    guardiaoId,
-    email: g.email,
-    token,
-    enviadoEm: Date.now(),
-  };
-  try { localStorage.setItem(RECUPERAR_SENHA_KEY, JSON.stringify(pendente)); } catch {}
-
-  // Envia magic link
+  // Envia OTP via Cloud Function /enviarOtp
   try {
-    if (typeof firebase === 'undefined' || !firebase.auth) {
-      throw new Error('Firebase indisponível — use recuperação offline');
-    }
-    if (typeof initFirebaseRefs === 'function') initFirebaseRefs();
-    const actionCodeSettings = BF_AUTH.buildActionCodeSettings('?recoverPassword=1');
-    await BF_AUTH.sendSignInLink(g.email, '?recoverPassword=1', 'recuperar_senha');
-    if (typeof BFRateLimit !== 'undefined' && BFRateLimit.registrarFalha) BFRateLimit.registrarFalha('recuperar_senha_' + guardiaoId);
-    if (typeof BFAudit !== 'undefined') BFAudit.log('recuperar_senha_link_enviado', { id: guardiaoId });
-    if (statusEl) statusEl.innerHTML = '<span style="color:#78ff99">✓ Link enviado! Confira seu e-mail.</span>';
+    const cfEndpoint = window.BFAUTH2_OTP_ENDPOINT;
+    if (!cfEndpoint) throw new Error('Cloud Function não configurada');
 
-    // Aguarda 2s e troca para estado de "aguardando"
-    setTimeout(() => {
-      if (statusEl) statusEl.innerHTML = '<span style="color:var(--blue-neon)">📧 Aguardando clique no link...</span>';
-    }, 2000);
+    const resp = await fetch(cfEndpoint + '/enviarOtp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: g.email, locale: 'pt-BR' }),
+    });
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const data = await resp.json();
+    if (!data.ok) throw new Error(data.error || 'falha ao enviar');
+
+    if (typeof BFRateLimit !== 'undefined' && BFRateLimit.registrarFalha) BFRateLimit.registrarFalha('recuperar_senha_' + guardiaoId);
+    if (typeof BFAudit !== 'undefined') BFAudit.log('recuperar_senha_otp_enviado', { id: guardiaoId });
+    if (statusEl) statusEl.innerHTML = '<span style="color:#78ff99">✓ Código enviado! Confira seu e-mail.</span>';
+
+    // Substitui modal por tela de digitar código + nova senha
+    const modalRec = document.getElementById('modal-recuperar-senha');
+    if (modalRec && typeof _mostrarTelaOtpResetSenha === 'function') {
+      setTimeout(() => {
+        _mostrarTelaOtpResetSenha(modalRec, g.email, guardiaoId, data.otpId);
+      }, 800);
+    }
   } catch (e) {
-    console.warn('[recuperar senha]', e);
+    console.warn('[recuperar senha OTP]', e);
     if (statusEl) statusEl.innerHTML = `<span style="color:#ff8080">✗ ${_rcEsc(e.message || 'Erro ao enviar')}</span>`;
     if (btnEl) btnEl.disabled = false;
-    if (typeof BFAudit !== 'undefined') BFAudit.log('recuperar_senha_falha', { erro: e.code || 'unknown' });
+    if (typeof BFAudit !== 'undefined') BFAudit.log('recuperar_senha_otp_falha', { erro: e.code || 'unknown' });
   }
 };
 
@@ -13297,11 +13302,12 @@ async function obEnviarCodigoVerificacao() {
     _obAtualizarVerifyStatusBar('sending', 'Enviando link para seu e-mail...', 'Aguarde alguns segundos');
   }
 
-  // 6. Enviar magic link via Firebase
+  // 6. Enviar OTP via Cloud Function (Resend) — substitui magic link Firebase
   try {
-    if (typeof firebase === 'undefined' || !firebase.auth) {
-      // Firebase não disponível — modo fallback: marca como "verificado" (dev mode)
-      console.warn('[obEnviar] Firebase indisponível — modo dev (sem verificação real)');
+    const cfEndpoint = window.BFAUTH2_OTP_ENDPOINT;
+    if (!cfEndpoint) {
+      // Sem Cloud Function configurada: modo dev permissivo
+      console.warn('[obEnviar] BFAUTH2_OTP_ENDPOINT não configurado — modo dev (sem verificação real)');
       if (statusEl) {
         statusEl.innerHTML = `<div style="color:#FAC775;line-height:1.5;padding:10px;background:rgba(250,199,117,0.1);border-radius:6px;text-align:left;font-size:0.7rem">
           ⚠️ <strong>Modo offline/dev:</strong> a verificação real por e-mail não está disponível aqui.<br>
@@ -13311,54 +13317,66 @@ async function obEnviarCodigoVerificacao() {
       return;
     }
 
-    if (typeof initFirebaseRefs === 'function') initFirebaseRefs();
+    // Chama Cloud Function /enviarOtp
+    const resp = await fetch(cfEndpoint + '/enviarOtp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, locale: 'pt-BR' }),
+    });
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const data = await resp.json();
+    if (!data.ok) throw new Error(data.error || 'falha ao enviar OTP');
 
-    const actionCodeSettings = BF_AUTH.buildActionCodeSettings('?verifyOnboarding=1');
-    await BF_AUTH.sendSignInLink(email, '?verifyOnboarding=1', 'onboarding_primeiro_envio');
-    if (typeof BFAudit !== 'undefined') BFAudit.log('ob_magic_link_enviado', { email: email.substring(0, 3) + '***' });
+    // Salva otpId em _obAdminDados pra usar na verificação
+    _obAdminDados.otpId = data.otpId;
+    _obAdminDados.otpExpiraEm = Date.now() + 10 * 60 * 1000; // 10 min
+    try { localStorage.setItem(OB_ADMIN_PENDING_KEY, JSON.stringify(_obAdminDados)); } catch {}
+
+    if (typeof BFAudit !== 'undefined') BFAudit.log('ob_otp_enviado', { email: email.substring(0, 3) + '***' });
 
     if (statusEl) {
       statusEl.innerHTML = `<div style="color:#78ff99;line-height:1.5;padding:10px;background:rgba(120,255,153,0.1);border-radius:6px;text-align:left;font-size:0.7rem">
-        ✓ <strong>Link enviado!</strong> Verifique sua caixa de entrada (e spam).
+        ✓ <strong>Código enviado!</strong> Verifique sua caixa de entrada (e spam).
       </div>`;
     }
-    // C1 — feedback visual de sucesso + polling + countdown
+    // Feedback visual de sucesso
     if (typeof _obAtualizarVerifyStatusBar === 'function') {
       _obAtualizarVerifyStatusBar('waiting',
-        'Link enviado! Aguardando você clicar no e-mail',
-        'O app detecta automaticamente quando você volta');
+        'Código enviado! Digite o código de 6 dígitos do e-mail',
+        'Confira sua caixa de entrada e spam');
     }
-    if (typeof _obIniciarPollingVerify === 'function') _obIniciarPollingVerify();
     if (typeof _obIniciarCountdownReenviar === 'function') _obIniciarCountdownReenviar(60);
     _obReenviarTimestamp = Date.now();
   } catch (e) {
-    console.warn('[obEnviar] Firebase falhou:', e);
+    console.warn('[obEnviar] Cloud Function falhou:', e);
     if (statusEl) {
       statusEl.innerHTML = `<div style="color:#FAC775;line-height:1.5;padding:10px;background:rgba(250,199,117,0.1);border-radius:6px;text-align:left;font-size:0.7rem">
-        ⚠️ <strong>Não foi possível enviar o e-mail real.</strong><br>
+        ⚠️ <strong>Não foi possível enviar o e-mail.</strong><br>
         Motivo: ${_rcEsc(e.message || 'conexão indisponível')}.<br>
         Clique em <strong>"Já verifiquei"</strong> para continuar (modo offline).
       </div>`;
     }
-    // C1 — status bar de erro (modo offline)
+    // Status bar de erro (modo offline)
     if (typeof _obAtualizarVerifyStatusBar === 'function') {
       _obAtualizarVerifyStatusBar('error',
         'Não foi possível enviar o e-mail real',
         'Modo offline ativado. Clique em "Já verifiquei" para continuar');
     }
-    if (typeof BFAudit !== 'undefined') BFAudit.log('ob_magic_link_falha', { erro: e.code || 'unknown' });
+    if (typeof BFAudit !== 'undefined') BFAudit.log('ob_otp_falha', { erro: e.code || 'unknown' });
   }
 }
 
 /**
- * Chamado quando usuário clica "✓ Já verifiquei — continuar".
- * Verifica se o link foi clicado (via Firebase) OU aceita em modo offline.
+ * Chamado quando usuário clica "✓ Verificar código".
+ * Lê o OTP digitado e chama a Cloud Function /verificarOtp.
  */
 async function obVerificarEmailClicado() {
   const statusEl = document.getElementById('ob-verify-status');
   const btn = document.getElementById('ob-btn-verificar');
+  const otpInput = document.getElementById('ob-otp-input');
+
   if (!_obAdminDados) {
-    // Tenta recuperar de localStorage (caso a página tenha sido recarregada após magic link)
+    // Tenta recuperar de localStorage (caso a página tenha sido recarregada)
     try {
       const raw = localStorage.getItem(OB_ADMIN_PENDING_KEY);
       if (raw) _obAdminDados = JSON.parse(raw);
@@ -13372,29 +13390,15 @@ async function obVerificarEmailClicado() {
     return;
   }
 
-  // UX: desabilita botão e indica que está verificando
-  if (btn) btn.disabled = true;
-  if (typeof _obAtualizarVerifyStatusBar === 'function') {
-    _obAtualizarVerifyStatusBar('sending', 'Verificando...', 'Aguarde');
-  }
-
-  // ═══ FIX: curto-circuito se já verificado anteriormente ═══
-  // Cenário típico: o handler do boot (verifyOnboarding=1) já chamou esta função
-  // automaticamente quando o link foi clicado, consumiu o oobCode e marcou
-  // emailVerificado=true. Se o usuário clica também no botão "Já verifiquei",
-  // a URL não tem mais o magic link e isSignInWithEmailLink retorna false,
-  // resultando em falso-negativo "E-mail ainda não verificado".
-  // Solução: se _obAdminDados.emailVerificado já é true, avança direto.
+  // Curto-circuito: se já verificado anteriormente, avança direto
   if (_obAdminDados.emailVerificado === true) {
     if (typeof _obAtualizarVerifyStatusBar === 'function') {
       _obAtualizarVerifyStatusBar('success',
         _obAdminDados.verificadoRealmente ? 'E-mail já verificado!' : 'Continuando (já confirmado)',
         'Avançando para o próximo passo...');
     }
-    // Parar polling e countdown
     if (_obPollingVerifyInterval) { clearInterval(_obPollingVerifyInterval); _obPollingVerifyInterval = null; }
     if (_obReenviarCountdownInterval) { clearInterval(_obReenviarCountdownInterval); _obReenviarCountdownInterval = null; }
-    // Avança para step 3
     setTimeout(() => {
       _obCurrentStep = 3;
       document.getElementById('ob-step-2-email').classList.remove('active');
@@ -13408,76 +13412,125 @@ async function obVerificarEmailClicado() {
     return;
   }
 
-  // Tentar validar via Firebase (se disponível)
-  let verificadoDeVerdade = false;
-  try {
-    if (typeof firebase !== 'undefined' && firebase.auth) {
-      const auth = firebase.auth();
-      // Se URL tem o link mágico, valida
-      if (auth.isSignInWithEmailLink && auth.isSignInWithEmailLink(window.location.href)) {
-        try {
-          await auth.signInWithEmailLink(_obAdminDados.email, window.location.href);
-          try { await auth.signOut(); } catch {}  // não mantemos sessão Firebase
-          verificadoDeVerdade = true;
-          // Limpar URL
-          try { window.history.replaceState({}, document.title, window.location.pathname); } catch {}
-        } catch (e) {
-          console.warn('[obVerificar] signInWithEmailLink falhou:', e);
-        }
-      }
-    }
-  } catch (e) {
-    console.warn('[obVerificar]', e);
-  }
+  // Ler código OTP digitado pelo usuário
+  const codigo = otpInput ? (otpInput.value || '').trim() : '';
+  const cfEndpoint = window.BFAUTH2_OTP_ENDPOINT;
+  const otpId = _obAdminDados.otpId;
 
-  // Se NÃO verificado de verdade, pergunta ao usuário se quer continuar em modo offline
-  if (!verificadoDeVerdade) {
-    // C1 — substituir confirm() feio por BFModal estético
-    const continuar = await (typeof BFModal !== 'undefined'
-      ? BFModal.confirm({
-          title: 'E-mail ainda não verificado',
-          icon: '⚠️',
-          variant: 'warn',
-          message: 'Não conseguimos confirmar que você clicou no link enviado.\n\n' +
-                   '• OK: continua sem verificação (modo offline — e-mail marcado como "não verificado")\n' +
-                   '• Cancelar: volta e você clica no link do e-mail primeiro',
-          okLabel: 'Continuar mesmo assim',
-          cancelLabel: 'Voltar e verificar',
-        })
-      : Promise.resolve(confirm('E-mail não foi verificado. Continuar mesmo assim?')));
+  // Se não tem otpId (modo offline/dev) OU não tem endpoint, aceita modo permissivo
+  const modoPermissivo = !otpId || !cfEndpoint;
 
-    if (!continuar) {
-      if (btn) btn.disabled = false;
+  if (!modoPermissivo) {
+    // Validação real via Cloud Function
+    if (!codigo || !/^\d{6}$/.test(codigo)) {
       if (typeof _obAtualizarVerifyStatusBar === 'function') {
-        _obAtualizarVerifyStatusBar('waiting',
-          'Aguardando você clicar no link do e-mail',
-          'Confira sua caixa de entrada e o spam');
+        _obAtualizarVerifyStatusBar('error',
+          'Digite o código de 6 dígitos',
+          'O código está no e-mail que enviamos');
       }
+      if (otpInput) otpInput.focus();
       return;
     }
+
+    // UX: desabilita botão e indica que está verificando
+    if (btn) btn.disabled = true;
+    if (typeof _obAtualizarVerifyStatusBar === 'function') {
+      _obAtualizarVerifyStatusBar('sending', 'Verificando código...', 'Aguarde');
+    }
+
+    let verificadoDeVerdade = false;
+    try {
+      const resp = await fetch(cfEndpoint + '/verificarOtp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ otpId, codigo, email: _obAdminDados.email }),
+      });
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      const data = await resp.json();
+      if (data.ok === true) {
+        verificadoDeVerdade = true;
+      } else {
+        // Código inválido
+        if (typeof _obAtualizarVerifyStatusBar === 'function') {
+          _obAtualizarVerifyStatusBar('error',
+            data.error || 'Código inválido ou expirado',
+            'Confira o código do e-mail ou peça um novo');
+        }
+        if (btn) btn.disabled = false;
+        if (otpInput) { otpInput.focus(); otpInput.select(); }
+        return;
+      }
+    } catch (e) {
+      console.warn('[obVerificar] Cloud Function falhou:', e);
+      // Cai para modo permissivo abaixo
+    }
+
+    if (verificadoDeVerdade) {
+      _obAdminDados.emailVerificado = true;
+      _obAdminDados.verificadoRealmente = true;
+      try { localStorage.setItem(OB_ADMIN_PENDING_KEY, JSON.stringify(_obAdminDados)); } catch {}
+      if (typeof BFAudit !== 'undefined') BFAudit.log('ob_email_verificado', { real: true });
+      if (typeof _obAtualizarVerifyStatusBar === 'function') {
+        _obAtualizarVerifyStatusBar('success',
+          'E-mail verificado com sucesso!',
+          'Avançando para o próximo passo...');
+      }
+      if (_obPollingVerifyInterval) { clearInterval(_obPollingVerifyInterval); _obPollingVerifyInterval = null; }
+      if (_obReenviarCountdownInterval) { clearInterval(_obReenviarCountdownInterval); _obReenviarCountdownInterval = null; }
+      setTimeout(() => {
+        _obCurrentStep = 3;
+        document.getElementById('ob-step-2-email').classList.remove('active');
+        document.getElementById('ob-step-3-bebe').classList.add('active');
+        obAtualizarDots(3);
+        const inp = document.getElementById('ob-nasc-bebe');
+        if (inp && !inp.value) inp.value = todayISO();
+        if (statusEl) statusEl.innerHTML = '';
+        if (btn) btn.disabled = false;
+      }, 1200);
+      return;
+    }
+    // Se chegou aqui sem verificadoDeVerdade nem return, cai pra modo permissivo
   }
 
-  // Marcar como verificado (de verdade OU em modo offline permissivo)
+  // MODO PERMISSIVO: Cloud Function indisponível ou não configurada
+  // Pergunta ao usuário se quer continuar em modo offline (sem verificação real)
+  if (btn) btn.disabled = true;
+  const continuar = await (typeof BFModal !== 'undefined'
+    ? BFModal.confirm({
+        title: 'Verificação indisponível',
+        icon: '⚠️',
+        variant: 'warn',
+        message: 'Não conseguimos validar o código no servidor agora.\n\n' +
+                 '• OK: continua sem verificação real (modo offline — e-mail marcado como "não verificado")\n' +
+                 '• Cancelar: tenta novamente',
+        okLabel: 'Continuar mesmo assim',
+        cancelLabel: 'Tentar de novo',
+      })
+    : Promise.resolve(confirm('Verificação indisponível. Continuar mesmo assim?')));
+
+  if (!continuar) {
+    if (btn) btn.disabled = false;
+    if (typeof _obAtualizarVerifyStatusBar === 'function') {
+      _obAtualizarVerifyStatusBar('waiting',
+        'Aguardando código do e-mail',
+        'Confira sua caixa de entrada e o spam');
+    }
+    return;
+  }
+
+  // Marcar como verificado em modo permissivo
   _obAdminDados.emailVerificado = true;
-  _obAdminDados.verificadoRealmente = verificadoDeVerdade;
+  _obAdminDados.verificadoRealmente = false;
   try { localStorage.setItem(OB_ADMIN_PENDING_KEY, JSON.stringify(_obAdminDados)); } catch {}
+  if (typeof BFAudit !== 'undefined') BFAudit.log('ob_email_verificado', { real: false });
 
-  if (typeof BFAudit !== 'undefined') {
-    BFAudit.log('ob_email_verificado', { real: verificadoDeVerdade });
-  }
-
-  // C1 — feedback de sucesso antes de avançar
   if (typeof _obAtualizarVerifyStatusBar === 'function') {
     _obAtualizarVerifyStatusBar('success',
-      verificadoDeVerdade ? 'E-mail verificado com sucesso!' : 'Continuando em modo offline',
+      'Continuando em modo offline',
       'Avançando para o próximo passo...');
   }
-
-  // Parar polling e countdown
   if (_obPollingVerifyInterval) { clearInterval(_obPollingVerifyInterval); _obPollingVerifyInterval = null; }
   if (_obReenviarCountdownInterval) { clearInterval(_obReenviarCountdownInterval); _obReenviarCountdownInterval = null; }
-
-  // Avançar para step 3 (bebê) após breve pausa (mostra sucesso)
   setTimeout(() => {
     _obCurrentStep = 3;
     document.getElementById('ob-step-2-email').classList.remove('active');
@@ -13518,21 +13571,34 @@ async function obReenviarCodigo() {
 
   // UX: mostra estado "enviando"
   if (typeof _obAtualizarVerifyStatusBar === 'function') {
-    _obAtualizarVerifyStatusBar('sending', 'Reenviando link...', 'Aguarde alguns segundos');
+    _obAtualizarVerifyStatusBar('sending', 'Reenviando código...', 'Aguarde alguns segundos');
   }
 
   try {
-    if (typeof firebase === 'undefined' || !firebase.auth) throw new Error('Firebase não disponível');
-    if (typeof initFirebaseRefs === 'function') initFirebaseRefs();
-    const actionCodeSettings = BF_AUTH.buildActionCodeSettings('?verifyOnboarding=1');
-    await BF_AUTH.sendSignInLink(_obAdminDados.email, '?verifyOnboarding=1', 'onboarding_reenvio');
+    const cfEndpoint = window.BFAUTH2_OTP_ENDPOINT;
+    if (!cfEndpoint) throw new Error('Cloud Function não configurada');
+
+    const resp = await fetch(cfEndpoint + '/enviarOtp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: _obAdminDados.email, locale: 'pt-BR' }),
+    });
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const data = await resp.json();
+    if (!data.ok) throw new Error(data.error || 'falha ao reenviar');
+
+    // Atualizar otpId (cada novo envio gera novo ID)
+    _obAdminDados.otpId = data.otpId;
+    _obAdminDados.otpExpiraEm = Date.now() + 10 * 60 * 1000;
+    try { localStorage.setItem(OB_ADMIN_PENDING_KEY, JSON.stringify(_obAdminDados)); } catch {}
+
     _obReenviarTimestamp = agora;
-    if (typeof BFAudit !== 'undefined') BFAudit.log('ob_magic_link_reenviado');
+    if (typeof BFAudit !== 'undefined') BFAudit.log('ob_otp_reenviado');
 
     // UX sucesso — volta para waiting + countdown
     if (typeof _obAtualizarVerifyStatusBar === 'function') {
       _obAtualizarVerifyStatusBar('success',
-        'Link reenviado com sucesso!',
+        'Código reenviado com sucesso!',
         'Confira seu e-mail (e o spam)');
     }
     if (typeof _obIniciarCountdownReenviar === 'function') _obIniciarCountdownReenviar(60);
@@ -13540,8 +13606,8 @@ async function obReenviarCodigo() {
     setTimeout(() => {
       if (typeof _obAtualizarVerifyStatusBar === 'function') {
         _obAtualizarVerifyStatusBar('waiting',
-          'Aguardando você clicar no link',
-          'O app detecta automaticamente quando você volta');
+          'Aguardando código do e-mail',
+          'Digite o código de 6 dígitos que enviamos');
       }
     }, 2500);
   } catch (e) {
@@ -13550,7 +13616,7 @@ async function obReenviarCodigo() {
         'Erro ao reenviar',
         String(e.message || 'falha de conexão').substring(0, 80));
     }
-    if (typeof BFAudit !== 'undefined') BFAudit.log('ob_magic_link_reenvio_falha', { erro: e.code || 'unknown' });
+    if (typeof BFAudit !== 'undefined') BFAudit.log('ob_otp_reenvio_falha', { erro: e.code || 'unknown' });
   }
 }
 
@@ -14006,7 +14072,7 @@ async function obBemVindoEntrar() {
     +   '<button id="modal-bv-entrar-submit" style="width:100%;padding:14px;border-radius:10px;border:none;background:linear-gradient(135deg,#c9a227,#ffe066);color:#020b18;font-family:\'Orbitron\',monospace;font-size:0.74rem;font-weight:700;letter-spacing:0.1em;cursor:pointer;box-shadow:0 0 20px rgba(255,224,102,0.28)">ENTRAR</button>'
     +   '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px;font-size:0.68rem">'
     +     '<a id="modal-bv-esqueci" href="#" style="color:#7ab3d4;text-decoration:underline;opacity:0.85">Esqueci minha senha</a>'
-    +     '<a id="modal-bv-magiclink" href="#" style="color:#7ab3d4;text-decoration:underline;opacity:0.85">Entrar por link no e-mail</a>'
+    +     '<a id="modal-bv-magiclink" href="#" style="display:none">Entrar por link no e-mail</a>'
     +   '</div>'
     +   '<div style="border-top:1px solid rgba(0,180,255,0.15);margin:18px 0 12px"></div>'
     +   '<button id="modal-bv-entrar-cancel" style="width:100%;padding:10px;border-radius:10px;border:1px solid rgba(0,180,255,0.2);background:transparent;color:#7ab3d4;font-family:\'Orbitron\',monospace;font-size:0.7rem;letter-spacing:0.08em;cursor:pointer">Cancelar</button>'
@@ -14127,9 +14193,8 @@ async function obBemVindoEntrar() {
   emailInput.onkeydown = (ev) => { if (ev.key === 'Enter') senhaInput.focus(); };
   senhaInput.onkeydown = (ev) => { if (ev.key === 'Enter') submitLogin(); };
 
-  // Link "Esqueci minha senha" — envia magic link de RESET REAL de senha
-  // Popula RECUPERAR_SENHA_KEY pra que o handler global existente (linha ~3611)
-  // abra _abrirModalNovaSenha automaticamente ao retornar do link.
+  // Link "Esqueci minha senha" — envia OTP de 6 dígitos via Cloud Function (Resend)
+  // Substitui o magic link Firebase por código OTP enviado por noreply@babyforce.com.br.
   linkEsqueci.onclick = async (ev) => {
     ev.preventDefault();
     const email = (emailInput.value || '').trim().toLowerCase();
@@ -14159,41 +14224,32 @@ async function obBemVindoEntrar() {
       return;
     }
 
-    // Gera token e salva estado pendente (formato usado pelo handler na linha ~3611)
-    let token = null;
-    try {
-      if (typeof _gerarTokenRecuperacao === 'function') {
-        token = _gerarTokenRecuperacao();
-      } else {
-        // Fallback: token aleatório manual
-        const bytes = new Uint8Array(24);
-        crypto.getRandomValues(bytes);
-        token = Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
-      }
-    } catch (e) { console.warn('[esqueci senha token]', e); token = String(Date.now()); }
+    // Envia OTP via Cloud Function /enviarOtp
+    const cfEndpoint = window.BFAUTH2_OTP_ENDPOINT;
+    if (!cfEndpoint) {
+      errEl.textContent = '⚠ Recuperação de senha indisponível neste momento. Tente novamente em instantes.';
+      console.warn('[esqueci senha] BFAUTH2_OTP_ENDPOINT não configurado');
+      return;
+    }
 
-    const pendente = {
-      guardiaoId,
-      email,
-      token,
-      enviadoEm: Date.now(),
-    };
-    const CHAVE = (typeof RECUPERAR_SENHA_KEY !== 'undefined') ? RECUPERAR_SENHA_KEY : 'babyforce_recuperar_senha_v1';
-    try { localStorage.setItem(CHAVE, JSON.stringify(pendente)); } catch (_) {}
-
-    // Envia magic link de reset
     try {
-      if (typeof BF_AUTH === 'undefined' || !BF_AUTH.sendSignInLink) throw new Error('BF_AUTH indisponível');
-      await BF_AUTH.sendSignInLink(email, '?recoverPassword=1', 'recuperar_senha_bemvindo');
+      errEl.innerHTML = '<span style="color:var(--blue-neon)">⏳ Enviando código de 6 dígitos para seu e-mail...</span>';
+      const resp = await fetch(cfEndpoint + '/enviarOtp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, locale: 'pt-BR' }),
+      });
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      const data = await resp.json();
+      if (!data.ok) throw new Error(data.error || 'falha ao enviar OTP');
       if (typeof BFAudit !== 'undefined' && BFAudit.log) {
-        try { BFAudit.log('bemvindo_recuperar_senha_enviado', { guardiaoId }); } catch (_) {}
+        try { BFAudit.log('bemvindo_otp_enviado', { guardiaoId }); } catch (_) {}
       }
-      _mostrarTelaMagicLinkEnviado(modal, email, 'redefinir senha');
+      // Abre tela de digitar OTP + nova senha (substitui modal)
+      _mostrarTelaOtpResetSenha(modal, email, guardiaoId, data.otpId);
     } catch (e) {
-      errEl.textContent = '⚠ Não foi possível enviar o link de redefinição. Tente novamente.';
-      console.warn('[esqueci senha]', e);
-      // Limpa o pendente pra não ficar lixo no localStorage
-      try { localStorage.removeItem(CHAVE); } catch (_) {}
+      errEl.textContent = '⚠ Não foi possível enviar o código. Verifique sua conexão e tente novamente.';
+      console.warn('[esqueci senha OTP]', e);
     }
   };
 
@@ -14239,6 +14295,159 @@ function _mostrarTelaMagicLinkEnviado(modal, email, tipo) {
     + '</div>';
   const btnOk = modal.querySelector('#modal-bv-ok');
   if (btnOk) btnOk.onclick = () => modal.remove();
+}
+
+// Helper: substitui modal por tela de digitar OTP de 6 dígitos + nova senha
+// Após sucesso, atualiza senha do guardião localmente e loga o usuário.
+function _mostrarTelaOtpResetSenha(modal, email, guardiaoId, otpId) {
+  const emailSafe = String(email).replace(/[<>&"]/g, '');
+  modal.innerHTML = ''
+    + '<div style="background:linear-gradient(135deg,#0a2a4a,#030f1f);border:1px solid rgba(255,224,102,0.4);border-radius:16px;padding:30px 22px;max-width:400px;width:100%;color:#e8f4fd;font-family:\'Exo 2\',sans-serif;margin:auto">'
+    +   '<div style="text-align:center;font-size:2.4rem;margin-bottom:8px">🔐</div>'
+    +   '<div style="text-align:center;font-family:\'Orbitron\',monospace;font-size:0.82rem;font-weight:700;letter-spacing:0.08em;color:#ffe066;margin-bottom:12px">REDEFINIR SENHA</div>'
+    +   '<div style="text-align:center;font-size:0.74rem;color:#7ab3d4;line-height:1.55;margin-bottom:18px">Enviamos um código de 6 dígitos para:<br><strong style="color:#00d4ff">' + emailSafe + '</strong></div>'
+
+    +   '<label style="font-family:\'Orbitron\',monospace;font-size:0.62rem;letter-spacing:0.1em;color:#7ab3d4;display:block;margin-bottom:6px">CÓDIGO DE 6 DÍGITOS</label>'
+    +   '<input id="modal-bv-otp" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="one-time-code" placeholder="000000" style="width:100%;padding:14px;background:rgba(0,30,60,0.5);border:1px solid rgba(255,224,102,0.3);border-radius:10px;color:#e8f4fd;font-size:1.4rem;font-family:\'Orbitron\',monospace;box-sizing:border-box;text-align:center;letter-spacing:0.5em;margin-bottom:14px">'
+
+    +   '<label style="font-family:\'Orbitron\',monospace;font-size:0.62rem;letter-spacing:0.1em;color:#7ab3d4;display:block;margin-bottom:6px">NOVA SENHA</label>'
+    +   '<input id="modal-bv-newpw" type="password" autocomplete="new-password" placeholder="mínimo 8 caracteres, letras + números" style="width:100%;padding:12px 14px;background:rgba(0,30,60,0.5);border:1px solid rgba(0,180,255,0.25);border-radius:10px;color:#e8f4fd;font-size:0.9rem;font-family:\'Exo 2\',sans-serif;box-sizing:border-box;margin-bottom:6px">'
+
+    +   '<div id="modal-bv-otp-error" role="alert" aria-live="polite" style="color:#ff8080;font-size:0.72rem;min-height:18px;margin-bottom:10px;line-height:1.4"></div>'
+
+    +   '<button id="modal-bv-otp-submit" style="width:100%;padding:14px;border-radius:10px;border:none;background:linear-gradient(135deg,#c9a227,#ffe066);color:#020b18;font-family:\'Orbitron\',monospace;font-size:0.74rem;font-weight:700;letter-spacing:0.1em;cursor:pointer;box-shadow:0 0 20px rgba(255,224,102,0.28)">REDEFINIR SENHA</button>'
+
+    +   '<div style="text-align:center;margin-top:12px;font-size:0.68rem">'
+    +     '<a id="modal-bv-otp-cancel" href="#" style="color:#7ab3d4;text-decoration:underline;opacity:0.85">Cancelar</a>'
+    +   '</div>'
+    +   '<div style="font-size:0.64rem;color:#7ab3d4;opacity:0.75;text-align:center;margin-top:14px;line-height:1.5">💡 Se não chegar em 1 min, confira <strong style="color:#ffe066">spam/lixo eletrônico</strong>.</div>'
+    + '</div>';
+
+  const inpOtp = modal.querySelector('#modal-bv-otp');
+  const inpPw = modal.querySelector('#modal-bv-newpw');
+  const errEl = modal.querySelector('#modal-bv-otp-error');
+  const btnSubmit = modal.querySelector('#modal-bv-otp-submit');
+  const btnCancel = modal.querySelector('#modal-bv-otp-cancel');
+
+  setTimeout(() => { try { inpOtp.focus(); } catch (_) {} }, 100);
+
+  // Filtro: só números no campo OTP
+  inpOtp.oninput = (ev) => {
+    const v = (ev.target.value || '').replace(/\D/g, '').slice(0, 6);
+    ev.target.value = v;
+  };
+
+  btnCancel.onclick = (ev) => { ev.preventDefault(); modal.remove(); };
+
+  const submit = async () => {
+    errEl.textContent = '';
+    const codigo = (inpOtp.value || '').trim();
+    const novaSenha = inpPw.value || '';
+
+    if (!/^\d{6}$/.test(codigo)) {
+      errEl.textContent = '⚠ Digite o código de 6 dígitos do e-mail';
+      try { inpOtp.focus(); } catch (_) {}
+      return;
+    }
+    if (novaSenha.length < 8) {
+      errEl.textContent = '⚠ Senha deve ter ao menos 8 caracteres';
+      try { inpPw.focus(); } catch (_) {}
+      return;
+    }
+    if (!/[a-zA-Z]/.test(novaSenha) || !/[0-9]/.test(novaSenha)) {
+      errEl.textContent = '⚠ Senha deve conter letras E números';
+      try { inpPw.focus(); } catch (_) {}
+      return;
+    }
+
+    btnSubmit.disabled = true;
+    btnSubmit.style.opacity = '0.6';
+    btnSubmit.textContent = 'VERIFICANDO...';
+
+    try {
+      const cfEndpoint = window.BFAUTH2_OTP_ENDPOINT;
+      if (!cfEndpoint) throw new Error('BFAUTH2_OTP_ENDPOINT não configurado');
+
+      // Verifica OTP via Cloud Function /verificarOtp
+      const resp = await fetch(cfEndpoint + '/verificarOtp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ otpId, codigo, email }),
+      });
+      if (!resp.ok) {
+        if (resp.status === 401 || resp.status === 403) {
+          errEl.textContent = '⚠ Código inválido ou expirado. Verifique e tente de novo.';
+        } else {
+          errEl.textContent = '⚠ Erro ao verificar código (HTTP ' + resp.status + ')';
+        }
+        btnSubmit.disabled = false;
+        btnSubmit.style.opacity = '1';
+        btnSubmit.textContent = 'REDEFINIR SENHA';
+        return;
+      }
+      const data = await resp.json();
+      if (!data.ok) {
+        errEl.textContent = '⚠ ' + (data.error || 'Código inválido. Tente de novo.');
+        btnSubmit.disabled = false;
+        btnSubmit.style.opacity = '1';
+        btnSubmit.textContent = 'REDEFINIR SENHA';
+        return;
+      }
+
+      // OTP OK — atualiza senha do guardião localmente
+      const g = (typeof GUARDIOES !== 'undefined' && GUARDIOES) ? GUARDIOES[guardiaoId] : null;
+      if (!g) {
+        errEl.textContent = '⚠ Guardião não encontrado neste dispositivo. Recarregue a página.';
+        return;
+      }
+
+      // Hash da nova senha com salt
+      const saltBytes = crypto.getRandomValues(new Uint8Array(16));
+      const newSalt = btoa(String.fromCharCode(...saltBytes));
+      let newHash = null;
+      if (typeof BFSec !== 'undefined' && BFSec.sha256) {
+        newHash = await BFSec.sha256(novaSenha + newSalt);
+      } else {
+        const data2 = new TextEncoder().encode(novaSenha + newSalt);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', data2);
+        newHash = Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+      }
+
+      g.senhaHash = newHash;
+      g.senhaSalt = newSalt;
+      g.precisaMigrarSenha = false;
+      try { if (typeof saveGuardioes === 'function') saveGuardioes(GUARDIOES); } catch (e) { console.warn('[reset senha save]', e); }
+
+      if (typeof BFAudit !== 'undefined' && BFAudit.log) {
+        try { BFAudit.log('senha_redefinida_via_otp', { guardiaoId }); } catch (_) {}
+      }
+
+      // Marca sessão e entra
+      try {
+        const chaveSessao = (typeof SESSION_KEY !== 'undefined') ? SESSION_KEY : 'babyforce_session_v1';
+        sessionStorage.setItem(chaveSessao, guardiaoId);
+      } catch (_) {}
+
+      modal.remove();
+      const nomeG = g.nome ? g.nome.split(' ')[0] : 'Guardião';
+      if (typeof showToast === 'function') {
+        showToast('🔐 Senha redefinida! Bem-vindo(a) de volta, ' + nomeG + '!');
+      }
+      if (typeof fazerLogin === 'function') {
+        fazerLogin(guardiaoId);
+      }
+    } catch (e) {
+      console.warn('[reset senha OTP]', e);
+      errEl.textContent = '⚠ Erro ao redefinir senha. Verifique sua conexão.';
+      btnSubmit.disabled = false;
+      btnSubmit.style.opacity = '1';
+      btnSubmit.textContent = 'REDEFINIR SENHA';
+    }
+  };
+
+  btnSubmit.onclick = submit;
+  inpOtp.onkeydown = (ev) => { if (ev.key === 'Enter') inpPw.focus(); };
+  inpPw.onkeydown = (ev) => { if (ev.key === 'Enter') submit(); };
 }
 
 
@@ -25550,12 +25759,12 @@ window.abrirRecuperacaoPin = function() {
           <div class="ng-field">
             <label class="ng-label">Digite o email cadastrado</label>
             <input type="email" id="recmail-email" class="ng-input" placeholder="seu@email.com" autocomplete="off" inputmode="email" spellcheck="false">
-            <div class="ng-hint">Por segurança, NÃO pré-preenchemos seu email. Digite o email que VOCÊ cadastrou como guardião. Enviaremos um link seguro para redefinir o PIN. Requer conexão com internet.</div>
+            <div class="ng-hint">Por segurança, NÃO pré-preenchemos seu email. Digite o email que VOCÊ cadastrou como guardião. Enviaremos um código de 6 dígitos para redefinir o PIN. Requer conexão com internet.</div>
           </div>
 
           <div id="recmail-status" style="font-size:0.72rem;text-align:center;min-height:18px;margin-bottom:10px"></div>
 
-          <button onclick="window._enviarMagicLinkRecuperacao()" aria-label="Enviar link por email" style="width:100%;padding:13px;background:linear-gradient(135deg,#00d4ff,#0066aa);border:none;border-radius:10px;color:#fff;font-family:'Orbitron',monospace;font-size:0.74rem;letter-spacing:0.08em;cursor:pointer;font-weight:700;margin-bottom:10px">📧 ENVIAR LINK POR EMAIL</button>
+          <button onclick="window._enviarMagicLinkRecuperacao()" aria-label="Enviar código por email" style="width:100%;padding:13px;background:linear-gradient(135deg,#00d4ff,#0066aa);border:none;border-radius:10px;color:#fff;font-family:'Orbitron',monospace;font-size:0.74rem;letter-spacing:0.08em;cursor:pointer;font-weight:700;margin-bottom:10px">📧 ENVIAR CÓDIGO POR EMAIL</button>
         </div>
       ` : `
         <div style="background:rgba(255,136,136,0.1);border:1px solid rgba(255,136,136,0.3);border-radius:8px;padding:12px;font-size:0.76rem;color:#ff8080;line-height:1.5;margin-bottom:16px">
@@ -25691,38 +25900,163 @@ window._enviarMagicLinkRecuperacao = async function() {
     const r = BFRateLimit.podeTemtarLogin('magic_link');
     if (!r.permitido) {
       const restante = Math.ceil(r.esperarMs / 1000);
-      statusEl.innerHTML = `<span style="color:#ff8080">🔒 Aguarde ${restante}s antes de solicitar novo link</span>`;
+      statusEl.innerHTML = `<span style="color:#ff8080">🔒 Aguarde ${restante}s antes de solicitar novo código</span>`;
       return;
     }
   }
 
-  statusEl.innerHTML = '<span style="color:var(--blue-neon)">⏳ Enviando link...</span>';
+  statusEl.innerHTML = '<span style="color:var(--blue-neon)">⏳ Enviando código de 6 dígitos...</span>';
 
   try {
-    if (typeof firebase === 'undefined' || !firebase.auth) {
-      throw new Error('Firebase não disponível. Use a recuperação OFFLINE.');
-    }
-    // Garante que o firebase foi inicializado
-    if (typeof initFirebaseRefs === 'function') initFirebaseRefs();
+    const cfEndpoint = window.BFAUTH2_OTP_ENDPOINT;
+    if (!cfEndpoint) throw new Error('Cloud Function não configurada. Use a recuperação OFFLINE.');
 
-    const actionCodeSettings = BF_AUTH.buildActionCodeSettings('?recoverPin=1');
-    await BF_AUTH.sendSignInLink(email, '?recoverPin=1', 'recover_pin');
-    // Salva email pendente para verificação quando usuário clica no link
+    const resp = await fetch(cfEndpoint + '/enviarOtp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, locale: 'pt-BR' }),
+    });
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const data = await resp.json();
+    if (!data.ok) throw new Error(data.error || 'falha ao enviar');
+
+    // Salva email e otpId pendentes pra próxima etapa
     try { localStorage.setItem(MAGIC_LINK_PENDING_KEY, email); } catch {}
-    if (typeof BFRateLimit !== 'undefined' && BFRateLimit.registrarFalha) BFRateLimit.registrarFalha('magic_link');
-    if (typeof BFAudit !== 'undefined') BFAudit.log('magic_link_enviado', { email: email.substring(0,3) + '***' });
+    try { localStorage.setItem('babyforce_pin_otp_pending_v1', JSON.stringify({
+      email, otpId: data.otpId, expiraEm: Date.now() + 10*60*1000,
+    })); } catch {}
 
-    statusEl.innerHTML = `<div style="color:#78ff99;line-height:1.5;padding:8px;background:rgba(120,255,153,0.1);border-radius:6px;text-align:left;font-size:0.7rem">
-      ✓ <strong>Link enviado!</strong><br>
-      Verifique seu email em <strong>${_rcEsc(email)}</strong>.<br>
-      O link expira em <strong>1 hora</strong> e só funciona neste dispositivo.
-    </div>`;
+    if (typeof BFRateLimit !== 'undefined' && BFRateLimit.registrarFalha) BFRateLimit.registrarFalha('magic_link');
+    if (typeof BFAudit !== 'undefined') BFAudit.log('pin_otp_enviado', { email: email.substring(0,3) + '***' });
+
+    // Substitui modal por tela de digitar código
+    const modalRec = document.getElementById('modal-recuperar-pin');
+    if (modalRec) {
+      setTimeout(() => {
+        _mostrarTelaOtpRecuperarPin(modalRec, email, data.otpId);
+      }, 600);
+    }
   } catch (e) {
-    console.warn('[magic link]', e);
+    console.warn('[OTP recuperar PIN]', e);
     statusEl.innerHTML = `<span style="color:#ff8080">✗ Erro: ${_rcEsc(e.message || 'falha ao enviar')}</span>`;
-    if (typeof BFAudit !== 'undefined') BFAudit.log('magic_link_falha', { erro: e.code || 'unknown' });
+    if (typeof BFAudit !== 'undefined') BFAudit.log('pin_otp_falha', { erro: e.code || 'unknown' });
   }
 };
+
+// Helper: substitui modal de recuperar-pin por tela de digitar código de 6 dígitos
+// Após sucesso, chama _abrirDefinicaoNovoPin() pra usuário definir novo PIN.
+function _mostrarTelaOtpRecuperarPin(modal, email, otpId) {
+  const emailSafe = String(email).replace(/[<>&"]/g, '');
+  modal.innerHTML = ''
+    + '<div style="background:linear-gradient(135deg,#0a1a3d,#1a0a3d);border:1px solid rgba(199,125,255,0.4);border-radius:14px;padding:24px;max-width:420px;width:100%;color:#fff;font-family:\'Exo 2\',sans-serif" onclick="event.stopPropagation()">'
+    +   '<div style="text-align:center;font-size:2.6rem;margin-bottom:8px">📧</div>'
+    +   '<div style="text-align:center;font-family:\'Orbitron\',monospace;font-size:0.82rem;color:var(--purple-neon);letter-spacing:0.08em;font-weight:700;margin-bottom:6px">CONFIRMAR IDENTIDADE</div>'
+    +   '<div style="font-size:0.74rem;color:var(--text-dim);line-height:1.5;margin-bottom:18px;text-align:center">Enviamos um código de 6 dígitos para:<br><strong style="color:var(--blue-neon)">' + emailSafe + '</strong></div>'
+
+    +   '<div class="ng-field">'
+    +     '<label class="ng-label">CÓDIGO DE 6 DÍGITOS</label>'
+    +     '<input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="6" id="recpin-otp" class="ng-input" placeholder="000000" autocomplete="one-time-code" style="text-align:center;letter-spacing:0.5em;font-size:1.4rem;font-family:\'Orbitron\',monospace">'
+    +   '</div>'
+
+    +   '<div id="recpin-otp-error" style="color:#ff8080;font-size:0.72rem;text-align:center;min-height:18px;margin-bottom:10px"></div>'
+
+    +   '<button id="recpin-otp-submit" style="width:100%;padding:13px;background:linear-gradient(135deg,#c77dff,#00d4ff);border:none;border-radius:10px;color:#fff;font-family:\'Orbitron\',monospace;font-size:0.74rem;letter-spacing:0.08em;cursor:pointer;font-weight:700;margin-bottom:10px">✓ VERIFICAR CÓDIGO</button>'
+
+    +   '<div style="background:rgba(250,199,117,0.08);border-left:3px solid var(--gold);padding:10px 12px;border-radius:6px;font-size:0.66rem;color:var(--text-dim);line-height:1.5;margin-bottom:14px">'
+    +     '💡 <strong style="color:var(--gold)">Dica:</strong> confira spam/lixo eletrônico se não receber em 1 minuto.'
+    +   '</div>'
+
+    +   '<button id="recpin-otp-cancel" style="width:100%;padding:11px;background:rgba(0,60,120,0.5);border:1px solid rgba(0,180,255,0.3);border-radius:8px;color:var(--blue-neon);font-family:\'Orbitron\',monospace;font-size:0.66rem;letter-spacing:0.06em;cursor:pointer">Cancelar</button>'
+    + '</div>';
+
+  const inpOtp = modal.querySelector('#recpin-otp');
+  const errEl = modal.querySelector('#recpin-otp-error');
+  const btnSubmit = modal.querySelector('#recpin-otp-submit');
+  const btnCancel = modal.querySelector('#recpin-otp-cancel');
+
+  setTimeout(() => { try { inpOtp.focus(); } catch (_) {} }, 100);
+
+  // Filtro: só números
+  inpOtp.oninput = (ev) => {
+    ev.target.value = (ev.target.value || '').replace(/\D/g, '').slice(0, 6);
+  };
+
+  btnCancel.onclick = () => modal.remove();
+
+  const submit = async () => {
+    errEl.textContent = '';
+    const codigo = (inpOtp.value || '').trim();
+    if (!/^\d{6}$/.test(codigo)) {
+      errEl.textContent = '⚠ Digite o código de 6 dígitos do e-mail';
+      try { inpOtp.focus(); } catch (_) {}
+      return;
+    }
+
+    btnSubmit.disabled = true;
+    btnSubmit.style.opacity = '0.6';
+    btnSubmit.textContent = 'VERIFICANDO...';
+
+    try {
+      const cfEndpoint = window.BFAUTH2_OTP_ENDPOINT;
+      const resp = await fetch(cfEndpoint + '/verificarOtp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ otpId, codigo, email }),
+      });
+      if (!resp.ok) {
+        if (resp.status === 401 || resp.status === 403) {
+          errEl.textContent = '⚠ Código inválido ou expirado.';
+        } else {
+          errEl.textContent = '⚠ Erro ' + resp.status;
+        }
+        btnSubmit.disabled = false;
+        btnSubmit.style.opacity = '1';
+        btnSubmit.textContent = '✓ VERIFICAR CÓDIGO';
+        return;
+      }
+      const data = await resp.json();
+      if (!data.ok) {
+        errEl.textContent = '⚠ ' + (data.error || 'Código inválido');
+        btnSubmit.disabled = false;
+        btnSubmit.style.opacity = '1';
+        btnSubmit.textContent = '✓ VERIFICAR CÓDIGO';
+        return;
+      }
+
+      // Limpa pendente
+      try { localStorage.removeItem('babyforce_pin_otp_pending_v1'); } catch (_) {}
+      try { localStorage.removeItem(MAGIC_LINK_PENDING_KEY); } catch (_) {}
+
+      if (typeof BFAudit !== 'undefined') BFAudit.log('pin_otp_validado');
+
+      // Fecha modal e abre tela de novo PIN
+      modal.remove();
+      if (typeof BFModal !== 'undefined') {
+        try {
+          await BFModal.alert({
+            title: 'E-mail confirmado!',
+            icon: '✓',
+            variant: 'success',
+            message: 'Sua identidade foi verificada.\n\nAgora defina seu novo PIN de 6 dígitos para acessar o app.',
+            okLabel: 'Definir PIN',
+          });
+        } catch (_) {}
+      }
+      setTimeout(() => {
+        if (typeof window._abrirDefinicaoNovoPin === 'function') window._abrirDefinicaoNovoPin();
+      }, 200);
+    } catch (e) {
+      console.warn('[OTP verificar PIN]', e);
+      errEl.textContent = '⚠ Erro ao validar. Tente novamente.';
+      btnSubmit.disabled = false;
+      btnSubmit.style.opacity = '1';
+      btnSubmit.textContent = '✓ VERIFICAR CÓDIGO';
+    }
+  };
+
+  btnSubmit.onclick = submit;
+  inpOtp.onkeydown = (ev) => { if (ev.key === 'Enter') submit(); };
+}
 
 // Verifica se a URL atual contém o link mágico → se sim, valida e abre tela de novo PIN
 window._verificarMagicLinkAtivo = async function() {
@@ -35909,6 +36243,18 @@ window.PremiumCompra = {
 //   • BFAuth2.start()     — abre fluxo welcome
 //   • BFAuth2.state       — read-only, inspeção
 // ═══════════════════════════════════════════════════════════════════════
+
+// ═══════════════════════════════════════════════════════════════════════
+// CONFIGURAÇÃO DE PRODUÇÃO — Cloud Function OTP (Resend)
+// ═══════════════════════════════════════════════════════════════════════
+// Endpoint da Cloud Function deployada em southamerica-east1
+// Projeto: padawan-arthur · Deploy: 2026-04-29
+// As funções enviarOtp e verificarOtp são chamadas com sufixo /enviarOtp e /verificarOtp
+//
+// Para desativar (modo dev sem backend): definir BFAUTH2_USE_REAL_FIREBASE = false
+// Nesse caso, OTP será simulado com prompt no console (apenas para debug local).
+window.BFAUTH2_OTP_ENDPOINT = 'https://southamerica-east1-padawan-arthur.cloudfunctions.net';
+window.BFAUTH2_USE_REAL_FIREBASE = true;
 
 window.BFAuth2 = (function() {
   'use strict';
