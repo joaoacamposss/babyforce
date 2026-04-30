@@ -91,9 +91,9 @@ body{background:#020b18;margin:0;}
 
   /* ─── Tela principal ─── */
   #tela-auth-v2 {
-    position:fixed;  /* fixed em vez de relative — garante isolamento */
+    position:fixed;
     inset:0;
-    z-index:99000;   /* acima do app legado */
+    z-index:99000;
     background:var(--bfa-bg-deep);
     color:var(--bfa-text);
     font-family:'Outfit', sans-serif;
@@ -101,10 +101,18 @@ body{background:#020b18;margin:0;}
     overflow-y:auto;
     overflow-x:hidden;
     display:flex; flex-direction:column;
-    align-items:center; justify-content:flex-start;
-    padding:24px 16px; gap:24px;
+    align-items:center;
+    /* v3 fix: justify-content:center + margin:auto competem; usar SÓ margin:auto no filho */
+    justify-content:flex-start;
+    padding:0 16px;
+    padding-top:max(24px, env(safe-area-inset-top));
+    padding-bottom:max(24px, env(safe-area-inset-bottom));
+    gap:0;
     -webkit-overflow-scrolling:touch;
   }
+  /* v3 fix: card ganha margem automática top+bottom — centraliza quando conteúdo cabe,
+     vira normal scroll quando ultrapassa altura. Funciona em iOS Safari sem flexbox quirks. */
+  #tela-auth-v2 > .bf-auth-card { margin:auto 0; }
   #tela-auth-v2::before {
     content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
     background:
@@ -1489,7 +1497,8 @@ html.bf-tema-claro [style*="color: var(--white)"] { color: var(--white) !importa
 
     <div style="height:1px;background:rgba(255,100,100,0.15);margin:6px 8px"></div>
 
-    <button onclick="sairSessao()" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:none;border:none;color:var(--text-dim);cursor:pointer;border-radius:8px;font-family:'Exo 2',sans-serif;font-size:0.88rem">↩ Trocar Guardião</button>
+    <button onclick="sairSessao()" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:none;border:none;color:var(--text-dim);cursor:pointer;border-radius:8px;font-family:'Exo 2',sans-serif;font-size:0.88rem">↩ Trocar guardião</button>
+    <button onclick="logoutCompleto()" style="width:calc(100% - 16px);margin:8px;display:flex;align-items:center;justify-content:center;gap:10px;padding:12px;background:rgba(255,100,100,0.08);border:1px solid rgba(255,100,100,0.35);color:#ff8080;cursor:pointer;border-radius:10px;font-family:'Orbitron',monospace;font-size:0.78rem;letter-spacing:0.06em;font-weight:600">🚪 SAIR DA CONTA</button>
   </div>
 </div>
 
@@ -4401,6 +4410,12 @@ window.abrirMinhaConta = function() {
           <label class="ng-label">E-mail ${verifiedBadge}</label>
           <input type="email" id="mc-email" class="ng-input" value="${_rcEsc(g.email || '')}" autocomplete="email" inputmode="email">
           <div style="font-size:0.6rem;color:var(--text-dim);margin-top:4px;line-height:1.4">Se alterar, precisará reverificar o e-mail.</div>
+          ${!g.verificadoRealmente && g.email ? `
+            <button type="button" onclick="window._mcReenviarVerificacaoEmail()" id="mc-reenviar-email-btn" style="margin-top:8px;width:100%;padding:9px 12px;background:linear-gradient(135deg,rgba(250,199,117,0.15),rgba(250,199,117,0.05));border:1px solid rgba(250,199,117,0.4);border-radius:8px;color:#FAC775;font-family:'Orbitron',monospace;font-size:0.65rem;letter-spacing:0.05em;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">
+              📧 Reenviar e-mail de verificação
+            </button>
+            <div id="mc-reenviar-email-msg" style="font-size:0.62rem;text-align:center;margin-top:6px;min-height:14px;line-height:1.4"></div>
+          ` : ''}
         </div>
 
         <div class="ng-field">
@@ -4520,6 +4535,104 @@ window._mcMostrarAba = function(aba) {
     if (pan) pan.style.display = ativo ? 'block' : 'none';
   });
   if (aba === 'atividade') window._mcRenderAtividade();
+};
+
+// Reenviar e-mail de verificação — usa Firebase Auth (sendEmailVerification) com fallback informativo.
+// Rate-limited via localStorage pra evitar spam (1x a cada 60s por sessão).
+window._mcReenviarVerificacaoEmail = async function() {
+  const btn = document.getElementById('mc-reenviar-email-btn');
+  const msg = document.getElementById('mc-reenviar-email-msg');
+  const setMsg = (txt, color) => { if (msg) { msg.textContent = txt; msg.style.color = color || 'var(--text-dim)'; } };
+  const setBtnDisabled = (dis, label) => {
+    if (!btn) return;
+    btn.disabled = dis;
+    btn.style.opacity = dis ? '0.5' : '1';
+    btn.style.cursor = dis ? 'wait' : 'pointer';
+    if (label) btn.innerHTML = label;
+  };
+
+  // Rate limit: 60s entre reenvios
+  const RATE_KEY = 'babyforce_email_reenvio_v1';
+  try {
+    const last = parseInt(localStorage.getItem(RATE_KEY) || '0', 10);
+    const elapsed = Date.now() - last;
+    if (elapsed < 60000) {
+      const segs = Math.ceil((60000 - elapsed) / 1000);
+      setMsg(`⏳ Aguarde ${segs}s para tentar novamente`, '#FAC775');
+      return;
+    }
+  } catch {}
+
+  const g = GUARDIOES[usuarioAtual];
+  if (!g || !g.email) {
+    setMsg('⚠ Conta sem e-mail cadastrado', '#ff8080');
+    return;
+  }
+
+  setBtnDisabled(true, '<span class="bf-spinner" style="width:12px;height:12px;border:2px solid rgba(250,199,117,0.3);border-top-color:#FAC775;border-radius:50%;animation:bfspin 0.8s linear infinite"></span> Enviando...');
+  setMsg('Enviando...', 'var(--text-dim)');
+
+  try {
+    let enviado = false;
+    let viaFirebase = false;
+
+    // Caminho 1: Firebase Auth — se o user está autenticado e Firebase carregou
+    if (typeof firebase !== 'undefined' && firebase.auth) {
+      const fbUser = firebase.auth().currentUser;
+      if (fbUser) {
+        try {
+          await fbUser.sendEmailVerification();
+          enviado = true;
+          viaFirebase = true;
+        } catch (fe) {
+          console.warn('[reenviar email] firebase falhou:', fe);
+          // Se erro de rate limit do Firebase ("too-many-requests"), aviso amigável
+          if (fe.code === 'auth/too-many-requests') {
+            setMsg('⏳ Muitas tentativas — tente em alguns minutos', '#FAC775');
+            setBtnDisabled(false, '📧 Reenviar e-mail de verificação');
+            return;
+          }
+        }
+      }
+    }
+
+    // Caminho 2: fallback — Cloud Function própria (OTP padrão BabyForce)
+    // A função padawan-arthur/enviarOtp também envia link de verificação se passar 'verificacao'
+    if (!enviado) {
+      try {
+        const url = 'https://southamerica-east1-padawan-arthur.cloudfunctions.net/enviarOtp';
+        const r = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: g.email, tipo: 'verificacao_email' })
+        });
+        if (r.ok) {
+          enviado = true;
+        } else {
+          const errBody = await r.text().catch(() => '');
+          console.warn('[reenviar email] cloud fn falhou:', r.status, errBody);
+        }
+      } catch (cfe) {
+        console.warn('[reenviar email] cloud fn fetch erro:', cfe);
+      }
+    }
+
+    if (enviado) {
+      try { localStorage.setItem(RATE_KEY, String(Date.now())); } catch {}
+      try { if (typeof BFAudit !== 'undefined' && BFAudit.log) BFAudit.log('email_reenvio', { via: viaFirebase ? 'firebase' : 'cloud_fn', email: g.email }); } catch {}
+      setMsg(`✓ E-mail enviado para ${g.email}. Verifique sua caixa de entrada (e o SPAM).`, '#78ff99');
+      setBtnDisabled(true, '✓ Enviado');
+      // Reabilita após 60s
+      setTimeout(() => setBtnDisabled(false, '📧 Reenviar e-mail de verificação'), 60000);
+    } else {
+      setMsg('⚠ Não foi possível enviar agora. Verifique sua conexão.', '#ff8080');
+      setBtnDisabled(false, '📧 Reenviar e-mail de verificação');
+    }
+  } catch (e) {
+    console.error('[_mcReenviarVerificacaoEmail]', e);
+    setMsg('❌ Erro inesperado: ' + (e.message || 'desconhecido'), '#ff8080');
+    setBtnDisabled(false, '📧 Reenviar e-mail de verificação');
+  }
 };
 
 // Trocar emblema (chama obRenderEmojiGrid reaproveitando)
@@ -10379,6 +10492,60 @@ function sairSessao(){
   document.getElementById('tela-login').style.display='flex';
   if(id&&lembrarData[id])setTimeout(()=>{_guardiaoPendente=id;mostrarTelaFaceIDAutomatico(id);},200);
 }
+
+// Logout COMPLETO — encerra sessão, limpa autoLogin, faz signOut Firebase, volta pra welcome BFAuth2
+// Diferente de sairSessao que volta pra tela de PIN/seleção do mesmo guardião.
+window.logoutCompleto = async function(){
+  if (!confirm('Sair da conta?\n\nVocê voltará para a tela inicial e precisará entrar de novo na próxima vez.')) return;
+  try {
+    // 1. Limpa estado em memória
+    const id = usuarioAtual;
+    usuarioAtual = null;
+    _pinAtual = '';
+    _guardiaoPendente = null;
+    if (_autoLockTimer) clearTimeout(_autoLockTimer);
+
+    // 2. Limpa sessão local
+    try { sessionStorage.removeItem(SESSION_KEY); } catch {}
+    try { localStorage.removeItem(AUTOLOGIN_KEY); } catch {}
+
+    // 3. Remove "lembrar dispositivo" desse guardião (forçando re-auth)
+    if (id && lembrarData && lembrarData[id]) {
+      delete lembrarData[id];
+      try { saveLembrar(lembrarData); } catch {}
+    }
+
+    // 4. Tenta signOut Firebase Auth (se conectado)
+    try {
+      if (typeof firebase !== 'undefined' && firebase.auth) {
+        await firebase.auth().signOut();
+      }
+    } catch (e) { console.warn('[logout] firebase signOut:', e); }
+
+    // 5. Audit log
+    try { if (typeof BFAudit !== 'undefined' && BFAudit.log) BFAudit.log('logout_completo', { ts: Date.now(), guardiaoId: id }); } catch {}
+
+    // 6. Esconde menus e modais abertos
+    try { if (typeof fecharMenuGuardiao === 'function') fecharMenuGuardiao(); } catch {}
+    document.querySelectorAll('[id^="modal-"]').forEach(el => { try { el.remove(); } catch {} });
+
+    // 7. Volta pra welcome screen do BFAuth2 (não tela-login)
+    document.getElementById('tela-login').style.display = 'none';
+    const auth = document.getElementById('tela-auth-v2');
+    if (auth) {
+      auth.style.display = 'flex';
+      document.body.classList.add('bfauth2-active');
+    }
+    if (typeof BFAuth2 !== 'undefined' && typeof BFAuth2.init === 'function') {
+      try { BFAuth2.init(); } catch (e) { console.warn('[logout] BFAuth2.init:', e); }
+    }
+
+    if (typeof showToast === 'function') showToast('🚪 Você saiu da conta');
+  } catch (e) {
+    console.error('[logoutCompleto]', e);
+    alert('Erro ao sair: ' + (e.message || 'desconhecido') + '. Recarregue a página.');
+  }
+};
 
 function atualizarBadge(){
   const g=GUARDIOES[usuarioAtual];if(!g)return;
